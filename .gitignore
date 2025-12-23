@@ -10,3 +10,4 @@ yarn-error.log*
 # Build
 dist/
 build/
+api-rest/arrancar-proyecto.bat
