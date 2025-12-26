@@ -2,6 +2,9 @@
 const bcrypt = require('bcrypt');
 const User = require('../models/user.js');
 
+// Importar servicios
+const jwt = require('../services/jwt.js');
+
 // Acciones de prueba
 const pruebaUser = (req, res) => {
   res.status(200).send({
@@ -71,9 +74,57 @@ const register = async(req, res) => {
   }
 }
 
+const login = async(req, res) => {
+  // Recoger parametros body
+  const params = req.body;
+
+  if(!params.email && !params.password) {
+    return res.status(400).json({
+      status: 'error',
+      message: 'Faltan datos por enviar'
+    });
+  }
+
+  // Buscar en la base de datos si existe
+  const user = await User.findOne({email: params.email});
+  
+  if(!user) {
+    return res.status(400).json({
+      status: 'error',
+      message: 'No se ha encontrado el usuario'
+    });
+  }
+    
+  // Comprobar su contraseña
+  const pwd = bcrypt.compareSync(params.password, user.password);
+
+  if(!pwd) {
+    return res.status(400).json({
+      status: 'error',
+      message: 'Contraseña incorrecta'
+    })
+  }
+
+  // Conseguir token
+  const token = jwt.createToken(user);
+
+  // Devolver datos del usuario
+  return res.status(200).json({
+    status: 'success',
+    message: 'Login correcto',
+    user: {
+      _id: user._id,
+      name: user.name,
+      nick: user.nick
+    },
+    token
+  })
+}
+
 
 // Exportar funciones
 module.exports = {
   pruebaUser,
-  register
+  register, 
+  login
 };
