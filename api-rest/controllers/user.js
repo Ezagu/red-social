@@ -1,11 +1,14 @@
 // Importar dependencias y modulos
 const bcrypt = require('bcrypt');
+const fs = require('fs');
+const path = require('path');
 
 // Importar modelos
 const User = require('../models/user.js');
 
 // Importar servicios
 const jwt = require('../services/jwt.js');
+const followService = require('../services/followService.js');
 
 // Acciones de prueba
 const pruebaUser = (req, res) => {
@@ -139,11 +142,16 @@ const profile = async(req, res) => {
       });
     }
 
+    // Info de seguimiento
+    const followInfo = await followService.followThisUser(req.user.id, id);
+
     // Devolver el resultado
     // TODO: Devolver informacion de follows
     return res.status(200).json({
       status: 'success',
-      user: userProfile
+      user: userProfile,
+      following: followInfo.following,
+      follower: followInfo.follower
     })
 
   } catch(err) {
@@ -168,6 +176,8 @@ const list = async(req, res) => {
       sort: '_id'
     });
 
+    const followUserIds = await followService.followUserIds(req.user.id);
+
     // Devolver resultado
     return res.status(200).json({
       status: 'success',
@@ -175,7 +185,9 @@ const list = async(req, res) => {
       users,
       itemsPerPage,
       totalUsers,
-      totalPages
+      totalPages,
+      user_following: followUserIds.following,
+      user_follow_me: followUserIds.followers
     });
   } catch(err){
     return res.status(500).json({
@@ -250,7 +262,7 @@ const update = async(req, res) => {
   
   // Buscar y actualizar
   try {
-    const userUpdated = await User.findByIdAndUpdate(userIdentity.id, userToUpdate, {new: true});
+    const userUpdated = await User.findByIdAndUpdate({_id: userIdentity.id}, userToUpdate, {new: true});
 
     if(userUpdated) {
       return res.status(200).json({
@@ -266,30 +278,70 @@ const update = async(req, res) => {
   }
 };
 
-const upload = (req, res) => {
+const upload = async(req, res) => {
   // Recoger el fichero de imagen y comprobar que existe
-  if(!file) {
-
+  if(!req.file) {
+    return res.status(404).send({
+      status: 'error',
+      message: 'Peticion no incluye la imagen'
+    })
   }
 
   // Conseguir nombre del archivo
+  const image = req.file.originalname;
 
   // Sacar la extensión del archivo
+  const imagesSplit = image.split("\.");
+  const extension = imagesSplit[1];
 
   // Comprobar extensión
+  if(extension != 'png' && extension != 'jpg' && extension != 'jpeg' && extension != 'gif') {
+    // Borrar archivo subido
+    const filePath = req.file.path;
+    const fileDeleted = fs.unlinkSync(filePath);
 
-  // Si no es correcta, borrar archivo
+    return res.status(400).json({
+      status: 'error',
+      message: 'Extensión del fichero invalida'
+    });
+  }
 
   // Si lo es, guardar imagen en base de datos
+  try{
+    const userUpdated = await User.findOneAndUpdate({_id: req.user.id}, {image: req.file.filename}, {new: true});
 
-  // Devolver respuesta
+    return res.status(200).json({
+      status: 'success',
+      user: userUpdated,
+      file: req.file
+    });
+  } catch(error) {
+    return res.status(400).json({
+      status: 'error',
+      message: 'Error en la subida de avatar'
+    })
+  }
+}
 
-  return res.status(200).send({
-    staus: 'success',
-    message: 'Subida de imagenes',
-    user: req.user,
-    file: req.file
-  });
+const avatar = async(req, res) => {
+  // Sacar el parametro de la url
+  const file = req.params.file;
+
+  // Montar el path real de la imagen
+  const filePath = './uploads/avatars/'+ file;
+
+  // Comprobar que existe
+  fs.stat(filePath, (error) => {
+    if(error) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'No existe la image'
+      })
+    }
+
+    // Devolver un file
+    return res.sendFile(path.resolve(filePath));
+  }); 
 }
 
 // Exportar funciones
@@ -300,5 +352,6 @@ module.exports = {
   profile,
   list,
   update,
-  upload
+  upload,
+  avatar
 };

@@ -7,7 +7,7 @@ const auth = require('../middlewares/auth.js');
 // Configuracion de subida
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, '../uploads/avatars');
+    cb(null, './uploads/avatars');
   },
   filename: (req, file, cb) => {
     cb(null, 'avatar-' + Date.now() + '-' + file.originalname);
@@ -25,6 +25,7 @@ router.get('/list', auth, userController.list);
 router.get('/list/:page', auth, userController.list);
 router.put('/update', auth, userController.update);
 router.post('/upload', [auth, uploads.single('file0')], userController.upload);
+router.get('/avatar/:file', auth, userController.avatar);
 
 
 // Exportar router
