@@ -23,7 +23,7 @@ router.get('/detail/:id', auth, publicationController.detail);
 router.delete('/remove/:id', auth, publicationController.remove);
 router.get('/user/:id{/:page}', auth, publicationController.user);
 router.post('/upload/:id', [auth, uploads.single('file0')], publicationController.upload);
-router.get('/media/:file', auth, publicationController.media);
+router.get('/media/:file', publicationController.media);
 router.get('/feed{/:page}', auth, publicationController.feed);
 
 
