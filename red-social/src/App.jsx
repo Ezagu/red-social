@@ -1,12 +1,11 @@
-import { useState } from 'react'
+import { Routing } from "./router/Routing.jsx";
 
 function App() {
-
   return (
-    <div className='layout'>
-      <h1>Proyecto red social react</h1>
+    <div className="layout">
+      <Routing />
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
