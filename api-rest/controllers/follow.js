@@ -106,6 +106,7 @@ const following = async (req, res) => {
       follows: follows.docs,
       total: follows.totalDocs,
       totalPages: follows.totalPages,
+      hasNextPage: follows.hasNextPage,
       user_following: followUserIds.following,
       user_follow_me: followUserIds.followers,
     });
@@ -153,6 +154,7 @@ const followers = async (req, res) => {
       follows: follows.docs,
       total: follows.totalDocs,
       totalPages: follows.totalPages,
+      hasNextPage: follows.hasNextPage,
       user_following: followUserIds.following,
       user_follow_me: followUserIds.followers,
     });

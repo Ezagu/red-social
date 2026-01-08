@@ -172,6 +172,7 @@ const list = async (req, res) => {
       docs: users,
       totalDocs: totalUsers,
       totalPages,
+      hasNextPage
     } = await User.paginate(
       {},
       {
@@ -192,6 +193,7 @@ const list = async (req, res) => {
       itemsPerPage,
       totalUsers,
       totalPages,
+      hasNextPage,
       user_following: followUserIds.following,
       user_follow_me: followUserIds.followers,
     });

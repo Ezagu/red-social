@@ -7,6 +7,10 @@ import { Register } from "../components/user/Register.jsx";
 import { Feed } from "../components/publication/Feed.jsx";
 import { AuthProvider } from "../context/AuthProvider.jsx";
 import { Logout } from "../components/user/Logout.jsx";
+import { People } from "../components/user/People.jsx";
+import { Config } from "../components/user/Config.jsx";
+import { Following } from '../components/follow/Following.jsx'
+import { Followers } from "../components/follow/Followers.jsx";
 
 export const Routing = () => {
   return (
@@ -24,6 +28,12 @@ export const Routing = () => {
             <Route index element={<Feed />}/>
             <Route path='feed' element={<Feed />}/>
             <Route path='logout' element={<Logout/>}/>
+            <Route path='gente' element={<People />}/>
+            <Route path='ajustes' element={<Config />}/>
+            <Route path='siguiendo/:userId' element={<Following />}/>
+            <Route path='seguidores/:userId' element={<Followers />}/>
+
+
           </Route>
 
           <Route path="*" element={
