@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { useForm } from '../../hooks/useForm.jsx';
 import { Global } from '../../helpers/Global.jsx';
+import useAuth from '../../hooks/useAuth.jsx';
 
 export const Login = () => {
 
   const { form, changed } = useForm({});
-  const [ logued, setLogued ] = useState({});
+  const [ alert, setAlert ] = useState(null);
+  
+  const {setAuth} = useAuth();
   
 
   const loginUser = async (e) => {
@@ -25,12 +28,15 @@ export const Login = () => {
 
     const data = await req.json();
 
-    setLogued({status: data.status, message: data.message});
-
     // Persistir los datos en el navegador
-    if(data.status = 'success') {
+    if(data.status === 'success') {
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
+
+      // Redirección
+      window.location.reload();
+    } else {
+      setAlert(data.message);
     }
   }
 
@@ -43,17 +49,9 @@ export const Login = () => {
       <div className="content__posts">
 
         {
-          logued.status === 'success' 
-          ? (<strong className="alert alert-success">
-              {logued.message}
-            </strong>)
-          : ''
-        }
-
-        {
-          logued.status === 'error' 
+          alert 
           ? (<strong className="alert alert-danger">
-              {logued.message}
+              {alert}
             </strong>)
           : ''
         }

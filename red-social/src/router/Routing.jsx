@@ -5,34 +5,39 @@ import { PrivateLayout } from "../components/layout/private/PrivateLayout.jsx";
 import { Login } from "../components/user/Login.jsx";
 import { Register } from "../components/user/Register.jsx";
 import { Feed } from "../components/publication/Feed.jsx";
+import { AuthProvider } from "../context/AuthProvider.jsx";
+import { Logout } from "../components/user/Logout.jsx";
 
 export const Routing = () => {
   return (
     <BrowserRouter>
-      <Routes>
+      <AuthProvider>
+        <Routes>
 
-        <Route path="/" element={<PublicLayout />}>
-          <Route index element={<Login />} />
-          <Route path="login" element={<Login />} />
-          <Route path="register" element={<Register />} />
-        </Route>
+          <Route path="/" element={<PublicLayout />}>
+            <Route index element={<Login />} />
+            <Route path="login" element={<Login />} />
+            <Route path="register" element={<Register />} />
+          </Route>
 
-        <Route path="/social" element={<PrivateLayout />}> 
-          <Route index element={<Feed />}/>
-          <Route path='feed' element={<Feed />}/>
-        </Route>
+          <Route path="/social" element={<PrivateLayout />}> 
+            <Route index element={<Feed />}/>
+            <Route path='feed' element={<Feed />}/>
+            <Route path='logout' element={<Logout/>}/>
+          </Route>
 
-        <Route path="*" element={
-          <>
-            <p>
-              <h1>Error 404</h1>
-              <Link to='/'>Volver al inicio</Link>
-            </p>
-          </>
-        }
-        />
+          <Route path="*" element={
+            <>
+              <p>
+                <h1>Error 404</h1>
+                <Link to='/'>Volver al inicio</Link>
+              </p>
+            </>
+          }
+          />
 
-      </Routes>
+        </Routes>
+      </AuthProvider>
     </BrowserRouter>
   );
 }

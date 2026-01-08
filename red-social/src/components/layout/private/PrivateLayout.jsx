@@ -1,21 +1,33 @@
 import React from 'react'
 import { Header } from './Header'
-import { Outlet } from 'react-router-dom'
+import { Navigate, Outlet } from 'react-router-dom'
 import { Sidebar } from './Sidebar'
+import useAuth from '../../../hooks/useAuth'
 
 export const PrivateLayout = () => {
-  return (
-    <>
-      {/*Cabecera*/}
-      <Header />
 
-      {/*Contenido principal*/}
-      <section className='layout__content'>
-        <Outlet />
-      </section>
+  const {auth, loading} = useAuth();
 
-      {/*Barra lateral*/}
-      <Sidebar />
-    </>
-  )
+  if(loading) {
+    return <h1>Cargando...</h1>
+  } else {
+    return (
+      <>
+        {/*Cabecera*/}
+        <Header />
+
+        {/*Contenido principal*/}
+        <section className='layout__content'>
+          {
+            auth._id 
+            ? <Outlet />
+            : <Navigate to='/login'/> 
+          }
+        </section>
+
+        {/*Barra lateral*/}
+        <Sidebar />
+      </>
+    )
+  }
 }
