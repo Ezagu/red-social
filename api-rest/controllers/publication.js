@@ -124,6 +124,7 @@ const user = async (req, res) => {
       status: "success",
       message: "Listado de publicaciones de un usuario",
       page,
+      hasNextPage: publications.hasNextPage,
       totalPublications: publications.totalDocs,
       totalPages: publications.totalPages,
       publications: publications.docs,
