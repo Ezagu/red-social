@@ -2,6 +2,7 @@ import React from "react";
 import avatar from "../../assets/img/user.png";
 import { Global } from "../../helpers/Global";
 import useAuth from "../../hooks/useAuth";
+import { Link } from "react-router-dom";
 
 export const UserList = ({ users, following, setFollowing, more, page, setPage, loading }) => {
   const { auth } = useAuth();
@@ -58,7 +59,7 @@ export const UserList = ({ users, following, setFollowing, more, page, setPage, 
             <article className="posts__post" key={user._id}>
               <div className="post__container">
                 <div className="post__image-user">
-                  <a href="#" className="post__image-link">
+                  <Link to={'/social/perfil/' + user._id} className="post__image-link">
                     <img
                       src={
                         user.image !== "default.png"
@@ -68,14 +69,14 @@ export const UserList = ({ users, following, setFollowing, more, page, setPage, 
                       className="post__user-image"
                       alt="Foto de perfil"
                     />
-                  </a>
+                  </Link>
                 </div>
 
                 <div className="post__body">
                   <div className="post__user-info">
-                    <a href="#" className="user-info__name">
+                    <Link to={'/social/perfil/' + user._id} className="user-info__name">
                       {user.name} {user.surname}
-                    </a>
+                    </Link>
                     <span className="user-info__divider"> | </span>
                     <a href="#" className="user-info__create-date">
                       {user.create_at}

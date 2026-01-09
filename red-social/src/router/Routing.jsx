@@ -11,6 +11,7 @@ import { People } from "../components/user/People.jsx";
 import { Config } from "../components/user/Config.jsx";
 import { Following } from '../components/follow/Following.jsx'
 import { Followers } from "../components/follow/Followers.jsx";
+import { Profile } from "../components/user/Profile.jsx";
 
 export const Routing = () => {
   return (
@@ -32,8 +33,7 @@ export const Routing = () => {
             <Route path='ajustes' element={<Config />}/>
             <Route path='siguiendo/:userId' element={<Following />}/>
             <Route path='seguidores/:userId' element={<Followers />}/>
-
-
+            <Route path='perfil/:userId' element={<Profile />}/>
           </Route>
 
           <Route path="*" element={
