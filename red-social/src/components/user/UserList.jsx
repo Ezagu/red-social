@@ -75,11 +75,11 @@ export const UserList = ({ users, following, setFollowing, more, page, setPage, 
                 <div className="post__body">
                   <div className="post__user-info">
                     <Link to={'/social/perfil/' + user._id} className="user-info__name">
-                      {user.name} {user.surname}
+                      {user.nick}
                     </Link>
                     <span className="user-info__divider"> | </span>
                     <a href="#" className="user-info__create-date">
-                      {user.create_at}
+                      {user.name} {user.surname}
                     </a>
                   </div>
 

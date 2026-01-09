@@ -110,8 +110,6 @@ export const Profile = () => {
 
     if (data.status !== "success") return;
 
-    console.log(data);
-
     if(newProfile) {
       setPublications(data.publications);
     } else {
@@ -197,6 +195,7 @@ export const Profile = () => {
         more={more}
         setMore={setMore}
         setPublications={setPublications}
+        getPublications={getPublications}
       />
       
       <br/>

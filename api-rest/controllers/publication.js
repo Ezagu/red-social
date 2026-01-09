@@ -251,6 +251,7 @@ const feed = async (req, res) => {
       totalPublications: publications.totalDocs,
       page,
       totalPages: publications.totalPages,
+      hasNextPage: publications.hasNextPage,
       publications: publications.docs,
     });
   } catch (error) {
