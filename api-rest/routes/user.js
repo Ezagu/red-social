@@ -3,6 +3,7 @@ const router = express.Router();
 const multer = require('multer');
 const userController = require('../controllers/user');
 const auth = require('../middlewares/auth.js');
+const userValidator = require('../validators/userValidator.js');
 
 // Configuracion de subida
 const storage = multer.diskStorage({
@@ -17,13 +18,12 @@ const storage = multer.diskStorage({
 const uploads = multer({storage});
 
 // Rutas
-router.get('/prueba-usuario', auth, userController.pruebaUser);
-router.post('/register', userController.register);
+router.post('/register', userValidator.register ,userController.register);
 router.post('/login', userController.login);
 router.get('/profile/:id', auth, userController.profile);
 router.get('/list', auth, userController.list);
 router.get('/list/:page', auth, userController.list);
-router.put('/update', auth, userController.update);
+router.put('/update', auth, userValidator.update, userController.update);
 router.post('/upload', [auth, uploads.single('file0')], userController.upload);
 router.get('/avatar/:file', userController.avatar);
 router.get('/counters{/:id}', auth, userController.counters);

@@ -2,6 +2,7 @@
 const bcrypt = require("bcrypt");
 const fs = require("fs");
 const path = require("path");
+const { validationResult } = require('express-validator');
 
 // Importar modelos
 const User = require("../models/user.js");
@@ -12,26 +13,14 @@ const Publication = require("../models/publication.js");
 const jwt = require("../services/jwt.js");
 const followService = require("../services/followService.js");
 
-// Acciones de prueba
-const pruebaUser = (req, res) => {
-  res.status(200).send({
-    message: "Mensaje enviado desde el controlador: controllers/user.js",
-    usuario: req.user,
-  });
-};
-
 // Registro de usuario
 const register = async (req, res) => {
+
+  // Recoger validacion de datos
+  const validation = validationResult(req);
+
   //Recoger datos de la peticion
   const params = req.body;
-
-  // Comprobar que me llegan bien (+validacion)
-  if (!params.name || !params.email || !params.password || !params.nick) {
-    return res.status(400).json({
-      message: "Faltan datos por enviar",
-      status: "error",
-    });
-  }
 
   // Control usuarios duplicados
   const duplicatedUsers = await User.find({
@@ -232,12 +221,8 @@ const update = async (req, res) => {
     conditions.push({ nick: userToUpdate.nick });
   }
 
-  let duplicatedUsers = [];
-
   if (conditions.length > 0) {
-    duplicatedUsers = await User.find({
-      $or: conditions,
-    });
+    const duplicatedUsers = await User.find({$or: conditions});
 
     let userIsset = false;
     duplicatedUsers.forEach((user) => {
@@ -249,7 +234,7 @@ const update = async (req, res) => {
     if (userIsset) {
       return res.status(400).json({
         status: "error",
-        message: "El email o nick ya está registrado",
+        message: "El nick ya está en uso",
       });
     }
   }
@@ -279,6 +264,7 @@ const update = async (req, res) => {
     if (userUpdated) {
       return res.status(200).json({
         status: "success",
+        message: 'Actualizado con éxito',
         userUpdated,
       });
     }
@@ -393,7 +379,6 @@ const counters = async (req, res) => {
 
 // Exportar funciones
 module.exports = {
-  pruebaUser,
   register,
   login,
   profile,

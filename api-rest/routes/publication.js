@@ -3,6 +3,7 @@ const router = express.Router();
 const multer = require('multer');
 const publicationController = require('../controllers/publication');
 const auth = require('../middlewares/auth.js');
+const publicationValidator = require('../validators/publicationValidator.js');
 
 // Configuracion de subida
 const storage = multer.diskStorage({
@@ -18,7 +19,7 @@ const uploads = multer({storage});
 
 // Rutas
 router.get('/prueba-publication', publicationController.pruebaPublication);
-router.post('/save', auth, publicationController.save);
+router.post('/save', auth, publicationValidator.save, publicationController.save);
 router.get('/detail/:id', auth, publicationController.detail);
 router.delete('/remove/:id', auth, publicationController.remove);
 router.get('/user/:id{/:page}', auth, publicationController.user);
