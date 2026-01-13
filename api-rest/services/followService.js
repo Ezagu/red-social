@@ -1,26 +1,47 @@
 const Follow = require('../models/follow.js');
 
-const followUserIds = async (identityUserId) => {
-  // Devuelve array con los ids de los usuarios que sigo y me siguen
-  try {
-    // Sacar info de seguimiento
-    const following = await Follow.find({'user': identityUserId}, 'followed -_id');
-    const followers = await Follow.find({'followed': identityUserId}, 'user -_id');
-
-    // Procesar array de identificadores
-    const followingClean = [];
-    following.forEach(follow => followingClean.push(follow.followed));
-
-    const followersClean = [];
-    followers.forEach(follow => followersClean.push(follow.user));
-
-    return {
-      following: followingClean,
-      followers: followersClean
-    }
-  } catch(error) {
-    return {};
+const followsIds = async (userId) => {
+  return {
+    following: await followingIds(userId),
+    followers: await followersIds(userId)
   }
+}
+
+const followersIds = async (userId) => {
+  try {
+    const followersObj = await Follow.find({'followed': userId}, 'user');
+
+    const followers = [];
+    followersObj.forEach(follow => followers.push(follow.user.toString()));
+
+    return followers;
+  } catch (err) {
+    return null;
+  }
+};
+
+const followingIds = async (userId) => {
+  try {
+    const followingObj = await Follow.find({'user': userId}, 'followed');
+
+    const following = [];
+    followingObj.forEach(follow => following.push(follow.followed.toString()));
+
+    return following;
+  } catch (err) {
+    return null;
+  }
+};
+
+const addFollowInfo = (users, followsIds) => {
+  return users.map((user) => {
+    const id = user._id.toString();
+    return {
+      ...user.toObject(),
+      isFollower: followsIds.followers.includes(id) ? true : false,
+      isFollowed: followsIds.following.includes(id) ? true : false,
+    };
+  });
 }
 
 const followThisUser = async (identityUserId, profileUserId) => {
@@ -39,6 +60,9 @@ const followThisUser = async (identityUserId, profileUserId) => {
 }
 
 module.exports = {
-  followUserIds,
-  followThisUser
+  followsIds,
+  followThisUser,
+  followersIds,
+  followingIds,
+  addFollowInfo
 }

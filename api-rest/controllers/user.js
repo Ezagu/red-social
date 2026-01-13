@@ -14,7 +14,6 @@ const followService = require("../services/followService.js");
 
 // Registro de usuario
 const register = async (req, res) => {
-
   //Recoger datos de la peticion
   const params = req.body;
 
@@ -69,7 +68,9 @@ const login = async (req, res) => {
   const params = req.body;
 
   // Buscar en la base de datos si existe
-  const user = await User.findOne({$or: [{ email: params.email }, {nick: params.email}]});
+  const user = await User.findOne({
+    $or: [{ email: params.email }, { nick: params.email }],
+  });
 
   if (!user) {
     return res.status(400).json({
@@ -99,7 +100,7 @@ const login = async (req, res) => {
       _id: user._id,
       name: user.name,
       nick: user.nick,
-      image: user.image
+      image: user.image,
     },
     token,
   });
@@ -141,45 +142,108 @@ const profile = async (req, res) => {
 
 const list = async (req, res) => {
   // Controlar en que pagina estamos
-  const page = parseInt(req.params.page) || 1;
-
-  const itemsPerPage = 5;
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 5;
 
   try {
+    const followsIds = await followService.followsIds(req.user.id);
+
     // Consulta con mongoose paginate
-    const {
-      docs: users,
-      totalDocs: totalUsers,
-      totalPages,
-      hasNextPage
-    } = await User.paginate(
-      {},
+    const result = await User.paginate(
+      {
+        _id: { $ne: req.user.id },
+      },
       {
         page,
-        limit: itemsPerPage,
+        limit,
         sort: "_id",
         select: "-password -role -email -__v",
       }
     );
 
-    const followUserIds = await followService.followUserIds(req.user.id);
+    // Agrega informacion de follows
+    const usersWithFollowInfo = followService.addFollowInfo(result.docs, followsIds);
 
     // Devolver resultado
     return res.status(200).json({
       status: "success",
       page,
-      users,
-      itemsPerPage,
-      totalUsers,
-      totalPages,
-      hasNextPage,
-      user_following: followUserIds.following,
-      user_follow_me: followUserIds.followers,
+      limit,
+      totalUsers: result.totalDocs,
+      totalPages: result.totalPages,
+      hasNextPage: result.hasNextPage,
+      users: usersWithFollowInfo,
     });
   } catch (err) {
     return res.status(500).json({
       status: "error",
-      message: "Error al buscar los usuarios en la base de datos",
+      message: "Usuarios no encontrados",
+    });
+  }
+};
+
+const listFollowers = async (req, res) => {
+  const userId = req.params.id || req.user.id;
+  const page = req.query.page || 1;
+  const limit = req.query.limit || 5;
+
+  try {
+    const followsIds = await followService.followsIds(userId);
+
+    const result = await User.paginate(
+      { _id: followsIds.followers },
+      { page, limit, select: "-password -role -email -__v" }
+    );
+
+    // Indica si el usuario te sigue y si lo sigues
+    const usersWithFollowInfo = followService.addFollowInfo(result.docs, followsIds);
+
+    return res.status(200).json({
+      status: "success",
+      page,
+      limit,
+      totalUsers: result.totalDocs,
+      totalPages: result.totalPages,
+      hasNextPage: result.hasNextPage,
+      users: usersWithFollowInfo,
+    });
+  } catch {
+    return res.status(400).json({
+      status: "error",
+      message: "Usuario no encontrado",
+    });
+  }
+};
+
+const listFollowing = async (req, res) => {
+  const userId = req.params.id || req.user.id;
+  const page = req.query.page || 1;
+  const limit = req.query.limit || 5;
+
+  try {
+    const followsIds = await followService.followsIds(userId);
+
+    const result = await User.paginate(
+      { _id: followsIds.following },
+      { page, limit, select: "-password -role -email -__v" }
+    );
+
+    // Indica si el usuario te sigue y si lo sigues
+    const usersWithFollowInfo = followService.addFollowInfo(result.docs, followsIds);
+
+    return res.status(200).json({
+      status: "success",
+      page,
+      limit,
+      totalUsers: result.totalDocs,
+      totalPages: result.totalPages,
+      hasNextPage: result.hasNextPage,
+      users: usersWithFollowInfo,
+    });
+  } catch {
+    return res.status(400).json({
+      status: "error",
+      message: "Usuario no encontrado",
     });
   }
 };
@@ -199,7 +263,7 @@ const update = async (req, res) => {
   }
 
   if (conditions.length > 0) {
-    const duplicatedUsers = await User.find({$or: conditions});
+    const duplicatedUsers = await User.find({ $or: conditions });
 
     let userIsset = false;
     duplicatedUsers.forEach((user) => {
@@ -235,14 +299,14 @@ const update = async (req, res) => {
     const userUpdated = await User.findByIdAndUpdate(
       { _id: userIdentity.id },
       userToUpdate,
-      { new: true, select: '-password -role -__v -email' }
+      { new: true, select: "-password -role -__v -email" }
     );
 
     if (userUpdated) {
       return res.status(200).json({
         status: "success",
-        message: 'Actualizado con éxito',
-        userUpdated
+        message: "Actualizado con éxito",
+        userUpdated,
       });
     }
   } catch (error) {
@@ -266,10 +330,10 @@ const upload = async (req, res) => {
   const image = req.file.originalname;
 
   // Sacar la extensión del archivo
-  const extension = image.split(".").pop().toLowerCase();;
+  const extension = image.split(".").pop().toLowerCase();
 
   // Comprobar extensión
-  if (!['png', 'jpg', 'jpeg', 'gif'].includes(extension)) {
+  if (!["png", "jpg", "jpeg", "gif"].includes(extension)) {
     // Borrar archivo subido
     fs.unlinkSync(req.file.path);
     return res.status(400).json({
@@ -280,18 +344,20 @@ const upload = async (req, res) => {
 
   // Si lo es, guardar imagen en base de datos
   try {
-    const user = await User.findById(req.user.id, 'image');
+    const user = await User.findById(req.user.id, "image");
 
     const userUpdated = await User.findOneAndUpdate(
       { _id: req.user.id },
       { image: req.file.filename },
-      { new: true, select: '-password -role -__v -email'}
+      { new: true, select: "-password -role -__v -email" }
     );
 
     // Eliminar fichero de avatar anterior si es que tiene
-    const prevAvatarPath = user.image !== 'default.png' && path.join('uploads', 'avatars', user.image);
+    const prevAvatarPath =
+      user.image !== "default.png" &&
+      path.join("uploads", "avatars", user.image);
 
-    if(prevAvatarPath && fs.existsSync(prevAvatarPath)) {
+    if (prevAvatarPath && fs.existsSync(prevAvatarPath)) {
       fs.unlinkSync(prevAvatarPath);
     }
 
@@ -309,12 +375,11 @@ const upload = async (req, res) => {
 };
 
 const avatar = async (req, res) => {
-
   // Montar el path real de la imagen
-  const filePath = path.join('uploads', 'avatars', req.params.file);
+  const filePath = path.join("uploads", "avatars", req.params.file);
 
   // Comprobar que existe
-  if(!fs.existsSync(filePath)) {
+  if (!fs.existsSync(filePath)) {
     return res.status(404).json({
       status: "error",
       message: "No existe la image",
@@ -354,8 +419,10 @@ module.exports = {
   login,
   profile,
   list,
+  listFollowers,
+  listFollowing,
   update,
   upload,
   avatar,
-  counters
+  counters,
 };
