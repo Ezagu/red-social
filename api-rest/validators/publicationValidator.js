@@ -6,6 +6,8 @@ const text = body('text')
   .notEmpty().withMessage('Ingresa un texto');
 
 exports.save = [
-  [text],
+  [
+    text
+  ],
   validateFields
 ];

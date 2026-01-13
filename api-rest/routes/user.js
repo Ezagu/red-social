@@ -18,11 +18,10 @@ const storage = multer.diskStorage({
 const uploads = multer({storage});
 
 // Rutas
-router.post('/register', userValidator.register ,userController.register);
-router.post('/login', userController.login);
+router.post('/register', userValidator.register, userController.register);
+router.post('/login', userValidator.login, userController.login);
 router.get('/profile/:id', auth, userController.profile);
-router.get('/list', auth, userController.list);
-router.get('/list/:page', auth, userController.list);
+router.get('/list{/:page}', auth, userController.list);
 router.put('/update', auth, userValidator.update, userController.update);
 router.post('/upload', [auth, uploads.single('file0')], userController.upload);
 router.get('/avatar/:file', userController.avatar);

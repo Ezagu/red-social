@@ -59,8 +59,8 @@ export const Login = () => {
         <form className='form-login' onSubmit={loginUser}>
 
           <div className='form-group'>
-            <label htmlFor='email'>Email</label>
-            <input type='email' name='email' onChange={changed}/>
+            <label htmlFor='email'>Email o Nick</label>
+            <input type='text' name='email' onChange={changed}/>
           </div>
 
           <div className='form-group'>

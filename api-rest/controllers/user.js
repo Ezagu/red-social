@@ -2,7 +2,6 @@
 const bcrypt = require("bcrypt");
 const fs = require("fs");
 const path = require("path");
-const { validationResult } = require('express-validator');
 
 // Importar modelos
 const User = require("../models/user.js");
@@ -15,9 +14,6 @@ const followService = require("../services/followService.js");
 
 // Registro de usuario
 const register = async (req, res) => {
-
-  // Recoger validacion de datos
-  const validation = validationResult(req);
 
   //Recoger datos de la peticion
   const params = req.body;
@@ -72,20 +68,13 @@ const login = async (req, res) => {
   // Recoger parametros body
   const params = req.body;
 
-  if (!params.email && !params.password) {
-    return res.status(400).json({
-      status: "error",
-      message: "Faltan datos por enviar",
-    });
-  }
-
   // Buscar en la base de datos si existe
-  const user = await User.findOne({ email: params.email });
+  const user = await User.findOne({$or: [{ email: params.email }, {nick: params.email}]});
 
   if (!user) {
     return res.status(400).json({
       status: "error",
-      message: "No se ha encontrado el usuario",
+      message: "Usuario incorrecto",
     });
   }
 
@@ -110,6 +99,7 @@ const login = async (req, res) => {
       _id: user._id,
       name: user.name,
       nick: user.nick,
+      image: user.image
     },
     token,
   });
@@ -121,7 +111,7 @@ const profile = async (req, res) => {
 
   // Consulta para sacar los datos del usuario
   try {
-    const userProfile = await User.findById(id, "-password -role");
+    const userProfile = await User.findById(id, "-password -role -email -__v");
 
     if (!userProfile) {
       return res.status(404).send({
@@ -199,19 +189,6 @@ const update = async (req, res) => {
   let userIdentity = req.user;
   const userToUpdate = req.body;
 
-  if (!userToUpdate) {
-    return res.status(400).json({
-      status: "error",
-      message: "No se enviaron datos para actualizar",
-    });
-  }
-
-  // Eliminar campos sobrantes
-  delete userIdentity.iat;
-  delete userIdentity.exp;
-  delete userIdentity.role;
-  delete userIdentity.image;
-
   // Comprobar si se quiere actualizar a un email o nick que ya existe
   let conditions = [];
   if (userToUpdate.email) {
@@ -258,14 +235,14 @@ const update = async (req, res) => {
     const userUpdated = await User.findByIdAndUpdate(
       { _id: userIdentity.id },
       userToUpdate,
-      { new: true }
+      { new: true, select: '-password -role -__v -email' }
     );
 
     if (userUpdated) {
       return res.status(200).json({
         status: "success",
         message: 'Actualizado con éxito',
-        userUpdated,
+        userUpdated
       });
     }
   } catch (error) {
@@ -289,20 +266,12 @@ const upload = async (req, res) => {
   const image = req.file.originalname;
 
   // Sacar la extensión del archivo
-  const imagesSplit = image.split(".");
-  const extension = imagesSplit[1];
+  const extension = image.split(".").pop().toLowerCase();;
 
   // Comprobar extensión
-  if (
-    extension != "png" &&
-    extension != "jpg" &&
-    extension != "jpeg" &&
-    extension != "gif"
-  ) {
+  if (!['png', 'jpg', 'jpeg', 'gif'].includes(extension)) {
     // Borrar archivo subido
-    const filePath = req.file.path;
-    const fileDeleted = fs.unlinkSync(filePath);
-
+    fs.unlinkSync(req.file.path);
     return res.status(400).json({
       status: "error",
       message: "Extensión del fichero invalida",
@@ -311,11 +280,20 @@ const upload = async (req, res) => {
 
   // Si lo es, guardar imagen en base de datos
   try {
+    const user = await User.findById(req.user.id, 'image');
+
     const userUpdated = await User.findOneAndUpdate(
       { _id: req.user.id },
       { image: req.file.filename },
-      { new: true }
+      { new: true, select: '-password -role -__v -email'}
     );
+
+    // Eliminar fichero de avatar anterior si es que tiene
+    const prevAvatarPath = user.image !== 'default.png' && path.join('uploads', 'avatars', user.image);
+
+    if(prevAvatarPath && fs.existsSync(prevAvatarPath)) {
+      fs.unlinkSync(prevAvatarPath);
+    }
 
     return res.status(200).json({
       status: "success",
@@ -325,35 +303,30 @@ const upload = async (req, res) => {
   } catch (error) {
     return res.status(400).json({
       status: "error",
-      message: "Error en la subida de avatar",
+      message: "Error en la subida del avatar",
     });
   }
 };
 
 const avatar = async (req, res) => {
-  // Sacar el parametro de la url
-  const file = req.params.file;
 
   // Montar el path real de la imagen
-  const filePath = "./uploads/avatars/" + file;
+  const filePath = path.join('uploads', 'avatars', req.params.file);
 
   // Comprobar que existe
-  fs.stat(filePath, (error) => {
-    if (error) {
-      return res.status(404).json({
-        status: "error",
-        message: "No existe la image",
-      });
-    }
+  if(!fs.existsSync(filePath)) {
+    return res.status(404).json({
+      status: "error",
+      message: "No existe la image",
+    });
+  }
 
-    // Devolver un file
-    return res.sendFile(path.resolve(filePath));
-  });
+  // Devolver un file
+  return res.sendFile(path.resolve(filePath));
 };
 
 const counters = async (req, res) => {
   const userId = req.params.id || req.user.id;
-
 
   try {
     const following = await Follow.countDocuments({ user: userId });
@@ -370,9 +343,7 @@ const counters = async (req, res) => {
   } catch (error) {
     return res.status(400).json({
       status: "error",
-      message: "Error en los contadores",
-      error,
-      userId
+      message: "Error al obtener los contadores",
     });
   }
 };

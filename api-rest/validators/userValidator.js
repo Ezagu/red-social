@@ -1,4 +1,4 @@
-const { body } = require("express-validator");
+const { body, params } = require("express-validator");
 const validateFields = require('./validateFields');
 
 const name = body("name")
@@ -39,11 +39,20 @@ exports.register = [
 ]
 
 exports.update = [[
+  body().notEmpty().withMessage('No se evió ningún dato para actualizar'),
   email.optional(),
   password.optional(),
   name.optional(),
   surname.optional(),
   nick.optional(),
   bio.optional()],
+  validateFields
+]
+
+exports.login = [
+  [
+    body('email').trim().notEmpty().withMessage('Ingrese el mail'),
+    body('password').trim().notEmpty().withMessage('Ingrese la contraseña')
+  ],
   validateFields
 ]
