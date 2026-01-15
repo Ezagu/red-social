@@ -129,8 +129,8 @@ const profile = async (req, res) => {
     return res.status(200).json({
       status: "success",
       user: userProfile,
-      following: followInfo.following,
-      follower: followInfo.follower,
+      following: followInfo.following ? true : false,
+      follower: followInfo.follower ? true : false
     });
   } catch (err) {
     return res.status(404).send({

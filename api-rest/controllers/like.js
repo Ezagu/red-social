@@ -1,0 +1,63 @@
+const Like = require('../models/like.js');
+
+const save = async(req, res) => {
+
+  const {targetId, targetType} = req.body; 
+  const user = req.user._id;
+
+  try {
+    const like = new Like({
+      targetId,
+      targetType,
+      user
+    })
+
+    await like.save();
+
+    return res.status(200).json({
+      status: 'success',
+      message: 'Like guardado con éxito'
+    })
+  } catch(error) {
+    let message = 'No se pudo guardar el like';
+
+    if(error.code === 11000) {
+      message = 'Ya se likeo la publicacion o comentario'
+    }
+
+    return res.status(400).json({
+      status: 'error',
+      message
+    });
+  } 
+}
+
+const remove = async(req, res) => {
+  
+  const user = req.user._id;
+  const {targetType, targetId} = req.body;
+
+  try {
+    const likeRemoved = await Like.findOneAndDelete({
+      user,
+      targetId,
+      targetType
+    });
+
+    return res.status(200).json({
+      status: 'success',
+      message: 'Like eliminado',
+      likeRemoved
+    });
+  } catch {
+    return res.status(400).json({
+      status: 'error',
+      message: 'No se pudo deshacer el like'
+    });
+  }
+}
+
+module.exports = {
+  save,
+  remove
+};

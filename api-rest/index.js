@@ -3,41 +3,50 @@ const connection = require('./database/connection.js');
 const express = require('express');
 const cors = require('cors');
 
-console.log('API NODE para RED SOCIAL arrancada!!')
+// Modelos
+const Like = require('./models/like.js');
 
-// Conexion a base de datos
-connection();
-
-// Crear servidor de node
-const app = express();
-const puerto = 3900;
-
-// Configurar el cors
-app.use(cors());
-
-// Convertir datos del body a objetos js
-app.use(express.json());
-app.use(express.urlencoded({extended: true}));
-
-// Cargar conf rutas
+// Rutas
 const userRoutes = require('./routes/user.js');
 const publicationRoutes = require('./routes/publication.js');
 const followRoutes = require('./routes/follow.js'); 
+const likeRoutes = require('./routes/like.js');
 
-app.use('/api/user', userRoutes);
-app.use('/api/publication', publicationRoutes);
-app.use('/api/follow', followRoutes);
+console.log('Arrancando API NODE para RED SOCIAL');
 
+const startServer = async() => {
+  try {
+    // Conexion a base de datos
+    await connection();
 
-// Ruta de prueba
-app.get('/prueba', (req, res) => {
-  res.status(200).json({
-    mensaje: 'hola a todos'
-  })
-});
+    // Sincronizar indices (SOLO EN DEV)
+    await Like.syncIndexes();
+    console.log('Indices sincronizados');
 
+    // Crear servidor de node
+    const app = express();
+    const puerto = 3900;
 
-// Poner servidor a escuchar peticiones http
-app.listen(puerto, () => {
-  console.log('Servidor de node corriendo en el puerto: ' + puerto);
-});
+    // Configurar el cors
+    app.use(cors());
+
+    // Convertir datos del body a objetos js
+    app.use(express.json());
+    app.use(express.urlencoded({extended: true}));
+
+    // Cargar conf rutas
+    app.use('/api/user', userRoutes);
+    app.use('/api/publication', publicationRoutes);
+    app.use('/api/follow', followRoutes);
+    app.use('/api/like', likeRoutes);
+
+    // Poner servidor a escuchar peticiones http
+    app.listen(puerto, () => {
+      console.log('Servidor de node corriendo en el puerto: ' + puerto);
+    });
+  } catch(error) {
+    console.log('Error al iniciar la app: ', error);
+  }
+}
+
+startServer();
