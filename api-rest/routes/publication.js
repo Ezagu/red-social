@@ -18,13 +18,13 @@ const storage = multer.diskStorage({
 const uploads = multer({storage});
 
 // Rutas
+router.get('/publications', auth, publicationController.publications);
+// TODO: PASAR A USER router.get('/user/:id{/:page}', auth, publicationController.user);
+router.post('/:id/upload', [auth, uploads.single('file0')], publicationController.upload);
+router.get('/media/:file', publicationController.media);
 router.post('/', auth, publicationValidator.save, publicationController.save);
 router.get('/:id', auth, publicationController.detail);
 router.delete('/:id', auth, publicationController.remove);
-router.get('/user/:id{/:page}', auth, publicationController.user);
-router.post('/upload/:id', [auth, uploads.single('file0')], publicationController.upload);
-router.get('/media/:file', publicationController.media);
-router.get('/feed{/:page}', auth, publicationController.feed);
 
 
 // Exportar router

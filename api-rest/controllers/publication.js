@@ -212,23 +212,19 @@ const media = async (req, res) => {
 };
 
 // Listar todas las publicaciones (FEED)
-const feed = async (req, res) => {
+const publications = async (req, res) => {
   // Sacar la página actual
-  const page = req.params.page || 1;
-
+  const page = req.query.page || 1;
   // Establecer número de elementos por página
-  const itemsPerPage = 5;
+  const limit = req.query.limit || 5;
 
   try {
-    // Sacar array de ids de usuarios que yo sigo como usuario identificado
-    const myFollows = await followService.followUserIds(req.user.id);
-
     // Find a publicaciones in, ordenar, popular, paginar
     const publications = await Publication.paginate(
-      { user: myFollows.following },
+      {},
       {
         page,
-        limit: itemsPerPage,
+        limit,
         sort: "-created_at",
         populate: { path: "user", select: "-password -__v -role -email" },
       }
@@ -239,9 +235,9 @@ const feed = async (req, res) => {
     return res.status(200).json({
       status: "success",
       message: "Feed de publicaciones",
-      myFollows: myFollows.following,
       totalPublications: publications.totalDocs,
       page,
+      limit,
       totalPages: publications.totalPages,
       hasNextPage: publications.hasNextPage,
       publications: publications.docs,
@@ -250,6 +246,7 @@ const feed = async (req, res) => {
     return res.status(400).json({
       status: "error",
       message: "No se han listado las publicaciones del feed",
+      error
     });
   }
 };
@@ -262,5 +259,5 @@ module.exports = {
   user,
   upload,
   media,
-  feed,
+  publications
 };
