@@ -47,6 +47,9 @@ const UserSchema = Schema({
   }
 });
 
+UserSchema.index({email: 1}, {unique: true});
+UserSchema.index({nick: 1}, {unique: true});
+
 UserSchema.plugin(mongoosePaginate);
 
 module.exports = model('User', UserSchema, 'users');

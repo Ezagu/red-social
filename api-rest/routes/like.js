@@ -4,6 +4,6 @@ const likeController = require('../controllers/like.js');
 const auth = require('../middlewares/auth.js');
 
 router.post('/', auth, likeController.save);
-router.delete('/', auth, likeController.remove);
+router.delete('/:id', auth, likeController.remove);
 
 module.exports = router;

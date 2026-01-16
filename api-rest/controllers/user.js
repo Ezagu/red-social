@@ -17,48 +17,36 @@ const register = async (req, res) => {
   //Recoger datos de la peticion
   const params = req.body;
 
-  // Control usuarios duplicados
-  const duplicatedUsers = await User.find({
-    $or: [{ email: params.email }, { nick: params.nick }],
-  });
-
-  if (duplicatedUsers.length > 0) {
-    return res.status(409).send({
-      status: "error",
-      message: "El usuario ya existe",
-    });
-  }
-
   // Cifrar contraseña
   try {
     params.password = await bcrypt.hash(params.password, 10);
-  } catch (err) {
+  } catch (error) {
     return res.status(400).json({
       status: "error",
       message: "Error al encriptar la contraseña",
     });
   }
 
-  // Crear objeto de usuario
-  const userToSave = new User(params);
-
-  // Guardar usuario en la base de datos
   try {
-    const userStored = await userToSave.save();
+    // Guardar usuario en la base de datos
+    const user = await User.create(params);
 
-    if (userStored) {
-      return res.status(201).json({
-        message: "Usuario registrado correctamente",
-        status: "success",
-        user: userStored,
-      });
-    } else {
+    if (!user) {
       throw new Error();
     }
-  } catch (err) {
+
+    return res.status(201).json({
+      message: "Usuario registrado correctamente",
+      status: "success"
+    });
+  } catch (error) {
+    let message = 'Error al crear el usuario'
+    if(error.code === 11000) {
+      message = 'Ya existe el usuario';
+    }
     return res.status(500).send({
       status: "error",
-      message: "Error al guardar el usuario en la base de datos",
+      message
     });
   }
 };

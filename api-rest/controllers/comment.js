@@ -2,28 +2,48 @@ const mongoose = require('mongoose');
 
 const Comment = require('../models/comment.js');
 const Publication = require('../models/publication.js');
+const Notification = require('../models/notification.js');
 
 const create = async (req, res) => {
 
   const user = req.user._id;
-  const {publication, text} = req.body;
+  const {publicationId, text} = req.body;
   const parentComment = req.body.parentComment || null;
 
   try {
+    // Validar que la publicación exista
+    const publication = await Publication.findById(publicationId);
+
+    if(!publication) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'La publicacion no existe'
+      });
+    }
+
     // Crear comentario
     const newComment = await Comment.create({
-      user, publication, text, parentComment
+      user, publication: publicationId, text, parentComment
     });
 
     // Aumentar contador de comentarios de publicacion
-    await Publication.findByIdAndUpdate(publication, {$inc: {commentsCount: 1}});
+    await Publication.findByIdAndUpdate(publicationId, {$inc: {commentsCount: 1}});
+
+    // Determinar a quien notificar
+    let userToNotificate = publication.user._id;
 
     // Si tiene un comentario padre, aumentarle el contador de respuestas
     if(parentComment) {
-      await Comment.findByIdAndUpdate(parentComment, {$inc: {repliesCount: 1}});
+      const parentComent = await Comment.findByIdAndUpdate(parentComment, {$inc: {repliesCount: 1}});
+      userToNotificate = parentComent.user._id;
     }
 
-    return res.status(200).json({
+    // Generar notificacion si no es el mismo usuario el que se comenta
+    if(userToNotificate.toString() !== user.toString()) {
+      await Notification.create({user: userToNotificate, fromUser: user, targetType: 'Comment', targetId: newComment._id});
+    }
+
+    return res.status(201).json({
       status: 'success',
       message: 'Comentario publicado',
       comment: newComment
@@ -43,13 +63,8 @@ const remove = async (req, res) => {
   const {comment} = req.body;
 
   try {
+    // Elimina comentario
     const commentRemoved = await Comment.findOneAndDelete({user, _id: comment});
-
-    await Publication.findByIdAndUpdate(commentRemoved.publication, {$inc: {commentsCount: -1}});
-
-    if(commentRemoved.parentCommen) {
-      await Comment.findByIdAndUpdate(commentRemoved.parentComment, {$inc: {repliesCount: -1}});
-    }
 
     if(!commentRemoved) {
       return res.status(400).json({
@@ -57,6 +72,17 @@ const remove = async (req, res) => {
         message: 'Comentario no encontrado'
       });
     }
+
+    // Actualiza contador de comentartios de la publicacion
+    await Publication.findByIdAndUpdate(commentRemoved.publication, {$inc: {commentsCount: -1}});
+
+    // Si tiene comentario padre, le actualiza el contador de respuestas
+    if(commentRemoved.parentComment) {
+      await Comment.findByIdAndUpdate(commentRemoved.parentComment, {$inc: {repliesCount: -1}});
+    }
+
+    // Elimina notificación
+    await Notification.findOneAndDelete({targetType:'Comment', targetId: commentRemoved._id});
 
     return res.status(200).json({
       status: 'success',

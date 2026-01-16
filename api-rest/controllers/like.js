@@ -1,7 +1,7 @@
 const Like = require('../models/like.js');
 const Comment = require('../models/comment.js');
 const Publication = require('../models/publication.js');
-
+const Notification = require('../models/notification.js');
 
 const save = async(req, res) => {
 
@@ -15,10 +15,17 @@ const save = async(req, res) => {
       user
     });
 
+    // Aumentar contador de likes en comentario o publicación
+    let target = {};
     if(targetType === 'Comment') {
-      await Comment.findByIdAndUpdate(targetId, {$inc: {likesCount: 1}});
+      target = await Comment.findByIdAndUpdate(targetId, {$inc: {likesCount: 1}});
     } else if(targetType === 'Publication') {
-      await Publication.findByIdAndUpdate(targetId, {$inc: {likesCount: 1}});
+      target = await Publication.findByIdAndUpdate(targetId, {$inc: {likesCount: 1}});
+    }
+
+    // Crear notificación en caso de que no sea el mismo usuario identificado el que haya dado like
+    if(target.user.toString() !== user.toString()) {
+      await Notification.create({user: target.user, fromUser: user, targetType: 'Like', targetId: like._id});
     }
 
     return res.status(200).json({
@@ -35,7 +42,8 @@ const save = async(req, res) => {
 
     return res.status(400).json({
       status: 'error',
-      message
+      message,
+      error
     });
   } 
 }
@@ -43,27 +51,31 @@ const save = async(req, res) => {
 const remove = async(req, res) => {
   
   const user = req.user._id;
-  const {targetType, targetId} = req.body;
+  const likeId = req.params.id;
 
   try {
-    const likeRemoved = await Like.findOneAndDelete({
-      user,
-      targetId,
-      targetType
-    });
+    const likeRemoved = await Like.findOneAndDelete({_id: likeId, user});
 
-    if(targetType === 'Comment') {
-      await Comment.findByIdAndUpdate(targetId, {$inc: {likesCount: -1}});
-    } else if(targetType === 'Publication') {
-      await Publication.findByIdAndUpdate(targetId, {$inc: {likesCount: -1}});
+    console.log(likeRemoved);
+
+    if(!likeRemoved) {
+      throw new Error();
     }
+
+    if(likeRemoved.targetType === 'Comment') {
+      await Comment.findByIdAndUpdate(likeRemoved.targetId, {$inc: {likesCount: -1}});
+    } else if(likeRemoved.targetType === 'Publication') {
+      await Publication.findByIdAndUpdate(likeRemoved.targetId, {$inc: {likesCount: -1}});
+    }
+
+    // Eliminar notificación
+    await Notification.findOneAndDelete({targetType: 'Like', targetId: likeId});
 
     return res.status(200).json({
       status: 'success',
-      message: 'Like eliminado',
-      likeRemoved
+      message: 'Like eliminado'
     });
-  } catch {
+  } catch(error) {
     return res.status(400).json({
       status: 'error',
       message: 'No se pudo deshacer el like'

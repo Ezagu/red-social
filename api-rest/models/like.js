@@ -13,7 +13,7 @@ const LikeSchema = Schema({
   },
   targetType: {
     type: String,
-    required: 'true',
+    required: true,
     enum: ['Comment', 'Publication']
   }
 }, {

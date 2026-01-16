@@ -20,11 +20,11 @@ const uploads = multer({storage});
 // Rutas
 router.post('/register', userValidator.register, userController.register);
 router.post('/login', userValidator.login, userController.login);
-router.get('/profile/:id', auth, userController.profile);
+router.get('/:id', auth, userController.profile);
 router.get('/users', auth, userController.list);
 router.get('/users/followers{/:id}', auth, userController.listFollowers);
 router.get('/users/followings{/:id}', auth, userController.listFollowing);
-router.put('/update', auth, userValidator.update, userController.update);
+router.put('/', auth, userValidator.update, userController.update);
 router.post('/upload', [auth, uploads.single('file0')], userController.upload);
 router.get('/avatar/:file', userController.avatar);
 router.get('/counters{/:id}', auth, userController.counters);
