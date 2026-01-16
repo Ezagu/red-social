@@ -2,6 +2,7 @@ const Like = require('../models/like.js');
 const Comment = require('../models/comment.js');
 const Publication = require('../models/publication.js');
 const Notification = require('../models/notification.js');
+const User = require('../models/user.js');
 
 const save = async(req, res) => {
 
@@ -26,6 +27,8 @@ const save = async(req, res) => {
     // Crear notificación en caso de que no sea el mismo usuario identificado el que haya dado like
     if(target.user.toString() !== user.toString()) {
       await Notification.create({user: target.user, fromUser: user, targetType: 'Like', targetId: like._id});
+
+      await User.findByIdAndUpdate(target.user, {$inc: {unreadNotificationsCount: 1}});
     }
 
     return res.status(200).json({

@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const Comment = require('../models/comment.js');
 const Publication = require('../models/publication.js');
 const Notification = require('../models/notification.js');
+const User = require('../models/user.js');
 
 const create = async (req, res) => {
 
@@ -41,6 +42,8 @@ const create = async (req, res) => {
     // Generar notificacion si no es el mismo usuario el que se comenta
     if(userToNotificate.toString() !== user.toString()) {
       await Notification.create({user: userToNotificate, fromUser: user, targetType: 'Comment', targetId: newComment._id});
+
+      await User.findByIdAndUpdate(userToNotificate, {$inc: {unreadNotificationsCount: 1}});
     }
 
     return res.status(201).json({

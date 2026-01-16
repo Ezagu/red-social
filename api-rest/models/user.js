@@ -40,6 +40,10 @@ const UserSchema = Schema({
     type: Number,
     default: 0
   }, 
+  unreadNotificationsCount: {
+    type: Number,
+    default: 0
+  }
 }, {
   timestamps: {
     createdAt: true,

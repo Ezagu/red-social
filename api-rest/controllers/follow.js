@@ -1,6 +1,7 @@
 // Importar modelo
 const Follow = require("../models/follow.js");
 const User = require("../models/user.js");
+const Notification = require("../models/notification.js");
 
 // Importar servicio
 const followService = require("../services/followService.js");
@@ -8,7 +9,7 @@ const followService = require("../services/followService.js");
 // Acción de guardar un follow (acción seguir)
 const save = async (req, res) => {
   // Conseguir datos por body
-  const {followed} = req.body;
+  const followed = req.params.id;
 
   // Sacar id del usuario identificado
   const user = req.user.id;
@@ -20,22 +21,33 @@ const save = async (req, res) => {
       followed,
     });
 
-    await User.findByIdAndUpdate(user, {$inc: {followingCount: 1}});
-    await User.findByIdAndUpdate(followed, {$inc: {followersCount: 1}});
-    
+    await User.findByIdAndUpdate(user, { $inc: { followingCount: 1 } });
+    await User.findByIdAndUpdate(followed, { $inc: { followersCount: 1 } });
+
+    await Notification.create({
+      user: followed,
+      fromUser: user,
+      targetType: "Follow",
+      targetId: follow._id,
+    });
+
+    await User.findByIdAndUpdate(followed, {
+      $inc: { unreadNotificationsCount: 1 },
+    });
+
     return res.status(200).json({
       status: "success",
-      message: 'Seguido con éxito',
-      follow
+      message: "Seguido con éxito",
+      follow,
     });
   } catch (err) {
     let message = "No se pudo seguir al usuario";
-    if(err.code === 11000) {
-      message = 'Ya sigues a esta cuenta';
+    if (err.code === 11000) {
+      message = "Ya sigues a esta cuenta";
     }
     return res.status(400).json({
       status: "error",
-      message
+      message,
     });
   }
 };
@@ -50,26 +62,40 @@ const unfollow = async (req, res) => {
 
   // Find de las coincidencias y hacer remove
   try {
-    const followDeleted = await Follow.deleteOne({
+    const followDeleted = await Follow.findOneAndDelete({
       user,
-      followed
+      followed,
     });
 
-    if(!followDeleted) {
+    console.log("followDeleted: " + followDeleted);
+
+    if (!followDeleted) {
       throw new Error();
     }
 
-    await User.findByIdAndUpdate(user, {$inc: {followingCount: -1}});
-    await User.findByIdAndUpdate(followed, {$inc: {followersCount: -1}});
+    await User.findByIdAndUpdate(user, { $inc: { followingCount: -1 } });
+    await User.findByIdAndUpdate(followed, { $inc: { followersCount: -1 } });
+
+    const notification = await Notification.findOneAndDelete({
+      targetType: "Follow",
+      targetId: followDeleted._id,
+    });
+
+    if (!notification.read) {
+      await User.findByIdAndUpdate(followed, {
+        $inc: { unreadNotificationsCount: -1 },
+      });
+    }
 
     return res.status(200).json({
       status: "success",
-      message: "Follow eliminado correctamente"
+      message: "Follow eliminado correctamente",
     });
   } catch (error) {
     return res.status(400).json({
       status: "error",
       message: "No se pudo dejar de seguir",
+      error,
     });
   }
 };
