@@ -54,8 +54,7 @@ const create = async (req, res) => {
   } catch(error) {
     return res.status(400).json({
       status: 'error',
-      message: 'No se pudo publicar el comentario',
-      error
+      message: 'No se pudo publicar el comentario'
     });
   }
 }

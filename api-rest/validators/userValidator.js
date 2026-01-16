@@ -1,4 +1,4 @@
-const { body, params } = require("express-validator");
+const { body } = require("express-validator");
 const validateFields = require('./validateFields');
 
 const name = body("name")
