@@ -11,6 +11,7 @@ const userRoutes = require('./routes/user.js');
 const publicationRoutes = require('./routes/publication.js');
 const followRoutes = require('./routes/follow.js'); 
 const likeRoutes = require('./routes/like.js');
+const commentRoutes = require('./routes/comment.js');
 
 console.log('Arrancando API NODE para RED SOCIAL');
 
@@ -39,6 +40,7 @@ const startServer = async() => {
     app.use('/api/publication', publicationRoutes);
     app.use('/api/follow', followRoutes);
     app.use('/api/like', likeRoutes);
+    app.use('/api/comment', commentRoutes);
 
     // Poner servidor a escuchar peticiones http
     app.listen(puerto, () => {
