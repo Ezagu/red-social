@@ -4,7 +4,7 @@ const path = require("path");
 
 // Importar modelos
 const Publication = require("../models/publication.js");
-const User = require('../models/user.js');
+const User = require("../models/user.js");
 
 // Importar servicios
 const followService = require("../services/followService.js");
@@ -12,28 +12,28 @@ const followService = require("../services/followService.js");
 // Guardar publicacion
 const save = async (req, res) => {
   // Recoger datos
-  const {text} = req.body;
+  const { text } = req.body;
   const user = req.user.id;
 
   try {
     // Crear y guardar el objeto del modelo
-    const publication = await Publication.create({text, user});
+    const publication = await Publication.create({ text, user });
 
-    await publication.populate('user', '-email -password -role -__v');
+    await publication.populate("user", "-email -password -role -__v");
 
-    await User.findByIdAndUpdate(user, {$inc: {publicationsCount: 1}});
+    await User.findByIdAndUpdate(user, { $inc: { publicationsCount: 1 } });
 
     // Devolver respuesta
     return res.status(200).json({
       status: "success",
       message: "Publicación subida con éxito",
-      publication
+      publication,
     });
   } catch (error) {
     return res.status(400).json({
       status: "error",
       message: "No se pudo subir la publicación",
-      error
+      error,
     });
   }
 };
@@ -75,7 +75,7 @@ const remove = async (req, res) => {
 
     if (!publicationDeleted) throw new Error();
 
-    await User.findByIdAndUpdate(user, {$inc: {publicationsCount: -1}});
+    await User.findByIdAndUpdate(user, { $inc: { publicationsCount: -1 } });
 
     // DEvolver respuesta
     return res.status(200).json({
@@ -87,44 +87,6 @@ const remove = async (req, res) => {
     return res.status(500).json({
       status: "error",
       message: "No se eliminó la publicación",
-    });
-  }
-};
-
-// Listar publicaciones de un usuario
-const user = async (req, res) => {
-  // Sacar id de usuario
-  const userId = req.params.id;
-
-  // Controlar la pagina
-  const page = req.params.page || 1;
-  const itemsPerPage = 5;
-
-  // Find, populate, ordenar y paginar
-  try {
-    const publications = await Publication.paginate(
-      { user: userId },
-      {
-        page,
-        limit: itemsPerPage,
-        sort: "-created_at",
-        populate: { path: "user", select: "-password -__v -role -email" },
-      }
-    );
-
-    return res.status(200).json({
-      status: "success",
-      message: "Listado de publicaciones de un usuario",
-      page,
-      hasNextPage: publications.hasNextPage,
-      totalPublications: publications.totalDocs,
-      totalPages: publications.totalPages,
-      publications: publications.docs,
-    });
-  } catch (error) {
-    return res.status(404).json({
-      status: "error",
-      message: "No hay publicaciones para mostrar",
     });
   }
 };
@@ -211,7 +173,7 @@ const media = async (req, res) => {
   });
 };
 
-// Listar todas las publicaciones (FEED)
+// Listar todas las publicaciones de todos los usuarios
 const publications = async (req, res) => {
   // Sacar la página actual
   const page = req.query.page || 1;
@@ -246,7 +208,45 @@ const publications = async (req, res) => {
     return res.status(400).json({
       status: "error",
       message: "No se han listado las publicaciones del feed",
-      error
+      error,
+    });
+  }
+};
+
+const followingPublications = async (req, res) => {
+  const user = req.user.id;
+  const page = req.query.page || 1;
+  const limit = req.query.limit || 5;
+
+  try {
+    const following = await followService.followingIds(user);
+
+    const publications = await Publication.paginate(
+      { user: following },
+      {
+        page,
+        limit,
+        sort: { created_at: -1 },
+        populate: {
+          path: "user",
+          select: "-password -role -email -__v",
+        },
+      }
+    );
+
+    return res.status(200).json({
+      status: "success",
+      page,
+      limit,
+      totalPublications: publications.totalDocs,
+      totalPages: publications.totalPages,
+      hasNextPage: publications.hasNextPage,
+      publications: publications.docs,
+    });
+  } catch (error) {
+    return res.status(200).json({
+      status: "error",
+      message: "No se pudo listar las publicaciones de tus seguidos",
     });
   }
 };
@@ -256,8 +256,8 @@ module.exports = {
   save,
   detail,
   remove,
-  user,
   upload,
   media,
-  publications
+  publications,
+  followingPublications,
 };

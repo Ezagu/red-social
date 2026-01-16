@@ -19,7 +19,7 @@ const uploads = multer({storage});
 
 // Rutas
 router.get('/publications', auth, publicationController.publications);
-// TODO: PASAR A USER router.get('/user/:id{/:page}', auth, publicationController.user);
+router.get('/publications/following', auth, publicationController.followingPublications);
 router.post('/:id/upload', [auth, uploads.single('file0')], publicationController.upload);
 router.get('/media/:file', publicationController.media);
 router.post('/', auth, publicationValidator.save, publicationController.save);

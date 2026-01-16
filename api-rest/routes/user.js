@@ -25,6 +25,7 @@ router.get('/avatar/:file', userController.avatar);
 router.get('/users', auth, userController.list);
 router.get('{/:id}/followers', auth, userController.listFollowers);
 router.get('{/:id}/following', auth, userController.listFollowing);
+router.get('{/:id}/publications', auth, userController.publications);
 router.get('/:id', auth, userController.profile);
 router.put('/', auth, userValidator.update, userController.update);
 // DEPRECATED router.get('/counters{/:id}', auth, userController.counters);

@@ -37,16 +37,16 @@ const register = async (req, res) => {
 
     return res.status(201).json({
       message: "Usuario registrado correctamente",
-      status: "success"
+      status: "success",
     });
   } catch (error) {
-    let message = 'Error al crear el usuario'
-    if(error.code === 11000) {
-      message = 'Ya existe el usuario';
+    let message = "Error al crear el usuario";
+    if (error.code === 11000) {
+      message = "Ya existe el usuario";
     }
     return res.status(500).send({
       status: "error",
-      message
+      message,
     });
   }
 };
@@ -118,7 +118,7 @@ const profile = async (req, res) => {
       status: "success",
       user: userProfile,
       following: followInfo.following ? true : false,
-      follower: followInfo.follower ? true : false
+      follower: followInfo.follower ? true : false,
     });
   } catch (err) {
     return res.status(404).send({
@@ -150,7 +150,10 @@ const list = async (req, res) => {
     );
 
     // Agrega informacion de follows
-    const usersWithFollowInfo = followService.addFollowInfo(result.docs, followsIds);
+    const usersWithFollowInfo = followService.addFollowInfo(
+      result.docs,
+      followsIds
+    );
 
     // Devolver resultado
     return res.status(200).json({
@@ -184,7 +187,10 @@ const listFollowers = async (req, res) => {
     );
 
     // Indica si el usuario te sigue y si lo sigues
-    const usersWithFollowInfo = followService.addFollowInfo(result.docs, followsIds);
+    const usersWithFollowInfo = followService.addFollowInfo(
+      result.docs,
+      followsIds
+    );
 
     return res.status(200).json({
       status: "success",
@@ -217,7 +223,10 @@ const listFollowing = async (req, res) => {
     );
 
     // Indica si el usuario te sigue y si lo sigues
-    const usersWithFollowInfo = followService.addFollowInfo(result.docs, followsIds);
+    const usersWithFollowInfo = followService.addFollowInfo(
+      result.docs,
+      followsIds
+    );
 
     return res.status(200).json({
       status: "success",
@@ -401,6 +410,42 @@ const counters = async (req, res) => {
   }
 };
 
+const publications = async (req, res) => {
+  const user = req.params.id || req.user.id;
+  const page = req.query.page || 1;
+  const limit = req.query.limit || 5;
+
+  try {
+    const publications = await Publication.paginate(
+      { user },
+      {
+        page,
+        limit,
+        sort: { created_at: -1 },
+        populate: {
+          path: "user",
+          select: "-password -role -email -__v",
+        },
+      }
+    );
+
+    return res.status(200).json({
+      status: "success",
+      page,
+      limit,
+      totalPublications: publications.totalDocs,
+      totalPages: publications.totalPages,
+      hasNextPage: publications.hasNextPage,
+      publications: publications.docs,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      status: "error",
+      message: "No se pudo listar las publicaciones del usuario",
+    });
+  }
+};
+
 // Exportar funciones
 module.exports = {
   register,
@@ -413,4 +458,5 @@ module.exports = {
   upload,
   avatar,
   counters,
+  publications,
 };
