@@ -11,11 +11,18 @@ const PublicationSchema = Schema({
     required: true
   },
   file: String,
-  created_at: {
-    type: Date,
-    default: Date.now
+  commentsCount: {
+    type: Number,
+    default: 0
+  },
+  likesCount: {
+    type: Number,
+    default: 0
   }
-});
+}, {timestamps: {
+  createdAt: true,
+  updatedAt: false
+}});
 
 PublicationSchema.plugin(mongoosePaginate);
 

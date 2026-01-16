@@ -1,4 +1,7 @@
+const mongoose = require('mongoose');
+
 const Comment = require('../models/comment.js');
+const Publication = require('../models/publication.js');
 
 const create = async (req, res) => {
 
@@ -7,14 +10,17 @@ const create = async (req, res) => {
   const parentComment = req.body.parentComment || null;
 
   try {
-    const newComment = new Comment({
+    // Crear comentario
+    const newComment = await Comment.create({
       user, publication, text, parentComment
     });
 
-    await newComment.save();
+    // Aumentar contador de comentarios de publicacion
+    await Publication.findByIdAndUpdate(publication, {$inc: {commentsCount: 1}});
 
+    // Si tiene un comentario padre, aumentarle el contador de respuestas
     if(parentComment) {
-      await Comment.findOneAndUpdate({_id: parentComment}, {$inc: {repliesCount: 1}});
+      await Comment.findByIdAndUpdate(parentComment, {$inc: {repliesCount: 1}});
     }
 
     return res.status(200).json({
@@ -23,9 +29,10 @@ const create = async (req, res) => {
       comment: newComment
     });
   } catch(error) {
-    return res.status(200).json({
-      status: 'success',
-      message: 'No se pudo publicar el comentario'
+    return res.status(400).json({
+      status: 'error',
+      message: 'No se pudo publicar el comentario',
+      error
     });
   }
 }
@@ -38,8 +45,10 @@ const remove = async (req, res) => {
   try {
     const commentRemoved = await Comment.findOneAndDelete({user, _id: comment});
 
+    await Publication.findByIdAndUpdate(commentRemoved.publication, {$inc: {commentsCount: -1}});
+
     if(commentRemoved.parentCommen) {
-      await Comment.findOneAndUpdate({_id: commentRemoved.parentComment}, {$inc: {repliesCount: -1}});
+      await Comment.findByIdAndUpdate(commentRemoved.parentComment, {$inc: {repliesCount: -1}});
     }
 
     if(!commentRemoved) {
@@ -51,7 +60,7 @@ const remove = async (req, res) => {
 
     return res.status(200).json({
       status: 'success',
-      message: 'Comentario borrado con éxito!',
+      message: 'Comentario borrado con éxito',
       comment: commentRemoved
     });
   } catch(error) {

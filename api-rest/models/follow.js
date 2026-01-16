@@ -9,12 +9,13 @@ const FollowSchema = Schema({
   followed: {
     type: Schema.ObjectId,
     ref: 'User'
-  },
-  created_at: {
-    type: Date,
-    default: Date.now
   }
-});
+}, {timestamps: {
+  createdAt: true,
+  updatedAt: false
+}});
+
+FollowSchema.index({user: 1, followed: 1}, {unique: true});
 
 FollowSchema.plugin(mongoosePaginate);
 

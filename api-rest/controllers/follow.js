@@ -5,40 +5,37 @@ const User = require("../models/user.js");
 // Importar servicio
 const followService = require("../services/followService.js");
 
-// Acciones de prueba
-const pruebaFollow = (req, res) => {
-  res.status(200).send({
-    message: "Mensaje enviado desde el controlador: controllers/follow.js",
-  });
-};
-
 // Acción de guardar un follow (acción seguir)
 const save = async (req, res) => {
   // Conseguir datos por body
-  const params = req.body;
+  const {followed} = req.body;
 
   // Sacar id del usuario identificado
-  const identity = req.user;
+  const user = req.user.id;
 
-  // Crear objeto con modelo follow
-  const userToFollow = new Follow({
-    user: identity.id,
-    followed: params.followed,
-  });
-
-  // Guardar el objeto en bbdd
   try {
-    const followStored = await userToFollow.save();
+    // Crear objeto con modelo follow y guardar en bd
+    const follow = await Follow.create({
+      user,
+      followed,
+    });
 
+    await User.findByIdAndUpdate(user, {$inc: {followingCount: 1}});
+    await User.findByIdAndUpdate(followed, {$inc: {followersCount: 1}});
+    
     return res.status(200).json({
       status: "success",
-      identity: req.user,
-      follow: followStored,
+      message: 'Seguido con éxito',
+      follow
     });
   } catch (err) {
+    let message = "No se pudo seguir al usuario";
+    if(err.code === 11000) {
+      message = 'Ya sigues a esta cuenta';
+    }
     return res.status(400).json({
       status: "error",
-      message: "error al guardar en la base de datos",
+      message
     });
   }
 };
@@ -46,26 +43,33 @@ const save = async (req, res) => {
 // Acción de borrar un follow (accion dejar de seguir)
 const unfollow = async (req, res) => {
   // Recoger el id del usuario identificado
-  const userId = req.user.id;
+  const user = req.user.id;
 
   // Recoger el id del usuario que sigo y quiero dejar de seguir
-  const followedId = req.params.id;
+  const followed = req.params.id;
 
   // Find de las coincidencias y hacer remove
   try {
-    const followDeleted = await Follow.deleteMany({
-      user: userId,
-      followed: followedId,
+    const followDeleted = await Follow.deleteOne({
+      user,
+      followed
     });
+
+    if(!followDeleted) {
+      throw new Error();
+    }
+
+    await User.findByIdAndUpdate(user, {$inc: {followingCount: -1}});
+    await User.findByIdAndUpdate(followed, {$inc: {followersCount: -1}});
 
     return res.status(200).json({
       status: "success",
-      message: "Follow eliminado correctamente",
+      message: "Follow eliminado correctamente"
     });
   } catch (error) {
     return res.status(400).json({
       status: "error",
-      message: "No haz dejado de seguir a nadie",
+      message: "No se pudo dejar de seguir",
     });
   }
 };
@@ -168,7 +172,6 @@ const followers = async (req, res) => {
 
 // Exportar funciones
 module.exports = {
-  pruebaFollow,
   save,
   unfollow,
   following,

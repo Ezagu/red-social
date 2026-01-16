@@ -4,47 +4,36 @@ const path = require("path");
 
 // Importar modelos
 const Publication = require("../models/publication.js");
+const User = require('../models/user.js');
 
 // Importar servicios
 const followService = require("../services/followService.js");
 
-// Acciones de prueba
-const pruebaPublication = (req, res) => {
-  res.status(200).send({
-    message: "Mensaje enviado desde el controlador: controllers/publication.js",
-  });
-};
-
 // Guardar publicacion
 const save = async (req, res) => {
-  // Recoger datos del body
-  const params = req.body;
+  // Recoger datos
+  const {text} = req.body;
+  const user = req.user.id;
 
-  // Si no me llegan dar respuesta negativa
-  if (!params.text)
-    return res.status(400).json({
-      status: "error",
-      message: "Debes enviar el texto de la publicación",
-    });
-
-  // Crear y rellenar el objeto del modelo
-  const newPublication = new Publication(params);
-  newPublication.user = req.user.id;
-
-  // Guardar objeto en bbdd
   try {
-    const publicationStored = await newPublication.save();
+    // Crear y guardar el objeto del modelo
+    const publication = await Publication.create({text, user});
+
+    await publication.populate('user', '-email -password -role -__v');
+
+    await User.findByIdAndUpdate(user, {$inc: {publicationsCount: 1}});
 
     // Devolver respuesta
     return res.status(200).json({
       status: "success",
-      message: "Publicación guardada",
-      publicationStored,
+      message: "Publicación subida con éxito",
+      publication
     });
   } catch (error) {
     return res.status(400).json({
       status: "error",
-      message: "No se ha guardado la publicación",
+      message: "No se pudo subir la publicación",
+      error
     });
   }
 };
@@ -75,26 +64,29 @@ const detail = async (req, res) => {
 const remove = async (req, res) => {
   // Sacar el id de la publicacion a eliminar
   const publicationId = req.params.id;
+  const user = req.user._id;
 
   // Find y luego remove
   try {
     const publicationDeleted = await Publication.findOneAndDelete({
-      user: req.user.id,
+      user,
       _id: publicationId,
     });
 
     if (!publicationDeleted) throw new Error();
 
+    await User.findByIdAndUpdate(user, {$inc: {publicationsCount: -1}});
+
     // DEvolver respuesta
     return res.status(200).json({
       status: "success",
-      message: "Eliminar publicación",
+      message: "Publicación eliminada",
       publicationDeleted,
     });
   } catch (error) {
     return res.status(500).json({
       status: "error",
-      message: "No se ha eliminado la publicación",
+      message: "No se eliminó la publicación",
     });
   }
 };
@@ -264,7 +256,6 @@ const feed = async (req, res) => {
 
 // Exportar funciones
 module.exports = {
-  pruebaPublication,
   save,
   detail,
   remove,

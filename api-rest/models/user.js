@@ -28,9 +28,22 @@ const UserSchema = Schema({
     type: String,
     default: 'default.png'
   },
-  create_at: {
-    type: Date,
-    default: Date.now
+  followingCount: {
+    type: Number,
+    default: 0
+  }, 
+  followersCount: {
+    type: Number,
+    default: 0
+  }, 
+  publicationsCount: {
+    type: Number,
+    default: 0
+  }, 
+}, {
+  timestamps: {
+    createdAt: true,
+    updatedAt: false
   }
 });
 

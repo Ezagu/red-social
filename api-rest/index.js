@@ -5,6 +5,7 @@ const cors = require('cors');
 
 // Modelos
 const Like = require('./models/like.js');
+const Follow = require('./models/follow.js');
 
 // Rutas
 const userRoutes = require('./routes/user.js');
@@ -22,6 +23,8 @@ const startServer = async() => {
 
     // Sincronizar indices (SOLO EN DEV)
     await Like.syncIndexes();
+    await Follow.syncIndexes();
+
     console.log('Indices sincronizados');
 
     // Crear servidor de node

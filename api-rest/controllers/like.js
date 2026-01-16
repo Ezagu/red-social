@@ -1,4 +1,7 @@
 const Like = require('../models/like.js');
+const Comment = require('../models/comment.js');
+const Publication = require('../models/publication.js');
+
 
 const save = async(req, res) => {
 
@@ -6,17 +9,22 @@ const save = async(req, res) => {
   const user = req.user._id;
 
   try {
-    const like = new Like({
+    const like = await Like.create({
       targetId,
       targetType,
       user
-    })
+    });
 
-    await like.save();
+    if(targetType === 'Comment') {
+      await Comment.findByIdAndUpdate(targetId, {$inc: {likesCount: 1}});
+    } else if(targetType === 'Publication') {
+      await Publication.findByIdAndUpdate(targetId, {$inc: {likesCount: 1}});
+    }
 
     return res.status(200).json({
       status: 'success',
-      message: 'Like guardado con éxito'
+      message: 'Like guardado con éxito',
+      like
     })
   } catch(error) {
     let message = 'No se pudo guardar el like';
@@ -43,6 +51,12 @@ const remove = async(req, res) => {
       targetId,
       targetType
     });
+
+    if(targetType === 'Comment') {
+      await Comment.findByIdAndUpdate(targetId, {$inc: {likesCount: -1}});
+    } else if(targetType === 'Publication') {
+      await Publication.findByIdAndUpdate(targetId, {$inc: {likesCount: -1}});
+    }
 
     return res.status(200).json({
       status: 'success',
