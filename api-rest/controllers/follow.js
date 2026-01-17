@@ -3,9 +3,6 @@ const Follow = require("../models/follow.js");
 const User = require("../models/user.js");
 const Notification = require("../models/notification.js");
 
-// Importar servicio
-const followService = require("../services/followService.js");
-
 // Acción de guardar un follow (acción seguir)
 const save = async (req, res) => {
   // Conseguir datos por body
@@ -35,19 +32,21 @@ const save = async (req, res) => {
       $inc: { unreadNotificationsCount: 1 },
     });
 
-    return res.status(200).json({
+    return res.status(201).json({
       status: "success",
       message: "Seguido con éxito",
       follow,
     });
-  } catch (err) {
-    let message = "No se pudo seguir al usuario";
-    if (err.code === 11000) {
-      message = "Ya sigues a esta cuenta";
+  } catch (error) {
+    if (error.code === 11000) {
+      return res.status(409).json({
+        status: 'error',
+        message: "Ya sigues a esta cuenta"
+      });
     }
-    return res.status(400).json({
+    return res.status(500).json({
       status: "error",
-      message,
+      message: "No se pudo seguir al usuario"
     });
   }
 };
@@ -67,10 +66,11 @@ const unfollow = async (req, res) => {
       followed,
     });
 
-    console.log("followDeleted: " + followDeleted);
-
     if (!followDeleted) {
-      throw new Error();
+      return res.status(404).json({
+        status:'error',
+        message: 'No sigues a ese usuario'
+      })
     }
 
     await User.findByIdAndUpdate(user, { $inc: { followingCount: -1 } });
@@ -87,111 +87,11 @@ const unfollow = async (req, res) => {
       });
     }
 
-    return res.status(200).json({
-      status: "success",
-      message: "Follow eliminado correctamente",
-    });
+    return res.status(204).send();
   } catch (error) {
-    return res.status(400).json({
+    return res.status(500).json({
       status: "error",
-      message: "No se pudo dejar de seguir",
-      error,
-    });
-  }
-};
-
-// Acción listado de usuarios que cualquier usuario está siguiendo
-const following = async (req, res) => {
-  // Sacar el id del usuario
-  const userId = req.params.id || req.user.id;
-
-  // Comprobar si me llega la pagina, si no la pagina 1
-  const page = req.params.page || 1;
-
-  // Usuarios por pagina quiero mostrar
-  const itemsPerPage = 5;
-
-  // Find a follow, popular datos de los usuarios y paginar
-  try {
-    const follows = await Follow.paginate(
-      {
-        user: userId,
-      },
-      {
-        page,
-        limit: itemsPerPage,
-        populate: {
-          path: "user followed",
-          select: "-password -role -__v -email",
-        },
-      }
-    );
-
-    // Sacar un array de ids de los usuarios que me siguen y los que sigo como usuario identificado
-    const followUserIds = await followService.followUserIds(req.user.id);
-
-    return res.status(200).json({
-      status: "success",
-      message: "Listado de usuarios que estoy siguiendo",
-      follows: follows.docs,
-      total: follows.totalDocs,
-      totalPages: follows.totalPages,
-      hasNextPage: follows.hasNextPage,
-      user_following: followUserIds.following,
-      user_follow_me: followUserIds.followers,
-    });
-  } catch (error) {
-    return res.status(400).json({
-      status: "error",
-      message: "No se pudo encontrar los usuarios seguidos",
-    });
-  }
-};
-
-// Acción listado de usuarios que siguen a cualquier otro usuario
-const followers = async (req, res) => {
-  // Sacar el id del usuario
-  const userId = req.params.id || req.user.id;
-
-  // Comprobar si me llega la pagina, si no la pagina 1
-  const page = req.params.page || 1;
-
-  // Usuarios por pagina quiero mostrar
-  const itemsPerPage = 5;
-
-  // Find a follow, popular datos de los usuarios y paginar
-  try {
-    const follows = await Follow.paginate(
-      {
-        followed: userId,
-      },
-      {
-        page,
-        limit: itemsPerPage,
-        populate: {
-          path: "user",
-          select: "-password -role -__v -email",
-        },
-      }
-    );
-
-    // Sacar un array de ids de los usuarios que me siguen y los que sigo como usuario identificado
-    const followUserIds = await followService.followUserIds(req.user.id);
-
-    return res.status(200).json({
-      status: "success",
-      message: "Listado de usuarios que me siguen",
-      follows: follows.docs,
-      total: follows.totalDocs,
-      totalPages: follows.totalPages,
-      hasNextPage: follows.hasNextPage,
-      user_following: followUserIds.following,
-      user_follow_me: followUserIds.followers,
-    });
-  } catch (error) {
-    return res.status(400).json({
-      status: "error",
-      message: "No se pudo encontrar los usuarios que me siguen",
+      message: "No se pudo dejar de seguir"
     });
   }
 };
@@ -199,7 +99,5 @@ const followers = async (req, res) => {
 // Exportar funciones
 module.exports = {
   save,
-  unfollow,
-  following,
-  followers,
+  unfollow
 };

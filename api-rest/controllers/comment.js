@@ -16,7 +16,7 @@ const create = async (req, res) => {
     const publication = await Publication.findById(publicationId);
 
     if(!publication) {
-      return res.status(400).json({
+      return res.status(404).json({
         status: 'error',
         message: 'La publicacion no existe'
       });
@@ -52,7 +52,7 @@ const create = async (req, res) => {
       comment: newComment
     });
   } catch(error) {
-    return res.status(400).json({
+    return res.status(500).json({
       status: 'error',
       message: 'No se pudo publicar el comentario'
     });
@@ -62,14 +62,14 @@ const create = async (req, res) => {
 const remove = async (req, res) => {
 
   const user = req.user._id;
-  const {comment} = req.body;
+  const {comment} = req.params.id;
 
   try {
     // Elimina comentario
     const commentRemoved = await Comment.findOneAndDelete({user, _id: comment});
 
     if(!commentRemoved) {
-      return res.status(400).json({
+      return res.status(404).json({
         status:'error',
         message: 'Comentario no encontrado'
       });
@@ -92,7 +92,7 @@ const remove = async (req, res) => {
       comment: commentRemoved
     });
   } catch(error) {
-    return res.status(400).json({
+    return res.status(500).json({
       status: 'error',
       message: 'No se pudo eliminar el comentario'
     });
@@ -112,7 +112,7 @@ const replies = async (req, res) => {
       replies
     })
   } catch(error) {
-    return res.status(400).json({
+    return res.status(500).json({
       status: 'error',
       message: 'Error obteniendo las respuestas del comentario'
     });

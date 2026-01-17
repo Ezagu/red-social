@@ -31,38 +31,37 @@ const save = async(req, res) => {
       await User.findByIdAndUpdate(target.user, {$inc: {unreadNotificationsCount: 1}});
     }
 
-    return res.status(200).json({
+    return res.status(201).send({
       status: 'success',
-      message: 'Like guardado con éxito',
-      like
-    })
+      message: 'Like enviado'
+    });
   } catch(error) {
-    let message = 'No se pudo guardar el like';
-
     if(error.code === 11000) {
-      message = 'Ya se likeo la publicacion o comentario'
+      return res.status(409).json({
+        status: 'error',
+        message: 'Ya se likeo la publicacion o comentario'
+      })
     }
 
     return res.status(400).json({
       status: 'error',
-      message,
-      error
+      message: 'No se pudo guardar el like'
     });
   } 
 }
 
 const remove = async(req, res) => {
-  
   const user = req.user._id;
   const likeId = req.params.id;
 
   try {
     const likeRemoved = await Like.findOneAndDelete({_id: likeId, user});
 
-    console.log(likeRemoved);
-
     if(!likeRemoved) {
-      throw new Error();
+      return res.status(404).json({
+        status: 'error',
+        message: 'Like no encontrado'
+      })
     }
 
     if(likeRemoved.targetType === 'Comment') {
@@ -74,12 +73,9 @@ const remove = async(req, res) => {
     // Eliminar notificación
     await Notification.findOneAndDelete({targetType: 'Like', targetId: likeId});
 
-    return res.status(200).json({
-      status: 'success',
-      message: 'Like eliminado'
-    });
+    return res.status(204).send();
   } catch(error) {
-    return res.status(400).json({
+    return res.status(500).json({
       status: 'error',
       message: 'No se pudo deshacer el like'
     });

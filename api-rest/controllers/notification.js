@@ -23,7 +23,7 @@ const read = async (req, res) => {
       notification,
     });
   } catch (error) {
-    res.status(400).json({
+    res.status(500).json({
       status: "error",
       message: "No se pudo leer la notificación",
     });
@@ -39,14 +39,16 @@ const remove = async (req, res) => {
       _id: notificationId,
     });
 
-    if (!notificationRemoved) throw new Error();
+    if (!notificationRemoved) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Notificación inexistente'
+      })
+    }
 
-    res.status(200).json({
-      status: "success",
-      message: "Notificación eliminada",
-    });
+    res.status(204).send();
   } catch (error) {
-    res.status(400).json({
+    res.status(500).json({
       status: "error",
       message: "No se pudo eliminar la notificación",
     });
@@ -61,12 +63,9 @@ const readAll = async (req, res) => {
 
     await User.findByIdAndUpdate(user, { unreadNotificationsCount: 0 });
 
-    return res.status(200).json({
-      status: "success",
-      message: "Todas las notificaciones leídas",
-    });
+    return res.status(204).send()
   } catch (error) {
-    return res.status(400).json({
+    return res.status(500).json({
       status: "error",
       message: "No se pudieron leer las notificaciones",
     });
@@ -79,12 +78,9 @@ const removeAll = async (req, res) => {
   try {
     await Notification.deleteMany({ user });
 
-    return res.status(200).json({
-      status: "success",
-      message: "Se eliminaron todas las notificaciones",
-    });
+    return res.status(204).send()
   } catch (error) {
-    return res.status(400).json({
+    return res.status(500).json({
       status: "error",
       message: "No se pudieron eliminar las notificaciones",
     });
@@ -105,7 +101,7 @@ const list = async (req, res) => {
       notifications,
     });
   } catch (error) {
-    return res.status(200).json({
+    return res.status(500).json({
       status: "error",
       message: "No se pudo listar las notificaciones",
     });
@@ -117,5 +113,5 @@ module.exports = {
   remove,
   readAll,
   removeAll,
-  list,
+  list
 };

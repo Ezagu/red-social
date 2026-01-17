@@ -5,8 +5,8 @@ const path = require("path");
 
 // Importar modelos
 const User = require("../models/user.js");
-const Follow = require("../models/follow.js");
 const Publication = require("../models/publication.js");
+const Notification = require("../models/notification.js");
 
 // Importar servicios
 const jwt = require("../services/jwt.js");
@@ -21,9 +21,9 @@ const register = async (req, res) => {
   try {
     params.password = await bcrypt.hash(params.password, 10);
   } catch (error) {
-    return res.status(400).json({
+    return res.status(500).json({
       status: "error",
-      message: "Error al encriptar la contraseña",
+      message: "No se pudo encriptar la contraseña",
     });
   }
 
@@ -44,7 +44,7 @@ const register = async (req, res) => {
     if (error.code === 11000) {
       message = "Ya existe el usuario";
     }
-    return res.status(500).send({
+    return res.status(409).send({
       status: "error",
       message,
     });
@@ -105,7 +105,7 @@ const profile = async (req, res) => {
     if (!userProfile) {
       return res.status(404).send({
         status: "error",
-        message: "El usuario no ha sido encontrado",
+        message: "Usuario no encontrado",
       });
     }
 
@@ -132,15 +132,26 @@ const list = async (req, res) => {
   // Controlar en que pagina estamos
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 5;
+  const search = req.query.search;
 
   try {
     const followsIds = await followService.followsIds(req.user.id);
 
+    // No aparece el usuario identificado en el listado
+    const query = {_id: { $ne: req.user.id }}
+
+    // En caso de que haya una busqueda, buscar
+    if(search) {
+      query.$or = [
+        {'nick': {$regex: search, $options: 'i'}},
+        {'name': {$regex: search, $options: 'i'}},
+        {'surname': {$regex: search, $options: 'i'}}
+      ]
+    }
+
     // Consulta con mongoose paginate
     const result = await User.paginate(
-      {
-        _id: { $ne: req.user.id },
-      },
+      query,
       {
         page,
         limit,
@@ -163,10 +174,10 @@ const list = async (req, res) => {
       totalUsers: result.totalDocs,
       totalPages: result.totalPages,
       hasNextPage: result.hasNextPage,
-      users: usersWithFollowInfo,
+      users: usersWithFollowInfo
     });
   } catch (err) {
-    return res.status(500).json({
+    return res.status(404).json({
       status: "error",
       message: "Usuarios no encontrados",
     });
@@ -202,9 +213,9 @@ const listFollowers = async (req, res) => {
       users: usersWithFollowInfo,
     });
   } catch {
-    return res.status(400).json({
+    return res.status(404).json({
       status: "error",
-      message: "Usuario no encontrado",
+      message: "Usuarios no encontrados",
     });
   }
 };
@@ -240,7 +251,7 @@ const listFollowing = async (req, res) => {
   } catch {
     return res.status(400).json({
       status: "error",
-      message: "Usuario no encontrado",
+      message: "Usuarios no encontrados",
     });
   }
 };
@@ -270,7 +281,7 @@ const update = async (req, res) => {
     });
 
     if (userIsset) {
-      return res.status(400).json({
+      return res.status(409).json({
         status: "error",
         message: "El nick ya está en uso",
       });
@@ -282,9 +293,9 @@ const update = async (req, res) => {
     try {
       userToUpdate.password = await bcrypt.hash(userToUpdate.password, 10);
     } catch (err) {
-      return res.status(400).json({
+      return res.status(500).json({
         status: "error",
-        message: "Error al encriptar la contraseña",
+        message: "No se pudo encriptar la contraseña",
       });
     }
   } else {
@@ -307,7 +318,7 @@ const update = async (req, res) => {
       });
     }
   } catch (error) {
-    return res.status(400).json({
+    return res.status(404).json({
       status: "error",
       message: "Error al actualizar o usuario no encontrado",
     });
@@ -317,9 +328,9 @@ const update = async (req, res) => {
 const upload = async (req, res) => {
   // Recoger el fichero de imagen y comprobar que existe
   if (!req.file) {
-    return res.status(404).send({
+    return res.status(400).send({
       status: "error",
-      message: "Peticion no incluye la imagen",
+      message: "Falta enviar imagen",
     });
   }
 
@@ -335,7 +346,7 @@ const upload = async (req, res) => {
     fs.unlinkSync(req.file.path);
     return res.status(400).json({
       status: "error",
-      message: "Extensión del fichero invalida",
+      message: "Extensión del fichero inválida",
     });
   }
 
@@ -364,9 +375,9 @@ const upload = async (req, res) => {
       file: req.file,
     });
   } catch (error) {
-    return res.status(400).json({
+    return res.status(500).json({
       status: "error",
-      message: "Error en la subida del avatar",
+      message: "Error subiendo avatar",
     });
   }
 };
@@ -379,35 +390,12 @@ const avatar = async (req, res) => {
   if (!fs.existsSync(filePath)) {
     return res.status(404).json({
       status: "error",
-      message: "No existe la image",
+      message: "No existe la imagen",
     });
   }
 
   // Devolver un file
   return res.sendFile(path.resolve(filePath));
-};
-
-const counters = async (req, res) => {
-  const userId = req.params.id || req.user.id;
-
-  try {
-    const following = await Follow.countDocuments({ user: userId });
-    const followed = await Follow.countDocuments({ followed: userId });
-    const publications = await Publication.countDocuments({ user: userId });
-
-    return res.status(200).json({
-      status: "success",
-      userId,
-      following,
-      followed,
-      publications,
-    });
-  } catch (error) {
-    return res.status(400).json({
-      status: "error",
-      message: "Error al obtener los contadores",
-    });
-  }
 };
 
 const publications = async (req, res) => {
@@ -439,9 +427,30 @@ const publications = async (req, res) => {
       publications: publications.docs,
     });
   } catch (error) {
-    return res.status(400).json({
+    return res.status(500).json({
       status: "error",
       message: "No se pudo listar las publicaciones del usuario",
+    });
+  }
+};
+
+const notifications = async (req, res) => {
+  const user = req.user._id;
+  
+  try {
+    const notifications = await Notification.find({ user })
+      .populate("fromUser", "nick name surname image")
+      .populate("targetId");
+
+    return res.status(200).json({
+      status: "success",
+      message: "Listado de notificaciones",
+      notifications,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: "error",
+      message: "No se pudo listar las notificaciones",
     });
   }
 };
@@ -457,6 +466,6 @@ module.exports = {
   update,
   upload,
   avatar,
-  counters,
   publications,
+  notifications
 };

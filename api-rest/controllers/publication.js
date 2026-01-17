@@ -24,13 +24,13 @@ const save = async (req, res) => {
     await User.findByIdAndUpdate(user, { $inc: { publicationsCount: 1 } });
 
     // Devolver respuesta
-    return res.status(200).json({
+    return res.status(201).json({
       status: "success",
-      message: "Publicación subida con éxito",
+      message: "Publicación subida",
       publication,
     });
   } catch (error) {
-    return res.status(400).json({
+    return res.status(500).json({
       status: "error",
       message: "No se pudo subir la publicación",
       error,
@@ -49,7 +49,6 @@ const detail = async (req, res) => {
 
     return res.status(200).json({
       status: "success",
-      message: "Mostrar publicación",
       publication,
     });
   } catch (error) {
@@ -73,7 +72,12 @@ const remove = async (req, res) => {
       _id: publicationId,
     });
 
-    if (!publicationDeleted) throw new Error();
+    if (!publicationDeleted) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Publicación no encontrada'
+      })
+    }
 
     await User.findByIdAndUpdate(user, { $inc: { publicationsCount: -1 } });
 
@@ -144,7 +148,7 @@ const upload = async (req, res) => {
       file: req.file,
     });
   } catch (error) {
-    return res.status(400).json({
+    return res.status(500).json({
       status: "error",
       message: "Error en la subida del archivo",
     });
@@ -164,7 +168,7 @@ const media = async (req, res) => {
     if (error) {
       return res.status(404).json({
         status: "error",
-        message: "No existe la image",
+        message: "No existe la imagen",
       });
     }
 
@@ -205,9 +209,9 @@ const publications = async (req, res) => {
       publications: publications.docs,
     });
   } catch (error) {
-    return res.status(400).json({
+    return res.status(500).json({
       status: "error",
-      message: "No se han listado las publicaciones del feed",
+      message: "No se pudo listar las publicaciones del feed",
       error,
     });
   }
@@ -244,7 +248,7 @@ const followingPublications = async (req, res) => {
       publications: publications.docs,
     });
   } catch (error) {
-    return res.status(200).json({
+    return res.status(500).json({
       status: "error",
       message: "No se pudo listar las publicaciones de tus seguidos",
     });
