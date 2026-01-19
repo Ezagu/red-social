@@ -1,11 +1,19 @@
 import React from "react";
 
 export const Avatar = ({ size, src }) => {
+  const sizes = {
+    sm: "size-8",
+    md: "size-12",
+    lg: "size-16",
+    xl: "size-24",
+    "2xl": "size-30",
+  };
+
   return (
     <div>
       <img
         src={src}
-        className={`size-${size} rounded-full object-cover`}
+        className={`${sizes[size]} rounded-full object-cover`}
         alt="avatar"
       />
     </div>
