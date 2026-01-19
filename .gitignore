@@ -6,6 +6,9 @@ yarn-error.log*
 api-rest/uploads/avatars/*
 api-rest/uploads/publications/*
 
+/frontend/src/assets/*
+/frontend-deprecated
+
 
 # Environment variables
 .env
