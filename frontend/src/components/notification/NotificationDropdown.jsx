@@ -2,11 +2,12 @@ import React, { useState } from "react";
 import { Bell } from "lucide-react";
 import { ChevronUp } from "lucide-react";
 import { Dot } from "lucide-react";
+import { Circle } from "lucide-react";
 import { ListNotifications } from "./ListNotifications";
 
 export const NotificationDropdown = () => {
   const [show, setShow] = useState(false);
-  const [unreadNotification, setUnreadNotification] = useState(false);
+  const [unreadNotification, setUnreadNotification] = useState(true);
 
   return (
     <div className="text-text-primary bg-surface relative rounded-2xl">
@@ -16,8 +17,9 @@ export const NotificationDropdown = () => {
       >
         {unreadNotification && (
           <>
-            <Dot className="text-primary absolute -top-0.5 left-2 size-12" />
-            <Dot className="text-primary absolute -top-0.5 left-2 size-12 animate-ping" />
+            <span className="absolute top-2.5 left-8.5 z-10 text-xs">4</span>
+            <Circle className="text-primary fill-primary absolute top-2 left-7 size-5" />
+            <Circle className="text-primary absolute top-2 left-7 size-5 animate-ping" />
           </>
         )}
         <Bell />

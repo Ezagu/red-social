@@ -8,11 +8,11 @@ export const Layout = () => {
   return (
     <>
       <Header />
-      <div className="grid grid-cols-3 gap-4 p-4">
+      <main className="grid grid-cols-3 gap-4 p-4">
         <ProfileAside />
         <Outlet className="grow-" />
         <SocialAside />
-      </div>
+      </main>
     </>
   );
 };

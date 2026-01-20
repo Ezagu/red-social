@@ -33,25 +33,19 @@ export const ListPublications = () => {
         </Link>
 
         <footer className="mt-2 flex gap-4 px-6 pb-4">
+          <span className="text-text-secondary border-r pr-3 text-xl">4h</span>
           <Link className="flex cursor-pointer items-center gap-1.5">
             <div>
-              <MessageCircle className="size-4.5" />
+              <MessageCircle className="size-5.5" />
             </div>
-            <span>0</span>
+            <span className="text-lg">0</span>
           </Link>
 
           <button className="flex cursor-pointer items-center gap-1.5">
             <div>
-              <Heart className="size-5" />
+              <Heart className="fill-primary text-primary size-6" />
             </div>
-            <span>0</span>
-          </button>
-
-          <button className="flex cursor-pointer items-center gap-1.5">
-            <div>
-              <Heart className="bg-primary size-7 rounded-full p-1" />
-            </div>
-            <span>0</span>
+            <span className="text-lg">1</span>
           </button>
         </footer>
       </article>
@@ -80,25 +74,19 @@ export const ListPublications = () => {
         </Link>
 
         <footer className="mt-2 flex gap-4 px-6 pb-4">
+          <span className="text-text-secondary border-r pr-3 text-xl">6h</span>
           <Link className="flex cursor-pointer items-center gap-1.5">
             <div>
-              <MessageCircle className="size-4.5" />
+              <MessageCircle className="size-5.5" />
             </div>
-            <span>0</span>
+            <span className="text-lg">0</span>
           </Link>
 
           <button className="flex cursor-pointer items-center gap-1.5">
             <div>
-              <Heart className="size-5" />
+              <Heart className="fill-primary text-primary size-6" />
             </div>
-            <span>0</span>
-          </button>
-
-          <button className="flex cursor-pointer items-center gap-1.5">
-            <div>
-              <Heart className="bg-primary size-7 rounded-full p-1" />
-            </div>
-            <span>0</span>
+            <span className="text-lg">1</span>
           </button>
         </footer>
       </article>
@@ -119,25 +107,19 @@ export const ListPublications = () => {
         </Link>
 
         <footer className="mt-2 flex gap-4 px-6 pb-4">
+          <span className="text-text-secondary border-r pr-3 text-xl">12h</span>
           <Link className="flex cursor-pointer items-center gap-1.5">
             <div>
-              <MessageCircle className="size-4.5" />
+              <MessageCircle className="size-5.5" />
             </div>
-            <span>0</span>
+            <span className="text-lg">0</span>
           </Link>
 
           <button className="flex cursor-pointer items-center gap-1.5">
             <div>
-              <Heart className="size-5" />
+              <Heart className="fill-primary text-primary size-6" />
             </div>
-            <span>0</span>
-          </button>
-
-          <button className="flex cursor-pointer items-center gap-1.5">
-            <div>
-              <Heart className="bg-primary size-7 rounded-full p-1" />
-            </div>
-            <span>0</span>
+            <span className="text-lg">1</span>
           </button>
         </footer>
       </article>
@@ -166,25 +148,19 @@ export const ListPublications = () => {
         </Link>
 
         <footer className="mt-2 flex gap-4 px-6 pb-4">
+          <span className="text-text-secondary border-r pr-3 text-xl">2d</span>
           <Link className="flex cursor-pointer items-center gap-1.5">
             <div>
-              <MessageCircle className="size-4.5" />
+              <MessageCircle className="size-5.5" />
             </div>
-            <span>0</span>
+            <span className="text-lg">0</span>
           </Link>
 
           <button className="flex cursor-pointer items-center gap-1.5">
             <div>
-              <Heart className="size-5" />
+              <Heart className="fill-primary text-primary size-6" />
             </div>
-            <span>0</span>
-          </button>
-
-          <button className="flex cursor-pointer items-center gap-1.5">
-            <div>
-              <Heart className="bg-primary size-7 rounded-full p-1" />
-            </div>
-            <span>0</span>
+            <span className="text-lg">1</span>
           </button>
         </footer>
       </article>

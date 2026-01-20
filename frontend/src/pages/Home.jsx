@@ -7,14 +7,14 @@ export const Home = () => {
   const [loading, setLoading] = useState(false);
 
   return (
-    <section className="bg-surface rounded-2xl">
+    <main className="bg-surface rounded-2xl">
       <header className="text-text-primary border-border-input border-b text-center">
         <div className="flex">
           <button
             className={
               section === "all"
                 ? "bg-primary w-full cursor-pointer rounded-t-2xl p-2 text-lg font-semibold transition-all"
-                : "hover:bg-elevated text-text-secondary text-md text-md w-full cursor-pointer rounded-t-2xl rounded-tr-2xl p-2 font-normal transition-all"
+                : "hover:bg-elevated text-text-secondary text-md w-full cursor-pointer rounded-t-2xl rounded-tr-2xl p-2 text-lg font-normal transition-all"
             }
             onClick={() => setSection("all")}
           >
@@ -24,7 +24,7 @@ export const Home = () => {
             className={
               section === "following"
                 ? "bg-primary w-full cursor-pointer rounded-t-2xl p-2 text-lg font-semibold transition-all"
-                : "hover:bg-elevated text-text-secondary text-md text-md w-full cursor-pointer rounded-t-2xl rounded-tr-2xl p-2 font-normal transition-all"
+                : "hover:bg-elevated text-text-secondary text-md w-full cursor-pointer rounded-t-2xl rounded-tr-2xl p-2 text-lg font-normal transition-all"
             }
             onClick={() => setSection("following")}
           >
@@ -39,6 +39,6 @@ export const Home = () => {
           <ListPublications />
         )}
       </section>
-    </section>
+    </main>
   );
 };

@@ -9,21 +9,21 @@ export const ListNotifications = ({ notifications }) => {
   const data = {
     Comment: {
       icon: (
-        <MessageCircle className="bg-surface absolute -right-2 -bottom-1 size-6 rounded-full p-1" />
+        <MessageCircle className="bg-surface fill-text-primary absolute -right-2 -bottom-1 size-6 rounded-full p-1" />
       ),
       message: `ha comentado tu publicación.`,
       link: "",
     },
     Like: {
       icon: (
-        <Heart className="bg-surface absolute -right-2 -bottom-1 size-6 rounded-full p-1 text-red-800" />
+        <Heart className="bg-surface absolute -right-2 -bottom-1 size-6 rounded-full fill-red-800 p-1 text-red-800" />
       ),
       message: `ha dado me gusta a tu publicación.`,
       link: "",
     },
     Follow: {
       icon: (
-        <UserPlus className="bg-surface text-primary absolute -right-2 -bottom-1 size-6 rounded-full p-1" />
+        <UserPlus className="bg-surface text-primary fill-primary absolute -right-2 -bottom-1 size-6 rounded-full p-1" />
       ),
       message: `ha comenzado a seguirte.`,
       link: "",

@@ -12,12 +12,10 @@ export const Avatar = ({ size, src }) => {
   };
 
   return (
-    <div>
-      <img
-        src={src}
-        className={`${sizes[size]} rounded-full object-cover`}
-        alt="avatar"
-      />
-    </div>
+    <img
+      src={src}
+      className={`${sizes[size]} rounded-full object-cover`}
+      alt="avatar"
+    />
   );
 };

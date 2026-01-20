@@ -2,10 +2,22 @@ import React, { useState } from "react";
 import { ChevronUp } from "lucide-react";
 import { Pen } from "lucide-react";
 import { Alert } from "../ui/Alert.jsx";
+import { ImagePlus } from "lucide-react";
+import { X } from "lucide-react";
 
 export const CreatePublication = () => {
   const [show, setShow] = useState(true);
   const [result, setResult] = useState(null);
+
+  const [filePreview, setFilePreview] = useState(null);
+  const [fileSelected, setFileSelected] = useState(null);
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+
+    setFileSelected(file ? file : null);
+    setFilePreview(file ? URL.createObjectURL(file) : null);
+  };
 
   return (
     <div className="text-text-primary bg-surface relative rounded-2xl">
@@ -26,20 +38,51 @@ export const CreatePublication = () => {
       </button>
       {show && (
         <form className="flex flex-col gap-4 p-4 pt-0">
-          {result && <Alert status={result.status} message={result.message} />}
           <textarea
             placeholder="¿Qué estás pensando?"
-            className="border-border-input focus:border-primary resize-none rounded-2xl border p-2 focus:outline-none"
+            className="border-border-input focus:border-primary field-sizing-content resize-none rounded-2xl border p-2 py-3 text-xl focus:outline-none"
             maxLength="255"
             required
-            rows="3"
           />
-          <input type="file" className="ml-2" />
-          <input
-            type="submit"
-            value="Publicar"
-            className="bg-primary hover:bg-primary-hover cursor-pointer rounded-2xl p-2 font-semibold"
-          />
+          {filePreview && (
+            <div className="relative w-full">
+              <button
+                className="bg-surface absolute top-2 right-2 cursor-pointer rounded-full p-2"
+                onClick={() => {
+                  setFilePreview(null);
+                  setFileSelected(null);
+                }}
+              >
+                <X />
+              </button>
+              <img
+                src={filePreview}
+                className="border-border-input max-h-64 w-full rounded-2xl border object-contain"
+              />
+            </div>
+          )}
+
+          {result && <Alert status={result.status} message={result.message} />}
+          <div className="flex w-full items-center justify-between">
+            <label
+              className="hover:bg-primary cursor-pointer rounded-full p-2"
+              htmlFor="file0"
+            >
+              <ImagePlus />
+            </label>
+            <input
+              type="file"
+              className="hidden"
+              id="file0"
+              name="file0"
+              onChange={handleFileChange}
+            />
+            <input
+              type="submit"
+              value="Publicar"
+              className="bg-primary hover:bg-primary-hover cursor-pointer rounded-2xl p-2 px-4 font-semibold"
+            />
+          </div>
         </form>
       )}
     </div>

@@ -2,6 +2,12 @@
 
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
+@layer base {
+  html {
+    font-size: 13px;
+  }
+}
+
 @theme {
   --color-background: oklch(13% 0.028 261.692);
   --color-surface: oklch(21% 0.034 264.665);

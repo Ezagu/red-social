@@ -2,7 +2,7 @@ import React from "react";
 
 export const Footer = () => {
   return (
-    <footer className="sticky bottom-0 flex h-10 w-full items-center justify-center border-t border-gray-800 bg-gray-950 text-sm text-slate-50/70">
+    <footer className="flex h-10 w-full items-center justify-center border-t border-gray-800 bg-gray-950 text-sm text-slate-50/70">
       <p>
         Creado con 💖 por{" "}
         <a
