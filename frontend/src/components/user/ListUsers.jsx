@@ -1,6 +1,7 @@
 import React from "react";
 import { Avatar } from "../ui/Avatar";
 import { Link } from "react-router";
+import { ButtonFollowUnfollow } from "../ui/ButtonFollowUnfollow";
 
 export const ListUsers = () => {
   return (
@@ -17,9 +18,7 @@ export const ListUsers = () => {
           <p className="text-text-muted -mt-1">Kiara Duarte</p>
           <p>Tengo al mejor novio del mundoooo</p>
         </div>
-        <button className="bg-primary absolute top-3 right-4 cursor-pointer rounded-2xl px-3 py-1">
-          Seguir
-        </button>
+        <ButtonFollowUnfollow following={false} />
       </Link>
 
       <Link className="bg-surface relative flex w-full items-center gap-3 rounded-2xl px-4 py-2">
@@ -31,9 +30,7 @@ export const ListUsers = () => {
           <p className="text-text-muted -mt-1">William Gallagher</p>
           <p>Im the fucking number one</p>
         </div>
-        <button className="bg-danger absolute top-3 right-4 cursor-pointer rounded-2xl px-3 py-1">
-          Dejar de seguir
-        </button>
+        <ButtonFollowUnfollow following={true} />
       </Link>
 
       <button className="bg-primary hover:bg-primary-hover w-1/2 cursor-pointer rounded-2xl py-2 font-semibold">

@@ -7,6 +7,8 @@ export const Avatar = ({ size, src }) => {
     lg: "size-16",
     xl: "size-24",
     "2xl": "size-30",
+    "3xl": "size-36",
+    "4xl": "size-48",
   };
 
   return (

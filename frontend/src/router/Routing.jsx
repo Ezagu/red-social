@@ -5,6 +5,7 @@ import { Home } from "../pages/Home.jsx";
 import { Login } from "../pages/Login.jsx";
 import { Register } from "../pages/Register.jsx";
 import { Layout } from "../layout/Layout.jsx";
+import { Profile } from "../pages/Profile.jsx";
 
 export const Routing = () => {
   return (
@@ -17,6 +18,8 @@ export const Routing = () => {
         {/*Private Routes*/}
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/profile/:id" element={<Profile />} />
         </Route>
       </Routes>
       <Footer />

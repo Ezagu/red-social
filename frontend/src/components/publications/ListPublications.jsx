@@ -7,7 +7,7 @@ import { Heart } from "lucide-react";
 export const ListPublications = () => {
   return (
     <ul className="text-text-primary">
-      <article className="mt-4">
+      <article className="border-border-input border-t pt-4 first:border-none">
         <header className="flex items-center gap-2 px-4">
           <Link>
             <Avatar src="/src/assets/agus.jpg" size="md" />
@@ -32,7 +32,7 @@ export const ListPublications = () => {
           </div>
         </Link>
 
-        <footer className="border-border-input mt-2 flex gap-4 border-b px-6 pb-4">
+        <footer className="mt-2 flex gap-4 px-6 pb-4">
           <Link className="flex cursor-pointer items-center gap-1.5">
             <div>
               <MessageCircle className="size-4.5" />
@@ -56,7 +56,7 @@ export const ListPublications = () => {
         </footer>
       </article>
 
-      <article className="mt-4">
+      <article className="border-border-input border-t pt-4 first:border-none">
         <header className="flex items-center gap-2 px-4">
           <Link>
             <Avatar src="/src/assets/agus.jpg" size="md" />
@@ -79,7 +79,7 @@ export const ListPublications = () => {
           </div>
         </Link>
 
-        <footer className="border-border-input mt-2 flex gap-4 border-b px-6 pb-4">
+        <footer className="mt-2 flex gap-4 px-6 pb-4">
           <Link className="flex cursor-pointer items-center gap-1.5">
             <div>
               <MessageCircle className="size-4.5" />
@@ -103,7 +103,7 @@ export const ListPublications = () => {
         </footer>
       </article>
 
-      <article className="mt-4">
+      <article className="border-border-input border-t pt-4 first:border-none">
         <header className="flex items-center gap-2 px-4">
           <Link>
             <Avatar src="/src/assets/agus.jpg" size="md" />
@@ -118,7 +118,7 @@ export const ListPublications = () => {
           <p className="mt-2 px-6 text-xl">Publicacion sin ninguna imagen</p>
         </Link>
 
-        <footer className="border-border-input mt-2 flex gap-4 border-b px-6 pb-4">
+        <footer className="mt-2 flex gap-4 px-6 pb-4">
           <Link className="flex cursor-pointer items-center gap-1.5">
             <div>
               <MessageCircle className="size-4.5" />
@@ -142,7 +142,7 @@ export const ListPublications = () => {
         </footer>
       </article>
 
-      <article className="mt-4">
+      <article className="border-border-input border-t pt-4 first:border-none">
         <header className="flex items-center gap-2 px-4">
           <Link>
             <Avatar src="/src/assets/agus.jpg" size="md" />
@@ -165,7 +165,7 @@ export const ListPublications = () => {
           </div>
         </Link>
 
-        <footer className="border-border-input mt-2 flex gap-4 border-b px-6 pb-4">
+        <footer className="mt-2 flex gap-4 px-6 pb-4">
           <Link className="flex cursor-pointer items-center gap-1.5">
             <div>
               <MessageCircle className="size-4.5" />
