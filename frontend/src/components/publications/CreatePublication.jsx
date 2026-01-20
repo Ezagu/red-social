@@ -8,7 +8,7 @@ export const CreatePublication = () => {
   const [result, setResult] = useState(null);
 
   return (
-    <div className="text-text-primary bg-surface relative ml-40 rounded-2xl">
+    <div className="text-text-primary bg-surface relative rounded-2xl">
       <button
         className="flex w-full cursor-pointer items-center gap-2 p-4 text-xl font-semibold"
         onClick={() => {
