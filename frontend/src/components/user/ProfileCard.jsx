@@ -19,31 +19,25 @@ export const ProfileCard = () => {
         </Link>
         <div className="grow">
           <Link className="text-4xl font-semibold">Ezagu</Link>
-          <h2 className="text-text-secondary text-lg font-light">
-            Agustín Calpe
-          </h2>
+          <h2 className="text-text-secondary text-lg">Agustín Calpe</h2>
           <div className="mt-2 grid grid-cols-3">
             <Link className="border-border-input border-r">
-              <h3 className="text-text-muted text-center text-sm">
+              <h3 className="text-text-secondary text-center text-sm">
                 Publicaciones
               </h3>
-              <p className="text-text-secondary text-center text-xl font-bold">
-                9
-              </p>
+              <p className="text-center text-xl font-bold">9</p>
             </Link>
             <Link className="border-border-input border-r">
-              <h3 className="text-text-muted text-center text-sm">
+              <h3 className="text-text-secondary text-center text-sm">
                 Seguidores
               </h3>
-              <p className="text-text-secondary text-center text-xl font-bold">
-                12
-              </p>
+              <p className="text-center text-xl font-bold">12</p>
             </Link>
             <Link>
-              <h3 className="text-text-muted text-center text-sm">Seguidos</h3>
-              <p className="text-text-secondary text-center text-xl font-bold">
-                18
-              </p>
+              <h3 className="text-text-secondary text-center text-sm">
+                Seguidos
+              </h3>
+              <p className="text-center text-xl font-bold">18</p>
             </Link>
           </div>
         </div>
