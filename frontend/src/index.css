@@ -22,7 +22,7 @@
   --color-primary-hover: oklch(60.6% 0.16 232.661/90%);
   --color-primary-active: oklch(74.6% 0.16 232.661);
 
-  --color-danger: oklch(0.396 0.141 25.723 / 80%);
+  --color-danger: oklch(0.35 0.141 25.723);
   --color-success: oklch(44.8% 0.119 151.328);
 
   --color-border-input: oklch(44.6% 0.03 256.802);

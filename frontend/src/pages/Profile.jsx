@@ -1,8 +1,6 @@
 import React from "react";
 import { Link } from "react-router";
 import { Avatar } from "../components/ui/Avatar";
-import { ButtonFollowUnfollow } from "../components/ui/ButtonFollowUnfollow";
-import { ListPublications } from "../components/publications/ListPublications.jsx";
 import { SquarePen } from "lucide-react";
 import { PageHeader } from "../components/pages/PageHeader.jsx";
 import { Publication } from "../components/publications/Publication.jsx";

@@ -1,10 +1,27 @@
-import React, { useState } from "react";
-import { ListPublications } from "../components/publications/ListPublications";
+import React, { useEffect, useState } from "react";
 import { Loading } from "../components/ui/Loading";
+import { Publication } from "../components/publications/Publication";
+import Request from "../helpers/Request";
 
 export const Home = () => {
   const [section, setSection] = useState("all");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [publications, setPublications] = useState([]);
+
+  useEffect(() => {
+    const getPublications = async () => {
+      const token = localStorage.getItem("token");
+      const endpoint =
+        section === "all"
+          ? "publication/publications?limit=30"
+          : "publication/publications/following?limit=10";
+      const response = await Request(endpoint, "GET", token);
+      setPublications(response.publications);
+      setLoading(false);
+    };
+
+    getPublications();
+  }, [section]);
 
   return (
     <main className="bg-surface rounded-2xl">
@@ -32,7 +49,15 @@ export const Home = () => {
           </button>
         </div>
       </header>
-      <section>{loading ? <Loading /> : <ListPublications />}</section>
+      <section className="text-text-primary">
+        {loading ? (
+          <Loading />
+        ) : (
+          publications.map((publication) => (
+            <Publication publication={publication} key={publication._id} />
+          ))
+        )}
+      </section>
     </main>
   );
 };

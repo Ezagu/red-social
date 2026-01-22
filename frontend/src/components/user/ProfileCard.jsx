@@ -20,26 +20,27 @@ export const ProfileCard = () => {
   return loading ? (
     <Loading />
   ) : (
-    <div className="text-text-primary bg-surface relative rounded-2xl p-4">
-      <button
-        onClick={logout}
-        className="hover:bg-danger hover:text-text-primary absolute top-5 right-10 cursor-pointer rounded-full p-2 text-gray-500 transition-all"
-      >
-        <LogOut />
-      </button>
-      <div className="ml-4 flex items-center gap-4">
-        <Link to="/profile">
-          <Avatar
-            src={url + "user/avatar/" + user.image}
-            size="2xl"
-            className="border-primary border"
-          />
+    <div className="text-text-primary bg-surface rounded-2xl p-4">
+      <div className="ml-4 flex min-w-0 items-center gap-4 overflow-hidden">
+        <Link to="/profile" className="shrink-0">
+          <Avatar src={url + "user/avatar/" + user.image} size="2xl" />
         </Link>
-        <div className="grow">
-          <Link to="/profile" className="text-4xl font-semibold">
-            {user.nick}
-          </Link>
-          <h2 className="text-text-secondary text-lg">{user.fullName}</h2>
+        <div className="min-w-0 grow">
+          <div className="flex justify-between">
+            <Link to="/profile" className="truncate text-4xl font-semibold">
+              {user.nick}
+            </Link>
+            <button
+              onClick={logout}
+              className="hover:bg-danger hover:text-text-primary bg-surface cursor-pointer rounded-full p-2 text-gray-500 transition-all"
+            >
+              <LogOut />
+            </button>
+          </div>
+
+          <h2 className="text-text-secondary truncate text-lg">
+            {user.fullName}
+          </h2>
           <div className="mt-2 grid grid-cols-3">
             <Link to="/profile" className="border-border-input border-r">
               <h3 className="text-text-secondary text-center text-sm">
