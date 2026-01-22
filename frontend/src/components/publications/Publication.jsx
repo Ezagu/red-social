@@ -13,9 +13,7 @@ export const Publication = ({ mode = "feed", publication }) => {
   const isFeed = mode === "feed";
 
   const Wrapper = isFeed ? Link : "div";
-  const WrapperProps = isFeed ? { to: "/publication/a" } : {};
-
-  console.log(publication);
+  const WrapperProps = isFeed ? { to: "/publication/" + publication._id } : {};
 
   return (
     <article className="border-border-input mt-4 border-t pt-4 first:border-none first:pt-0 last:border-b">

@@ -45,7 +45,10 @@ const detail = async (req, res) => {
 
   // Find con la condicion del id
   try {
-    const publication = await Publication.findById(publicationId);
+    const publication = await Publication.findById(publicationId).populate(
+      "user",
+      "-password -role -email -__v",
+    );
 
     return res.status(200).json({
       status: "success",
@@ -74,9 +77,9 @@ const remove = async (req, res) => {
 
     if (!publicationDeleted) {
       return res.status(404).json({
-        status: 'error',
-        message: 'Publicación no encontrada'
-      })
+        status: "error",
+        message: "Publicación no encontrada",
+      });
     }
 
     await User.findByIdAndUpdate(user, { $inc: { publicationsCount: -1 } });
@@ -137,7 +140,7 @@ const upload = async (req, res) => {
     const publicationUpdated = await Publication.findOneAndUpdate(
       { user: req.user.id, _id: publicationId },
       { file: req.file.filename },
-      { new: true }
+      { new: true },
     );
 
     if (!publicationUpdated) throw new Error();
@@ -193,7 +196,7 @@ const publications = async (req, res) => {
         limit,
         sort: "-created_at",
         populate: { path: "user", select: "-password -__v -role -email" },
-      }
+      },
     );
 
     if (!publications) throw new Error();
@@ -235,7 +238,7 @@ const followingPublications = async (req, res) => {
           path: "user",
           select: "-password -role -email -__v",
         },
-      }
+      },
     );
 
     return res.status(200).json({
