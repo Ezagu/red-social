@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { ListPublications } from "../components/publications/ListPublications";
-import { LoaderCircle } from "lucide-react";
+import { Loading } from "../components/ui/Loading";
 
 export const Home = () => {
   const [section, setSection] = useState("all");
@@ -32,13 +32,7 @@ export const Home = () => {
           </button>
         </div>
       </header>
-      <section>
-        {loading ? (
-          <LoaderCircle className="text-primary m-auto mt-10 size-15 animate-spin" />
-        ) : (
-          <ListPublications />
-        )}
-      </section>
+      <section>{loading ? <Loading /> : <ListPublications />}</section>
     </main>
   );
 };

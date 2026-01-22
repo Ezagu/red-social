@@ -1,20 +1,12 @@
 const { body } = require("express-validator");
 const validateFields = require("./validateFields");
 
-const name = body("name")
+const fullName = body("fullName")
   .trim()
   .notEmpty()
   .withMessage("Ingrese su nombre")
-  .isAlpha("es-ES")
-  .withMessage("Ingrese un nombre correcto")
   .isLength({ min: 3 })
   .withMessage("El nombre debe contener mínimo 3 caracteres");
-
-const surname = body("surname")
-  .trim()
-  .notEmpty()
-  .isAlpha("es-ES")
-  .withMessage("Ingrese un apellido correcto");
 
 const email = body("email")
   .notEmpty()
@@ -39,7 +31,7 @@ const bio = body("bio")
   .withMessage("La biografia no debe contener mas de 255 caracteres");
 
 exports.register = [
-  [name, surname.optional(), email, nick, password, bio.optional()],
+  [fullName, email, nick, password, bio.optional()],
   validateFields,
 ];
 
@@ -48,8 +40,7 @@ exports.update = [
     body().notEmpty().withMessage("No se evió ningún dato para actualizar"),
     email.optional(),
     password.optional(),
-    name.optional(),
-    surname.optional(),
+    fullName.optional(),
     nick.optional(),
     bio.optional(),
   ],

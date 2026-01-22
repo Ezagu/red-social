@@ -47,6 +47,7 @@ const register = async (req, res) => {
     return res.status(409).send({
       status: "error",
       message,
+      error,
     });
   }
 };
@@ -80,23 +81,25 @@ const login = async (req, res) => {
   // Conseguir token
   const token = jwt.createToken(user);
 
+  const userClean = user.toObject();
+
+  delete userClean.password;
+  delete userClean.email;
+  delete userClean.role;
+  delete userClean.__v;
+
   // Devolver datos del usuario
   return res.status(200).json({
     status: "success",
     message: "Login correcto",
-    user: {
-      _id: user._id,
-      name: user.name,
-      nick: user.nick,
-      image: user.image,
-    },
+    user: userClean,
     token,
   });
 };
 
 const profile = async (req, res) => {
   // Recibir el parámetro del id de usuario por la url
-  const id = req.params.id;
+  const id = req.params.id || req.user._id;
 
   // Consulta para sacar los datos del usuario
   try {
@@ -138,32 +141,29 @@ const list = async (req, res) => {
     const followsIds = await followService.followsIds(req.user.id);
 
     // No aparece el usuario identificado en el listado
-    const query = {_id: { $ne: req.user.id }}
+    const query = { _id: { $ne: req.user.id } };
 
     // En caso de que haya una busqueda, buscar
-    if(search) {
+    if (search) {
       query.$or = [
-        {'nick': {$regex: search, $options: 'i'}},
-        {'name': {$regex: search, $options: 'i'}},
-        {'surname': {$regex: search, $options: 'i'}}
-      ]
+        { nick: { $regex: search, $options: "i" } },
+        { name: { $regex: search, $options: "i" } },
+        { surname: { $regex: search, $options: "i" } },
+      ];
     }
 
     // Consulta con mongoose paginate
-    const result = await User.paginate(
-      query,
-      {
-        page,
-        limit,
-        sort: "_id",
-        select: "-password -role -email -__v",
-      }
-    );
+    const result = await User.paginate(query, {
+      page,
+      limit,
+      sort: "_id",
+      select: "-password -role -email -__v",
+    });
 
     // Agrega informacion de follows
     const usersWithFollowInfo = followService.addFollowInfo(
       result.docs,
-      followsIds
+      followsIds,
     );
 
     // Devolver resultado
@@ -174,7 +174,7 @@ const list = async (req, res) => {
       totalUsers: result.totalDocs,
       totalPages: result.totalPages,
       hasNextPage: result.hasNextPage,
-      users: usersWithFollowInfo
+      users: usersWithFollowInfo,
     });
   } catch (err) {
     return res.status(404).json({
@@ -194,13 +194,13 @@ const listFollowers = async (req, res) => {
 
     const result = await User.paginate(
       { _id: followsIds.followers },
-      { page, limit, select: "-password -role -email -__v" }
+      { page, limit, select: "-password -role -email -__v" },
     );
 
     // Indica si el usuario te sigue y si lo sigues
     const usersWithFollowInfo = followService.addFollowInfo(
       result.docs,
-      followsIds
+      followsIds,
     );
 
     return res.status(200).json({
@@ -230,13 +230,13 @@ const listFollowing = async (req, res) => {
 
     const result = await User.paginate(
       { _id: followsIds.following },
-      { page, limit, select: "-password -role -email -__v" }
+      { page, limit, select: "-password -role -email -__v" },
     );
 
     // Indica si el usuario te sigue y si lo sigues
     const usersWithFollowInfo = followService.addFollowInfo(
       result.docs,
-      followsIds
+      followsIds,
     );
 
     return res.status(200).json({
@@ -307,7 +307,7 @@ const update = async (req, res) => {
     const userUpdated = await User.findByIdAndUpdate(
       { _id: userIdentity.id },
       userToUpdate,
-      { new: true, select: "-password -role -__v -email" }
+      { new: true, select: "-password -role -__v -email" },
     );
 
     if (userUpdated) {
@@ -357,7 +357,7 @@ const upload = async (req, res) => {
     const userUpdated = await User.findOneAndUpdate(
       { _id: req.user.id },
       { image: req.file.filename },
-      { new: true, select: "-password -role -__v -email" }
+      { new: true, select: "-password -role -__v -email" },
     );
 
     // Eliminar fichero de avatar anterior si es que tiene
@@ -414,7 +414,7 @@ const publications = async (req, res) => {
           path: "user",
           select: "-password -role -email -__v",
         },
-      }
+      },
     );
 
     return res.status(200).json({
@@ -436,7 +436,7 @@ const publications = async (req, res) => {
 
 const notifications = async (req, res) => {
   const user = req.user._id;
-  
+
   try {
     const notifications = await Notification.find({ user })
       .populate("fromUser", "nick name surname image")
@@ -467,5 +467,5 @@ module.exports = {
   upload,
   avatar,
   publications,
-  notifications
+  notifications,
 };

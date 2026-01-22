@@ -4,23 +4,25 @@ import { PasswordInput } from "../components/ui/PasswordInput";
 import { useForm } from "react-hook-form";
 import request from "../helpers/Request";
 import { Alert } from "../components/ui/Alert";
+import { useAuth } from "../hooks/useAuth";
 
 export const Login = () => {
   const { register, handleSubmit } = useForm();
   const [alert, setAlert] = useState();
+  const { setUser } = useAuth();
 
   const navigate = useNavigate();
 
   const login = async (data) => {
-    const response = await request("user/login", "POST", data, {
-      "Content-Type": "application/json",
-    });
+    const response = await request("user/login", "POST", null, data);
 
     setAlert(response);
 
     if (response.status === "success") {
-      localStorage.setItem("token", JSON.stringify(response.token));
+      localStorage.setItem("token", response.token);
       localStorage.setItem("user", JSON.stringify(response.user));
+
+      setUser(response.user);
 
       navigate("/");
     }

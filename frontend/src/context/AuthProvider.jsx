@@ -1,19 +1,35 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { createContext, useEffect, useState } from "react";
 import request from "../helpers/Request";
+
+const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState({});
-  const AuthContext = useContext();
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {});
+  useEffect(() => {
+    const getProfile = async () => {
+      const token = localStorage.getItem("token");
 
-  const getProfile = async () => {
-    const profile = await request("user", "GET", {});
-  };
+      if (!token) {
+        setLoading(false);
+        return false;
+      }
+
+      const profile = await request("user", "GET", token);
+
+      setUser(profile.user);
+      setLoading(false);
+    };
+
+    getProfile();
+  }, []);
 
   return (
-    <AuthContext.Provider value={{ user, setUser }}>
+    <AuthContext.Provider value={{ user, setUser, loading }}>
       {children}
     </AuthContext.Provider>
   );
 };
+
+export default AuthContext;
