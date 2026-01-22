@@ -1,8 +1,31 @@
-import React from "react";
-import { Link } from "react-router";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router";
 import { PasswordInput } from "../components/ui/PasswordInput";
+import { useForm } from "react-hook-form";
+import request from "../helpers/Request";
+import { Alert } from "../components/ui/Alert";
 
 export const Login = () => {
+  const { register, handleSubmit } = useForm();
+  const [alert, setAlert] = useState();
+
+  const navigate = useNavigate();
+
+  const login = async (data) => {
+    const response = await request("user/login", "POST", data, {
+      "Content-Type": "application/json",
+    });
+
+    setAlert(response);
+
+    if (response.status === "success") {
+      localStorage.setItem("token", JSON.stringify(response.token));
+      localStorage.setItem("user", JSON.stringify(response.user));
+
+      navigate("/");
+    }
+  };
+
   return (
     <div className="text-text-primary flex h-dvh items-center justify-center">
       <section className="grid w-full max-w-6xl grid-cols-2 px-10">
@@ -16,13 +39,18 @@ export const Login = () => {
         </div>
 
         <div className="flex flex-col gap-4">
-          <form className="bg-surface flex flex-col gap-6 rounded-2xl px-10 py-10">
+          <form
+            className="bg-surface flex flex-col gap-6 rounded-2xl px-10 py-10"
+            onSubmit={handleSubmit(login)}
+          >
+            {alert && <Alert message={alert.message} status={alert.status} />}
             <input
               type="text"
               className="border-border-input placeholder:text-placeholder focus:border-primary w-full rounded-xl border p-3 text-lg focus:outline-none"
               placeholder="Email o nombre de usuario"
+              {...register("email")}
             />
-            <PasswordInput />
+            <PasswordInput register={register} />
 
             <input
               type="submit"

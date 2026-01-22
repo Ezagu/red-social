@@ -5,7 +5,7 @@ import { CircleX } from "lucide-react";
 export const Alert = ({ status, message }) => {
   return (
     <div
-      className={`flex gap-2 rounded-3xl ${status === "success" ? "bg-success" : "bg-danger"} px-2 py-3`}
+      className={`flex gap-2 rounded-3xl ${status === "success" ? "bg-success" : "bg-danger"} items-center px-2 py-3 text-lg`}
     >
       {status === "success" ? (
         <CircleCheck className="ml-1" />

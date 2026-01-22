@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { EyeOff } from "lucide-react";
 import { Eye } from "lucide-react";
 
-export const PasswordInput = () => {
+export const PasswordInput = ({ register }) => {
   const [watch, setWatch] = useState(false);
   const [showIcon, setShowIcon] = useState(false);
 
@@ -15,6 +15,7 @@ export const PasswordInput = () => {
         onChange={(e) =>
           e.target.value ? setShowIcon(true) : setShowIcon(false)
         }
+        {...register("password")}
       />
       {showIcon && (
         <button
