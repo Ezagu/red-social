@@ -10,7 +10,7 @@ export const ProfileCard = () => {
         <LogOut />
       </button>
       <div className="ml-4 flex items-center gap-4">
-        <Link>
+        <Link to="/profile">
           <Avatar
             src="/src/assets/agus.jpg"
             size="2xl"
@@ -18,22 +18,24 @@ export const ProfileCard = () => {
           />
         </Link>
         <div className="grow">
-          <Link className="text-4xl font-semibold">Ezagu</Link>
+          <Link to="/profile" className="text-4xl font-semibold">
+            Ezagu
+          </Link>
           <h2 className="text-text-secondary text-lg">Agustín Calpe</h2>
           <div className="mt-2 grid grid-cols-3">
-            <Link className="border-border-input border-r">
+            <Link to="/profile" className="border-border-input border-r">
               <h3 className="text-text-secondary text-center text-sm">
                 Publicaciones
               </h3>
               <p className="text-center text-xl font-bold">9</p>
             </Link>
-            <Link className="border-border-input border-r">
+            <Link to="/users" className="border-border-input border-r">
               <h3 className="text-text-secondary text-center text-sm">
                 Seguidores
               </h3>
               <p className="text-center text-xl font-bold">12</p>
             </Link>
-            <Link>
+            <Link to="/users">
               <h3 className="text-text-secondary text-center text-sm">
                 Seguidos
               </h3>

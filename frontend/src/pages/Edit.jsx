@@ -3,6 +3,7 @@ import { Avatar } from "../components/ui/Avatar";
 import { CircleX } from "lucide-react";
 import { CircleCheck } from "lucide-react";
 import { ImagePlus } from "lucide-react";
+import { PageHeader } from "../components/pages/PageHeader";
 
 export const Edit = () => {
   const [filePreview, setFilePreview] = useState(null);
@@ -17,10 +18,11 @@ export const Edit = () => {
 
   return (
     <main className="bg-surface text-text-primary w-full rounded-2xl">
+      <PageHeader title="Modificar perfil" />
       <form className="m-auto my-10 flex w-3/4 flex-col items-center gap-4">
         <label
           className="group relative cursor-pointer overflow-hidden"
-          htmlFor="file0"
+          htmlFor="avatar"
         >
           <ImagePlus className="absolute top-17 left-16 z-10 m-auto hidden size-15 group-hover:block" />
           <div className="group-hover:blur-[1px]">
@@ -34,7 +36,7 @@ export const Edit = () => {
         <input
           type="file"
           className="hidden"
-          id="file0"
+          id="avatar"
           name="file0"
           onChange={handleFileChange}
         />

@@ -7,6 +7,9 @@ import { Register } from "../pages/Register.jsx";
 import { Layout } from "../layout/Layout.jsx";
 import { Profile } from "../pages/Profile.jsx";
 import { Edit } from "../pages/edit.jsx";
+import { PublicationPage } from "../pages/PublicationPage.jsx";
+import { Users } from "../pages/Users.jsx";
+import { Error } from "../pages/Error.jsx";
 
 export const Routing = () => {
   return (
@@ -22,6 +25,9 @@ export const Routing = () => {
           <Route path="/profile" element={<Profile />} />
           <Route path="/profile/:id" element={<Profile />} />
           <Route path="/edit" element={<Edit />} />
+          <Route path="/publication/:id" element={<PublicationPage />} />
+          <Route path="/users" element={<Users />} />
+          <Route path="*" element={<Error />} />
         </Route>
       </Routes>
       <Footer />

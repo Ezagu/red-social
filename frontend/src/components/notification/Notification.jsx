@@ -5,7 +5,7 @@ import { Link } from "react-router";
 import { Heart } from "lucide-react";
 import { UserPlus } from "lucide-react";
 
-export const ListNotifications = ({ notifications }) => {
+export const Notification = () => {
   const data = {
     Comment: {
       icon: (
@@ -29,30 +29,23 @@ export const ListNotifications = ({ notifications }) => {
       link: "",
     },
   };
-
   return (
-    <div className="flex flex-col gap-2 p-4 pt-1">
-      {notifications.map((notification) => (
-        <Link
-          className={
-            "hover:bg-elevated relative flex items-center gap-4 rounded-2xl p-2" +
-            (!notification.read ? " bg-elevated" : "")
-          }
-          key={notification.id}
-        >
-          <div className="relative">
-            <Avatar src={notification.fromUser.image} size="md" />
-            {data[notification.targetType].icon}
-          </div>
-          <div className="text-md overflow-hidden text-nowrap">
-            <span className="font-bold">{notification.fromUser.nick}</span>{" "}
-            {data[notification.targetType].message}
-          </div>
-          <p className="text-text-secondary absolute top-1 right-2 bg-inherit">
-            3d
-          </p>
-        </Link>
-      ))}
-    </div>
+    <Link
+      className={
+        "hover:bg-elevated relative flex items-center gap-4 rounded-2xl p-2"
+      }
+    >
+      <div className="relative">
+        <Avatar src="/src/assets/kiara.jpg" size="md" />
+        {data.Like.icon}
+      </div>
+      <div className="text-md overflow-hidden text-nowrap">
+        <span className="font-bold">Dkiara03</span> Ha dado me gusta a tu
+        publicacion
+      </div>
+      <p className="text-text-secondary absolute top-1 right-2 bg-inherit">
+        3d
+      </p>
+    </Link>
   );
 };

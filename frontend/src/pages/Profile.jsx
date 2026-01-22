@@ -4,11 +4,14 @@ import { Avatar } from "../components/ui/Avatar";
 import { ButtonFollowUnfollow } from "../components/ui/ButtonFollowUnfollow";
 import { ListPublications } from "../components/publications/ListPublications.jsx";
 import { SquarePen } from "lucide-react";
+import { PageHeader } from "../components/pages/PageHeader.jsx";
+import { Publication } from "../components/publications/Publication.jsx";
 
 export const Profile = () => {
   return (
-    <main className="flex flex-col items-center gap-4">
-      <header className="text-text-primary bg-surface relative w-full rounded-2xl p-4">
+    <main className="text-text-primary bg-surface flex flex-col items-center rounded-2xl">
+      <PageHeader title="Perfil de ezagu" />
+      <header className="relative w-full p-4">
         <div className="ml-4 flex gap-4">
           {/*<ButtonFollowUnfollow following={true} />*/}
           <button className="bg-primary hover:bg-primary-hover absolute top-3 right-4 flex cursor-pointer items-center gap-2 rounded-2xl px-3 py-1">
@@ -53,9 +56,14 @@ export const Profile = () => {
         </div>
       </header>
       <section className="bg-surface w-full rounded-2xl pt-2">
-        <ListPublications />
+        <ul className="border-border-input border-t">
+          <Publication />
+          <Publication />
+          <Publication />
+          <Publication />
+        </ul>
       </section>
-      <button className="bg-primary hover:bg-primary-hover text-text-primary w-1/2 cursor-pointer rounded-2xl py-2 font-semibold">
+      <button className="bg-primary hover:bg-primary-hover text-text-primary m-auto my-4 w-1/2 cursor-pointer rounded-2xl py-2 font-semibold">
         Ver más
       </button>
     </main>

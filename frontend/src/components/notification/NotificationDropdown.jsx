@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import { Bell } from "lucide-react";
 import { ChevronUp } from "lucide-react";
-import { Dot } from "lucide-react";
 import { Circle } from "lucide-react";
-import { ListNotifications } from "./ListNotifications";
+import { Notification } from "./Notification.jsx";
 
 export const NotificationDropdown = () => {
   const [show, setShow] = useState(false);
@@ -31,36 +30,9 @@ export const NotificationDropdown = () => {
         />
       </button>
       {show && (
-        <ListNotifications
-          type="Comment"
-          notifications={[
-            {
-              _id: "333",
-              targetType: "Comment",
-              fromUser: {
-                image: "src/assets/kiara.jpg",
-                nick: "dkiara03",
-              },
-            },
-            {
-              _id: "111",
-              targetType: "Like",
-              fromUser: {
-                image: "src/assets/kiara.jpg",
-                nick: "dkiara03",
-              },
-            },
-            {
-              _id: "123",
-              targetType: "Follow",
-              read: true,
-              fromUser: {
-                image: "src/assets/kiara.jpg",
-                nick: "dkiara03",
-              },
-            },
-          ]}
-        />
+        <ul className="flex flex-col gap-2 p-4 pt-1">
+          <Notification />
+        </ul>
       )}
     </div>
   );

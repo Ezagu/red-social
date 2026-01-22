@@ -1,6 +1,6 @@
 import React from "react";
-import { Search } from "lucide-react";
-import { ListUsers } from "../components/user/ListUsers";
+import { Search, User } from "lucide-react";
+import { UserCard } from "../components/user/UserCard";
 
 export const SocialAside = () => {
   return (
@@ -13,7 +13,10 @@ export const SocialAside = () => {
           className="bg-surface focus:border-primary w-full rounded-2xl border border-transparent p-4 pl-12 text-lg focus:outline-none"
         />
       </header>
-      <ListUsers />
+      <ul className="flex flex-col items-center gap-4">
+        <UserCard />
+        <UserCard />
+      </ul>
     </aside>
   );
 };
