@@ -22,12 +22,15 @@ export const ProfileCard = () => {
   ) : (
     <div className="text-text-primary bg-surface rounded-2xl p-4">
       <div className="ml-4 flex min-w-0 items-center gap-4 overflow-hidden">
-        <Link to="/profile" className="shrink-0">
+        <Link to={"/profile/" + user._id} className="shrink-0">
           <Avatar src={url + "user/avatar/" + user.image} size="2xl" />
         </Link>
         <div className="min-w-0 grow">
           <div className="flex justify-between">
-            <Link to="/profile" className="truncate text-4xl font-semibold">
+            <Link
+              to={"/profile/" + user._id}
+              className="truncate text-4xl font-semibold"
+            >
               {user.nick}
             </Link>
             <button
@@ -42,7 +45,10 @@ export const ProfileCard = () => {
             {user.fullName}
           </h2>
           <div className="mt-2 grid grid-cols-3">
-            <Link to="/profile" className="border-border-input border-r">
+            <Link
+              to={"/profile/" + user._id}
+              className="border-border-input border-r"
+            >
               <h3 className="text-text-secondary text-center text-sm">
                 Publicaciones
               </h3>

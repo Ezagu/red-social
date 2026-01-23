@@ -14,7 +14,7 @@ export const Avatar = ({ size, src }) => {
   return (
     <img
       src={src}
-      className={`${sizes[size]} rounded-full object-cover`}
+      className={`${sizes[size]} shrink-0 rounded-full object-cover`}
       alt="avatar"
     />
   );

@@ -3,14 +3,17 @@ import { url } from "./Global";
 const Request = async (
   endpoint,
   method = "GET",
-  token = null,
+  token = true,
   body = null,
   contentType = "application/json",
 ) => {
   const stringifyBody = body ? JSON.stringify(body) : null;
+  let Authorization = null;
+  if (token) Authorization = localStorage.getItem("token");
+
   const headers = {
     "Content-Type": contentType,
-    Authorization: token,
+    Authorization,
   };
 
   const data = await fetch(url + endpoint, {

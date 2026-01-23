@@ -24,7 +24,6 @@ export const Routing = () => {
           {/*Private Routes*/}
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
-            <Route path="/profile" element={<Profile />} />
             <Route path="/profile/:id" element={<Profile />} />
             <Route path="/edit" element={<Edit />} />
             <Route path="/publication/:id" element={<PublicationPage />} />

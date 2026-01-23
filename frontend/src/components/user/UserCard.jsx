@@ -5,7 +5,10 @@ import { Avatar } from "../../components/ui/Avatar.jsx";
 
 export const UserCard = () => {
   return (
-    <Link className="bg-surface hover:bg-elevated relative flex w-full items-center gap-3 rounded-2xl px-4 py-2">
+    <Link
+      to="/profile/694e035510e7a9760e794ffd"
+      className="bg-surface hover:bg-elevated relative flex w-full items-center gap-3 rounded-2xl px-4 py-2"
+    >
       <Avatar src="/src/assets/kiara.jpg" size="lg" />
       <div>
         <div className="flex items-center gap-2">

@@ -14,11 +14,9 @@ export const PublicationPage = () => {
 
   useEffect(() => {
     const getPublication = async () => {
-      const token = localStorage.getItem("token");
-      const response = await Request("publication/" + id, "GET", token);
+      const response = await Request("publication/" + id, "GET");
       setPublication(response.publication);
       setLoading(false);
-      console.log(response.publication);
     };
 
     getPublication();

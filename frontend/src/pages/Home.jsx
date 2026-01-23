@@ -2,26 +2,44 @@ import React, { useEffect, useState } from "react";
 import { Loading } from "../components/ui/Loading";
 import { Publication } from "../components/publications/Publication";
 import Request from "../helpers/Request";
+import { ListPublications } from "../components/publications/ListPublications";
 
 export const Home = () => {
   const [section, setSection] = useState("all");
   const [loading, setLoading] = useState(true);
   const [publications, setPublications] = useState([]);
+  const [publicationsInfo, setPublicationsInfo] = useState([]);
+  const [page, setPage] = useState(1);
+
+  const changeSection = (newSection) => {
+    if (newSection === section) return;
+
+    setPublications([]);
+    setPublicationsInfo([]);
+    setPage(1);
+    setSection(newSection);
+  };
 
   useEffect(() => {
     const getPublications = async () => {
-      const token = localStorage.getItem("token");
       const endpoint =
         section === "all"
-          ? "publication/publications?limit=30"
-          : "publication/publications/following?limit=10";
-      const response = await Request(endpoint, "GET", token);
-      setPublications(response.publications);
+          ? "publication/publications?limit=5&page=" + page
+          : "publication/publications/following?limit=5&page=" + page;
+
+      const response = await Request(endpoint, "GET");
+
+      setPublicationsInfo(response);
+      setPublications((prev) =>
+        page === 1
+          ? response.publications
+          : [...prev, ...response.publications],
+      );
       setLoading(false);
     };
 
     getPublications();
-  }, [section]);
+  }, [page, section]);
 
   return (
     <main className="bg-surface rounded-2xl">
@@ -33,7 +51,7 @@ export const Home = () => {
                 ? "bg-primary w-full cursor-pointer rounded-t-2xl p-2 text-lg font-semibold transition-all"
                 : "hover:bg-elevated text-text-secondary text-md w-full cursor-pointer rounded-t-2xl rounded-tr-2xl p-2 text-lg font-normal transition-all"
             }
-            onClick={() => setSection("all")}
+            onClick={() => changeSection("all")}
           >
             Todos
           </button>
@@ -43,21 +61,22 @@ export const Home = () => {
                 ? "bg-primary w-full cursor-pointer rounded-t-2xl p-2 text-lg font-semibold transition-all"
                 : "hover:bg-elevated text-text-secondary text-md w-full cursor-pointer rounded-t-2xl rounded-tr-2xl p-2 text-lg font-normal transition-all"
             }
-            onClick={() => setSection("following")}
+            onClick={() => changeSection("following")}
           >
             Siguiendo
           </button>
         </div>
       </header>
-      <section className="text-text-primary">
-        {loading ? (
-          <Loading />
-        ) : (
-          publications.map((publication) => (
-            <Publication publication={publication} key={publication._id} />
-          ))
-        )}
-      </section>
+      {loading ? (
+        <Loading />
+      ) : (
+        <ListPublications
+          publications={publications}
+          setPublications={setPublications}
+          publicationsInfo={publicationsInfo}
+          setPage={setPage}
+        />
+      )}
     </main>
   );
 };
