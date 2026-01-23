@@ -24,8 +24,8 @@ export const Home = () => {
     const getPublications = async () => {
       const endpoint =
         section === "all"
-          ? "publication/publications?limit=5&page=" + page
-          : "publication/publications/following?limit=5&page=" + page;
+          ? "publication/publications?limit=20&page=" + page
+          : "publication/publications/following?limit=20&page=" + page;
 
       const response = await Request(endpoint, "GET");
 
