@@ -10,7 +10,7 @@ export const PageHeader = ({ title }) => {
       <button className="cursor-pointer" onClick={() => navigate(-1)}>
         <ArrowLeft />
       </button>
-      <h1 className="text-2xl font-semibold">{title}</h1>
+      <h1 className="truncate text-2xl font-semibold">{title}</h1>
     </header>
   );
 };

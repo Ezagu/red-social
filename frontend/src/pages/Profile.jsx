@@ -3,7 +3,6 @@ import { Link, useParams } from "react-router";
 import { Avatar } from "../components/ui/Avatar";
 import { SquarePen } from "lucide-react";
 import { PageHeader } from "../components/pages/PageHeader.jsx";
-import { Publication } from "../components/publications/Publication.jsx";
 import Request from "../helpers/Request.jsx";
 import { Loading } from "../components/ui/Loading.jsx";
 import { url } from "../helpers/Global.jsx";
@@ -17,56 +16,39 @@ export const Profile = () => {
   const [publicationsInfo, setPublicationsInfo] = useState({});
   const [publications, setPublications] = useState([]);
   const [loadingPublications, setLoadingPublications] = useState(true);
-  const [page, setPage] = useState(1);
   const { user } = useAuth();
 
   const { id } = useParams();
 
   useEffect(() => {
-    {
-      /*Agarra el perfil y lo setea */
-    }
     const getProfile = async () => {
       const response = await Request("user/" + id, "GET");
 
       setProfile(response);
       setLoadingProfile(false);
+
+      console.log(response);
     };
 
-    getProfile();
-  }, [id]);
-
-  useEffect(() => {
-    {
-      /*Agarra publicaciones y las setea*/
-    }
-    const getPublications = async () => {
-      const response = await Request(
-        "user/" + id + "/publications?limit=5&page=" + page,
-        "GET",
-      );
-
+    const loadPublications = async () => {
+      setLoadingPublications(true);
+      const response = await Request(`user/${id}/publications?limit=10`);
       setPublicationsInfo(response);
-      setPublications((prev) =>
-        page === 1
-          ? response.publications
-          : [...prev, ...response.publications],
-      );
+      setPublications(response.publications);
       setLoadingPublications(false);
     };
 
-    getPublications();
-  }, [id, page]);
-
-  useEffect(() => {
-    {
-      /*Resetea en caso de que se cambie de perfil */
-    }
-    setPublications([]);
-    setPublicationsInfo({});
-    setPage(1);
-    setLoadingPublications(true);
+    getProfile();
+    loadPublications();
   }, [id]);
+
+  const loadNextPage = async () => {
+    const response = await Request(
+      `user/${id}/publications?page=${Number(publicationsInfo.page) + 1}&limit=10`,
+    );
+    setPublicationsInfo(response);
+    setPublications((prev) => [...prev, ...response.publications]);
+  };
 
   return (
     <main className="text-text-primary bg-surface flex flex-col items-center rounded-2xl">
@@ -84,13 +66,16 @@ export const Profile = () => {
               />
               <div className="flex min-w-0 grow flex-col">
                 {user._id === profile.user._id ? (
-                  <button className="bg-primary hover:bg-primary-hover flex grow-0 cursor-pointer items-center gap-2 self-end rounded-2xl px-3 py-1">
+                  <Link
+                    to="/edit"
+                    className="bg-primary hover:bg-primary-hover flex grow-0 cursor-pointer items-center gap-2 self-end rounded-2xl px-3 py-1"
+                  >
                     Edit Profile
                     <SquarePen className="size-5" />
-                  </button>
+                  </Link>
                 ) : (
                   <ButtonFollowUnfollow
-                    following={profile.follower}
+                    following={profile.following}
                     className="grow-0 self-end"
                   />
                 )}
@@ -121,7 +106,10 @@ export const Profile = () => {
                   {profile.user.publicationsCount}
                 </p>
               </Link>
-              <Link className="border-border-input border-r">
+              <Link
+                to={"/users?mode=followers&id=" + profile.user._id}
+                className="border-border-input border-r"
+              >
                 <h3 className="text-text-secondary text-center text-xl">
                   Seguidores
                 </h3>
@@ -129,7 +117,7 @@ export const Profile = () => {
                   {profile.user.followersCount}
                 </p>
               </Link>
-              <Link>
+              <Link to={"/users?mode=following&id=" + profile.user._id}>
                 <h3 className="text-text-secondary text-center text-xl">
                   Seguidos
                 </h3>
@@ -145,7 +133,7 @@ export const Profile = () => {
             <ListPublications
               publications={publications}
               publicationsInfo={publicationsInfo}
-              setPage={setPage}
+              loadNextPage={loadNextPage}
             />
           )}
         </>

@@ -4,7 +4,7 @@ import { Publication } from "./Publication.jsx";
 export const ListPublications = ({
   publicationsInfo,
   publications,
-  setPage,
+  loadNextPage,
 }) => {
   return (
     <>
@@ -22,7 +22,7 @@ export const ListPublications = ({
           {publicationsInfo.hasNextPage ? (
             <button
               className="bg-primary hover:bg-primary-hover text-text-primary m-auto my-4 w-1/2 cursor-pointer rounded-2xl py-2 font-semibold"
-              onClick={() => setPage((prev) => prev + 1)}
+              onClick={loadNextPage}
             >
               Ver más
             </button>

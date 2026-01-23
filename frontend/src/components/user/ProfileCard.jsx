@@ -56,7 +56,10 @@ export const ProfileCard = () => {
                 {user.publicationsCount}
               </p>
             </Link>
-            <Link to="/users" className="border-border-input border-r">
+            <Link
+              to={"/users?mode=followers&id=" + user._id}
+              className="border-border-input border-r"
+            >
               <h3 className="text-text-secondary text-center text-sm">
                 Seguidores
               </h3>
@@ -64,7 +67,7 @@ export const ProfileCard = () => {
                 {user.followersCount}
               </p>
             </Link>
-            <Link to="/users">
+            <Link to={"/users?mode=following&id=" + user._id}>
               <h3 className="text-text-secondary text-center text-sm">
                 Seguidos
               </h3>

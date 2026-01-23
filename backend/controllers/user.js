@@ -283,7 +283,7 @@ const update = async (req, res) => {
     if (userIsset) {
       return res.status(409).json({
         status: "error",
-        message: "El nick ya está en uso",
+        message: "Nombre de usuario en uso",
       });
     }
   }
@@ -313,14 +313,14 @@ const update = async (req, res) => {
     if (userUpdated) {
       return res.status(200).json({
         status: "success",
-        message: "Actualizado con éxito",
+        message: "Usuario actualizado",
         userUpdated,
       });
     }
   } catch (error) {
     return res.status(404).json({
       status: "error",
-      message: "Error al actualizar o usuario no encontrado",
+      message: "Error al actualizar usuario",
     });
   }
 };

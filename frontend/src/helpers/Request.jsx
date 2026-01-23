@@ -6,8 +6,9 @@ const Request = async (
   token = true,
   body = null,
   contentType = "application/json",
+  bodyStringify = true,
 ) => {
-  const stringifyBody = body ? JSON.stringify(body) : null;
+  const finalBody = body ? (bodyStringify ? JSON.stringify(body) : body) : null;
   let Authorization = null;
   if (token) Authorization = localStorage.getItem("token");
 
@@ -18,7 +19,7 @@ const Request = async (
 
   const data = await fetch(url + endpoint, {
     method,
-    body: stringifyBody,
+    body: finalBody,
     headers,
   });
   return await data.json();

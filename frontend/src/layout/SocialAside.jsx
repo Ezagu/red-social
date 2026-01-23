@@ -7,38 +7,38 @@ import { Loading } from "../components/ui/Loading.jsx";
 export const SocialAside = () => {
   const [usersInfo, setUsersInfo] = useState([]);
   const [users, setUsers] = useState([]);
-  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      searchUsers();
-    }, 400);
-
     const searchUsers = async () => {
       if (search === "") return;
 
-      setLoading(true);
-
-      const response = await Request(
-        `user/users?page=${page}&search=${search}`,
-        "GET",
-      );
+      const response = await Request(`user/users?search=${search}`);
 
       setUsersInfo(response);
-      setUsers((prev) =>
-        page === 1 ? response.users : [...prev, ...response.users],
-      );
+      setUsers(response.users);
 
       setLoading(false);
     };
+
+    const timeout = setTimeout(() => {
+      searchUsers();
+    }, 400);
 
     {
       /*Cuando retornas, se ejecuta la proxima vez que se ejecuta el useEffect (función cleanup) */
     }
     return () => clearTimeout(timeout);
-  }, [page, search]);
+  }, [search]);
+
+  const loadNextPage = async () => {
+    const response = await Request(
+      `user/users?search=${search}&page=${Number(usersInfo.page) + 1}`,
+    );
+    setUsersInfo(response);
+    setUsers((prev) => [...prev, ...response.users]);
+  };
 
   return (
     <aside className="text-text-primary sticky top-20 flex h-fit w-full max-w-lg flex-col gap-4">
@@ -51,22 +51,26 @@ export const SocialAside = () => {
           onChange={(e) => {
             setUsers([]);
             setUsersInfo({});
-            setPage(1);
+            setLoading(true);
             setSearch(e.target.value);
           }}
         />
       </header>
       <ul className="flex flex-col items-center gap-4">
-        {loading ? (
+        {search === "" ? (
+          ""
+        ) : loading ? (
           <Loading />
+        ) : users.length === 0 ? (
+          <div>No se encontraron usuarios</div>
         ) : (
-          users.map((user) => <UserCard user={user} key={user._id} />)
+          users.map((user) => <UserCard user={user} />)
         )}
       </ul>
       {usersInfo.hasNextPage && (
         <button
           className="bg-primary hover:bg-primary-hover text-text-primary m-auto my-4 w-1/2 cursor-pointer rounded-2xl py-2 font-semibold"
-          onClick={() => setPage((prev) => prev + 1)}
+          onClick={() => loadNextPage()}
         >
           Ver más
         </button>
