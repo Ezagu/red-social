@@ -5,9 +5,11 @@ const path = require("path");
 // Importar modelos
 const Publication = require("../models/publication.js");
 const User = require("../models/user.js");
+const Comment = require("../models/comment.js");
 
 // Importar servicios
 const followService = require("../services/followService.js");
+const { getPublications } = require("../services/publicationService.js");
 
 // Guardar publicacion
 const save = async (req, res) => {
@@ -189,28 +191,20 @@ const publications = async (req, res) => {
 
   try {
     // Find a publicaciones in, ordenar, popular, paginar
-    const publications = await Publication.paginate(
-      {},
+    const publications = await getPublications(
+      req.user._id,
       {
-        page,
-        limit,
-        sort: "-created_at",
-        populate: { path: "user", select: "-password -__v -role -email" },
+        user: {
+          $ne: req.user._id,
+        },
       },
+      page,
+      limit,
     );
 
     if (!publications) throw new Error();
 
-    return res.status(200).json({
-      status: "success",
-      message: "Feed de publicaciones",
-      totalPublications: publications.totalDocs,
-      page,
-      limit,
-      totalPages: publications.totalPages,
-      hasNextPage: publications.hasNextPage,
-      publications: publications.docs,
-    });
+    return res.status(200).json(publications);
   } catch (error) {
     return res.status(500).json({
       status: "error",
@@ -228,32 +222,43 @@ const followingPublications = async (req, res) => {
   try {
     const following = await followService.followingIds(user);
 
-    const publications = await Publication.paginate(
+    const publications = await getPublications(
+      req.user._id,
       { user: following },
-      {
-        page,
-        limit,
-        sort: { created_at: -1 },
-        populate: {
-          path: "user",
-          select: "-password -role -email -__v",
-        },
-      },
-    );
-
-    return res.status(200).json({
-      status: "success",
       page,
       limit,
-      totalPublications: publications.totalDocs,
-      totalPages: publications.totalPages,
-      hasNextPage: publications.hasNextPage,
-      publications: publications.docs,
-    });
+    );
+
+    if (!publications) throw new Error();
+
+    return res.status(200).json(publications);
   } catch (error) {
     return res.status(500).json({
       status: "error",
       message: "No se pudo listar las publicaciones de tus seguidos",
+    });
+  }
+};
+
+const comments = async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    const comments = await Comment.find({
+      publication: id,
+      parentComment: null,
+    }).populate("user", "-password -role -email -__v");
+
+    res.status(200).json({
+      status: "success",
+      message: "Lista de comentarios",
+      comments,
+    });
+  } catch (error) {
+    res.status(200).json({
+      status: "error",
+      message: "No se pudo obtener los comentarios",
+      id,
     });
   }
 };
@@ -267,4 +272,5 @@ module.exports = {
   media,
   publications,
   followingPublications,
+  comments,
 };

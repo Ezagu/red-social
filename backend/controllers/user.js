@@ -11,6 +11,7 @@ const Notification = require("../models/notification.js");
 // Importar servicios
 const jwt = require("../services/jwt.js");
 const followService = require("../services/followService.js");
+const { getPublications } = require("../services/publicationService.js");
 
 // Registro de usuario
 const register = async (req, res) => {
@@ -147,8 +148,7 @@ const list = async (req, res) => {
     if (search) {
       query.$or = [
         { nick: { $regex: search, $options: "i" } },
-        { name: { $regex: search, $options: "i" } },
-        { surname: { $regex: search, $options: "i" } },
+        { fullName: { $regex: search, $options: "i" } },
       ];
     }
 
@@ -404,28 +404,16 @@ const publications = async (req, res) => {
   const limit = req.query.limit || 5;
 
   try {
-    const publications = await Publication.paginate(
+    const publications = await getPublications(
+      req.user._id,
       { user },
-      {
-        page,
-        limit,
-        sort: { created_at: -1 },
-        populate: {
-          path: "user",
-          select: "-password -role -email -__v",
-        },
-      },
-    );
-
-    return res.status(200).json({
-      status: "success",
       page,
       limit,
-      totalPublications: publications.totalDocs,
-      totalPages: publications.totalPages,
-      hasNextPage: publications.hasNextPage,
-      publications: publications.docs,
-    });
+    );
+
+    if (!publications) throw new Error();
+
+    return res.status(200).json(publications);
   } catch (error) {
     return res.status(500).json({
       status: "error",

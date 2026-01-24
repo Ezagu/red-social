@@ -19,7 +19,9 @@ const nick = body("nick")
   .notEmpty()
   .withMessage("Ingrese un nick")
   .isLength({ min: 3 })
-  .withMessage("El nick debe de contener mínimo 3 caracteres");
+  .withMessage("Nombre de usuario debe contener un mínimo de 3 caracteres")
+  .isLength({ max: 20 })
+  .withMessage("Nombre de usuario debe contener menos de 20 caracteres");
 
 const password = body("password")
   .trim()

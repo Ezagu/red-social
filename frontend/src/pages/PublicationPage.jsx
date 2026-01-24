@@ -2,25 +2,39 @@ import React, { useEffect, useState } from "react";
 import { Publication } from "../components/publications/Publication.jsx";
 import { Input } from "../components/ui/Input.jsx";
 import { Comment } from "../components/comments/Comment.jsx";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import Request from "../helpers/Request.jsx";
 import { Loading } from "../components/ui/Loading.jsx";
 
 export const PublicationPage = () => {
   const { id } = useParams();
 
+  const navigate = useNavigate();
+
   const [publication, setPublication] = useState({});
   const [loading, setLoading] = useState(true);
+  const [comments, setComments] = useState([]);
+  const [loadingComments, setLoadingComments] = useState(true);
 
   useEffect(() => {
     const getPublication = async () => {
       const response = await Request("publication/" + id, "GET");
+
+      if (response.status === "error") {
+        navigate("/error");
+      }
+
       setPublication(response.publication);
       setLoading(false);
+
+      //Buscar comentarios
+      const responseComments = await Request(`publication/${id}/comments`);
+      setLoadingComments(false);
+      setComments(responseComments.comments);
     };
 
     getPublication();
-  }, [id]);
+  }, [id, navigate]);
 
   return (
     <main className="bg-surface text-text-primary rounded-2xl">
@@ -39,9 +53,11 @@ export const PublicationPage = () => {
               />
             </header>
             <ul className="px-4">
-              <Comment />
-              <Comment />
-              <Comment />
+              {loadingComments ? (
+                <Loading />
+              ) : (
+                comments.map((comment) => <Comment comment={comment} />)
+              )}
             </ul>
           </section>
         </>

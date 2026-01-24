@@ -50,6 +50,7 @@ export const Edit = () => {
     );
 
     if (status === "error") {
+      setResult({ status, message });
       return;
     }
 

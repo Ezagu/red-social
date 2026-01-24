@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { Avatar } from "../../components/ui/Avatar.jsx";
 import { Link } from "react-router";
 import { MessageCircle } from "lucide-react";
 import { Heart } from "lucide-react";
 import { PageHeader } from "../pages/PageHeader.jsx";
 import { url } from "../../helpers/Global.jsx";
+import { handleLike } from "../../helpers/Like.jsx";
 
 export const Publication = ({ mode = "feed", publication }) => {
   {
@@ -15,8 +16,12 @@ export const Publication = ({ mode = "feed", publication }) => {
   const Wrapper = isFeed ? Link : "div";
   const WrapperProps = isFeed ? { to: "/publication/" + publication._id } : {};
 
+  const [liked, setLiked] = useState(publication.liked);
+
   return (
-    <article className="border-border-input border-t pt-4 first:border-t-0 last:border-b">
+    <article
+      className={`border-border-input border-t ${isFeed ? "pt-4" : ""} first:border-t-0 last:border-b`}
+    >
       {!isFeed && <PageHeader title="Publicación" />}
       <header className="flex items-center gap-2 px-4">
         <Link to={"/profile/" + publication.user._id}>
@@ -66,9 +71,22 @@ export const Publication = ({ mode = "feed", publication }) => {
           <span className="text-lg">{publication.commentsCount}</span>
         </Wrapper>
 
-        <button className="hover:text-text-primary flex cursor-pointer items-center gap-1.5">
+        <button
+          className="hover:text-text-primary flex cursor-pointer items-center gap-1.5"
+          onClick={() =>
+            handleLike(
+              publication._id,
+              "Publication",
+              liked,
+              setLiked,
+              publication,
+            )
+          }
+        >
           <div>
-            <Heart className="fill-primary text-primary size-6" />
+            <Heart
+              className={`${liked ? "fill-primary text-primary" : "text-text-secondary"} size-6`}
+            />
           </div>
           <span className="text-lg">{publication.likesCount}</span>
         </button>
