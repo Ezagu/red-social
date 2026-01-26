@@ -7,6 +7,7 @@ const path = require("path");
 const User = require("../models/user.js");
 const Publication = require("../models/publication.js");
 const Notification = require("../models/notification.js");
+const Like = require("../models/like.js");
 
 // Importar servicios
 const jwt = require("../services/jwt.js");
@@ -427,11 +428,29 @@ const publications = async (req, res) => {
 const notifications = async (req, res) => {
   const user = req.user._id;
 
-  try {
-    const notifications = await Notification.find({ user })
-      .populate("fromUser", "nick name surname image")
-      .populate("targetId");
+  const notificationsWithoutLikes = await Notification.find({
+    user,
+    targetType: { $ne: "Like" },
+  })
+    .populate("fromUser", "nick fullName image")
+    .populate({
+      path: "targetId",
+    });
 
+  // Separo en dos porque likes necesita un populate demás
+  const notificationsLikes = await Notification.find({
+    user,
+    targetType: "Like",
+  })
+    .populate("fromUser", "nick fullName image")
+    .populate({ path: "targetId", populate: "targetId" });
+
+  const notifications = [...notificationsWithoutLikes, ...notificationsLikes];
+
+  // Sort manual
+  notifications.sort((a, b) => b.createdAt - a.createdAt);
+
+  try {
     return res.status(200).json({
       status: "success",
       message: "Listado de notificaciones",

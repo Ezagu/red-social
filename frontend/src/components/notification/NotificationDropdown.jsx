@@ -1,12 +1,17 @@
 import React, { useState } from "react";
+import { useAuth } from "../../hooks/useAuth.jsx";
 import { Bell } from "lucide-react";
 import { ChevronUp } from "lucide-react";
 import { Circle } from "lucide-react";
 import { Notification } from "./Notification.jsx";
+import { useNotifications } from "../../hooks/useNotifications.jsx";
 
 export const NotificationDropdown = () => {
+  const { user } = useAuth();
   const [show, setShow] = useState(false);
-  const [unreadNotification, setUnreadNotification] = useState(true);
+
+  const { notifications, read, readAll, deleteOne, deleteAll } =
+    useNotifications();
 
   return (
     <div className="text-text-primary bg-surface relative rounded-2xl">
@@ -14,9 +19,11 @@ export const NotificationDropdown = () => {
         className="flex w-full cursor-pointer items-center gap-2 p-4 text-xl font-semibold"
         onClick={() => setShow((prev) => !prev)}
       >
-        {unreadNotification && (
+        {user.unreadNotificationsCount > 0 && (
           <>
-            <span className="absolute top-2.5 left-8.5 z-10 text-xs">4</span>
+            <span className="absolute top-2.5 left-8.5 z-10 text-xs">
+              {user.unreadNotificationsCount}
+            </span>
             <Circle className="text-primary fill-primary absolute top-2 left-7 size-5" />
             <Circle className="text-primary absolute top-2 left-7 size-5 animate-ping" />
           </>
@@ -29,11 +36,37 @@ export const NotificationDropdown = () => {
           }`}
         />
       </button>
-      {show && (
-        <ul className="flex flex-col gap-2 p-4 pt-1">
-          <Notification />
-        </ul>
-      )}
+      {show &&
+        (notifications.length > 0 ? (
+          <div>
+            <header className="flex gap-2 px-4 py-2">
+              <button
+                className="bg-primary hover:bg-primary-hover cursor-pointer rounded-2xl px-4 py-2 font-semibold"
+                onClick={readAll}
+              >
+                Leer todo
+              </button>
+              <button
+                className="bg-danger/80 hover:bg-danger cursor-pointer rounded-2xl px-4 py-2"
+                onClick={deleteAll}
+              >
+                Borrar todo
+              </button>
+            </header>
+            <ul className="flex flex-col gap-2 p-4 pt-1">
+              {notifications.map((notification) => (
+                <Notification
+                  notification={notification}
+                  key={notification._id}
+                  read={read}
+                  deleteOne={deleteOne}
+                />
+              ))}
+            </ul>
+          </div>
+        ) : (
+          <p className="py-6 text-center text-lg">No hay notificaciones</p>
+        ))}
     </div>
   );
 };

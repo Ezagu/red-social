@@ -8,7 +8,7 @@ const read = async (req, res) => {
   try {
     const notification = await Notification.findOneAndUpdate(
       { user: req.user._id, _id: notificationId },
-      { read: true }
+      { read: true },
     );
 
     if (!notification.read) {
@@ -41,12 +41,21 @@ const remove = async (req, res) => {
 
     if (!notificationRemoved) {
       return res.status(404).json({
-        status: 'error',
-        message: 'Notificación inexistente'
-      })
+        status: "error",
+        message: "Notificación inexistente",
+      });
+    }
+    if (!notificationRemoved.read) {
+      await User.findByIdAndUpdate(req.user._id, {
+        $inc: { unreadNotificationsCount: -1 },
+      });
     }
 
-    res.status(204).send();
+    res.status(200).json({
+      status: "success",
+      message: "Notificación eliminada",
+      notification: notificationRemoved,
+    });
   } catch (error) {
     res.status(500).json({
       status: "error",
@@ -63,7 +72,10 @@ const readAll = async (req, res) => {
 
     await User.findByIdAndUpdate(user, { unreadNotificationsCount: 0 });
 
-    return res.status(204).send()
+    return res.status(200).send({
+      status: "success",
+      message: "Se leyeron todas las notificaciones",
+    });
   } catch (error) {
     return res.status(500).json({
       status: "error",
@@ -78,32 +90,18 @@ const removeAll = async (req, res) => {
   try {
     await Notification.deleteMany({ user });
 
-    return res.status(204).send()
+    await User.findByIdAndUpdate(req.user._id, {
+      unreadNotificationsCount: 0,
+    });
+
+    return res.status(200).json({
+      status: "success",
+      message: "Todas las notificaciones fueron removidas",
+    });
   } catch (error) {
     return res.status(500).json({
       status: "error",
       message: "No se pudieron eliminar las notificaciones",
-    });
-  }
-};
-
-const list = async (req, res) => {
-  const user = req.user._id;
-
-  try {
-    const notifications = await Notification.find({ user })
-      .populate("fromUser", "nick name surname image")
-      .populate("targetId");
-
-    return res.status(200).json({
-      status: "success",
-      message: "Listado de notificaciones",
-      notifications,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      status: "error",
-      message: "No se pudo listar las notificaciones",
     });
   }
 };
@@ -113,5 +111,4 @@ module.exports = {
   remove,
   readAll,
   removeAll,
-  list
 };

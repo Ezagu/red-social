@@ -1,51 +1,69 @@
 import React from "react";
 import { MessageCircle } from "lucide-react";
+import { X } from "lucide-react";
 import { Avatar } from "../ui/Avatar";
 import { Link } from "react-router";
 import { Heart } from "lucide-react";
 import { UserPlus } from "lucide-react";
+import { url } from "../../helpers/Global";
 
-export const Notification = () => {
+export const Notification = ({ notification, read, deleteOne }) => {
   const data = {
     Comment: {
       icon: (
         <MessageCircle className="bg-surface fill-text-primary absolute -right-2 -bottom-1 size-6 rounded-full p-1" />
       ),
-      message: `ha comentado tu publicación.`,
-      link: "",
+      message: ` ha comentado tu publicación.`,
+      link: `publication/${notification.targetId.publication}`,
     },
     Like: {
       icon: (
         <Heart className="bg-surface absolute -right-2 -bottom-1 size-6 rounded-full fill-red-800 p-1 text-red-800" />
       ),
-      message: `ha dado me gusta a tu publicación.`,
-      link: "",
+      message: ` le ha dado like a tu ${notification.targetId.targetType === "Comment" ? "comentario" : "publicación"}`,
+      link: `publication/${notification.targetId.targetType === "Publication" ? notification.targetId.targetId?._id : notification.targetId.targetId?.publication}`,
     },
     Follow: {
       icon: (
         <UserPlus className="bg-surface text-primary fill-primary absolute -right-2 -bottom-1 size-6 rounded-full p-1" />
       ),
-      message: `ha comenzado a seguirte.`,
-      link: "",
+      message: ` comenzó a seguirte.`,
+      link: `/profile/${notification.targetId.user}`,
     },
   };
+
   return (
     <Link
-      className={
-        "hover:bg-elevated relative flex items-center gap-4 rounded-2xl p-2"
-      }
+      className={`hover:bg-elevated relative flex items-center gap-4 rounded-2xl p-2 ${!notification.read && "bg-elevated"}`}
+      to={data[notification.targetType].link}
+      onClick={() => read(notification._id)}
     >
-      <div className="relative">
-        <Avatar src="/src/assets/kiara.jpg" size="md" />
-        {data.Like.icon}
+      <div className="relative shrink-0">
+        <Avatar
+          src={url + "user/avatar/" + notification.fromUser.image}
+          size="md"
+        />
+        {data[notification.targetType].icon}
       </div>
-      <div className="text-md overflow-hidden text-nowrap">
-        <span className="font-bold">Dkiara03</span> Ha dado me gusta a tu
-        publicacion
+      <div className="flex min-w-0 flex-col">
+        <div className="truncate overflow-hidden text-lg text-nowrap">
+          <span className="font-bold">{notification.fromUser.nick}</span>{" "}
+          {data[notification.targetType].message}
+        </div>
+        <p className="text-text-secondary bg-inherit text-sm">
+          {notification.createdAt}
+        </p>
       </div>
-      <p className="text-text-secondary absolute top-1 right-2 bg-inherit">
-        3d
-      </p>
+      <div
+        className="text-text-muted hover:bg-danger hover:text-text-primary ml-auto shrink-0 justify-self-end rounded-full p-2 transition-all"
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          deleteOne(notification._id);
+        }}
+      >
+        <X className="size-6" />
+      </div>
     </Link>
   );
 };
