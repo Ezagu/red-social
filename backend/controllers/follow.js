@@ -40,13 +40,13 @@ const save = async (req, res) => {
   } catch (error) {
     if (error.code === 11000) {
       return res.status(409).json({
-        status: 'error',
-        message: "Ya sigues a esta cuenta"
+        status: "error",
+        message: "Ya sigues a esta cuenta",
       });
     }
     return res.status(500).json({
       status: "error",
-      message: "No se pudo seguir al usuario"
+      message: "No se pudo seguir al usuario",
     });
   }
 };
@@ -68,9 +68,9 @@ const unfollow = async (req, res) => {
 
     if (!followDeleted) {
       return res.status(404).json({
-        status:'error',
-        message: 'No sigues a ese usuario'
-      })
+        status: "error",
+        message: "No sigues a ese usuario",
+      });
     }
 
     await User.findByIdAndUpdate(user, { $inc: { followingCount: -1 } });
@@ -87,11 +87,14 @@ const unfollow = async (req, res) => {
       });
     }
 
-    return res.status(204).send();
+    return res.status(200).json({
+      status: "success",
+      message: "Se ha dejado de seguir al usuario",
+    });
   } catch (error) {
     return res.status(500).json({
       status: "error",
-      message: "No se pudo dejar de seguir"
+      message: "No se pudo dejar de seguir",
     });
   }
 };
@@ -99,5 +102,5 @@ const unfollow = async (req, res) => {
 // Exportar funciones
 module.exports = {
   save,
-  unfollow
+  unfollow,
 };

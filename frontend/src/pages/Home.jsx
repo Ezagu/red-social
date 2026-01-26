@@ -39,8 +39,8 @@ export const Home = () => {
   };
 
   return (
-    <main className="bg-surface rounded-2xl">
-      <header className="text-text-primary border-border-input border-b text-center">
+    <main className="bg-surface text-text-primary rounded-2xl">
+      <header className="border-border-input border-b text-center">
         <div className="flex">
           <button
             className={
@@ -66,13 +66,15 @@ export const Home = () => {
       </header>
       {loading ? (
         <Loading />
-      ) : (
+      ) : publications.length > 0 ? (
         <ListPublications
           publications={publications}
           setPublications={setPublications}
           publicationsInfo={publicationsInfo}
           loadNextPage={loadNextPage}
         />
+      ) : (
+        <p className="mt-10 text-center text-lg">No hay publicaciones</p>
       )}
     </main>
   );

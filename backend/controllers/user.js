@@ -120,9 +120,11 @@ const profile = async (req, res) => {
     // TODO: Devolver informacion de follows
     return res.status(200).json({
       status: "success",
-      user: userProfile,
-      following: followInfo.following ? true : false,
-      follower: followInfo.follower ? true : false,
+      user: {
+        ...userProfile.toObject(),
+        isFollower: followInfo.follower ? true : false,
+        isFollowed: followInfo.following ? true : false,
+      },
     });
   } catch (err) {
     return res.status(404).send({

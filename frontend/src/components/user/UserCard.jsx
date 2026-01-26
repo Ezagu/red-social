@@ -26,12 +26,6 @@ export const UserCard = ({ user }) => {
         <p className="text-text-muted -mt-1 truncate">{user.fullName}</p>
         <p className="truncate">{user.bio}</p>
       </div>
-      {user._id !== identity._id && (
-        <ButtonFollowUnfollow
-          following={user.isFollowed}
-          className="shrink-0"
-        />
-      )}
     </Link>
   );
 };

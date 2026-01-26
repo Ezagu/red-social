@@ -13,21 +13,20 @@ import { ListPublications } from "../components/publications/ListPublications.js
 export const Profile = () => {
   const [profile, setProfile] = useState({});
   const [loadingProfile, setLoadingProfile] = useState(true);
+
   const [publicationsInfo, setPublicationsInfo] = useState({});
   const [publications, setPublications] = useState([]);
   const [loadingPublications, setLoadingPublications] = useState(true);
-  const { user } = useAuth();
 
+  const { user } = useAuth();
   const { id } = useParams();
 
   useEffect(() => {
     const getProfile = async () => {
       const response = await Request("user/" + id, "GET");
 
-      setProfile(response);
+      setProfile(response.user);
       setLoadingProfile(false);
-
-      console.log(response);
     };
 
     const loadPublications = async () => {
@@ -56,16 +55,16 @@ export const Profile = () => {
         <Loading />
       ) : (
         <>
-          <PageHeader title={"Perfil de " + profile.user.nick} />
+          <PageHeader title={"Perfil de " + profile.nick} />
           <header className="border-border-input w-full border-b p-4">
             <div className="ml-4 flex gap-4">
               <Avatar
-                src={url + "user/avatar/" + profile.user.image}
+                src={url + "user/avatar/" + profile.image}
                 size="4xl"
                 className="border-primary border"
               />
               <div className="flex min-w-0 grow flex-col">
-                {user._id === profile.user._id ? (
+                {user._id === profile._id ? (
                   <Link
                     to="/edit"
                     className="bg-primary hover:bg-primary-hover flex grow-0 cursor-pointer items-center gap-2 self-end rounded-2xl px-3 py-1"
@@ -75,26 +74,25 @@ export const Profile = () => {
                   </Link>
                 ) : (
                   <ButtonFollowUnfollow
-                    following={profile.following}
+                    profile={profile}
+                    setProfile={setProfile}
                     className="grow-0 self-end"
                   />
                 )}
                 <div className="mt-2 flex items-center gap-2">
                   <h1 className="truncate text-5xl font-semibold">
-                    {profile.user.nick}
+                    {profile.nick}
                   </h1>
-                  {profile.follower && user._id !== profile.user._id && (
+                  {profile.isFollower && user._id !== profile._id && (
                     <span className="bg-elevated text-md shrink-0 rounded-2xl px-1.5 py-0.5">
                       Te sigue
                     </span>
                   )}
                 </div>
                 <h2 className="text-text-secondary mt-1 truncate text-xl">
-                  {profile.user.fullName}
+                  {profile.fullName}
                 </h2>
-                <p className="mt-2 line-clamp-3 grow text-xl">
-                  {profile.user.bio}
-                </p>
+                <p className="mt-2 line-clamp-3 grow text-xl">{profile.bio}</p>
               </div>
             </div>
             <div className="mt-6 grid grid-cols-3">
@@ -103,26 +101,26 @@ export const Profile = () => {
                   Publicaciones
                 </h3>
                 <p className="text-center text-3xl font-bold">
-                  {profile.user.publicationsCount}
+                  {profile.publicationsCount}
                 </p>
               </Link>
               <Link
-                to={"/users?mode=followers&id=" + profile.user._id}
+                to={"/users?mode=followers&id=" + profile._id}
                 className="border-border-input border-r"
               >
                 <h3 className="text-text-secondary text-center text-xl">
                   Seguidores
                 </h3>
                 <p className="text-center text-3xl font-bold">
-                  {profile.user.followersCount}
+                  {profile.followersCount}
                 </p>
               </Link>
-              <Link to={"/users?mode=following&id=" + profile.user._id}>
+              <Link to={"/users?mode=following&id=" + profile._id}>
                 <h3 className="text-text-secondary text-center text-xl">
                   Seguidos
                 </h3>
                 <p className="text-center text-3xl font-bold">
-                  {profile.user.followingCount}
+                  {profile.followingCount}
                 </p>
               </Link>
             </div>
