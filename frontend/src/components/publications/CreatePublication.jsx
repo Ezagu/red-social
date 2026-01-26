@@ -1,9 +1,12 @@
 import React, { useState } from "react";
+import { useAuth } from "../../hooks/useAuth.jsx";
+import Request from "../../helpers/Request.jsx";
 import { ChevronUp } from "lucide-react";
 import { Pen } from "lucide-react";
 import { Alert } from "../ui/Alert.jsx";
 import { ImagePlus } from "lucide-react";
 import { X } from "lucide-react";
+import { url } from "../../helpers/Global.jsx";
 
 export const CreatePublication = () => {
   const [show, setShow] = useState(true);
@@ -12,6 +15,8 @@ export const CreatePublication = () => {
   const [filePreview, setFilePreview] = useState(null);
   const [fileSelected, setFileSelected] = useState(null);
 
+  const { setUser } = useAuth();
+
   const handleFileChange = (e) => {
     const file = e.target.files[0];
 
@@ -19,12 +24,67 @@ export const CreatePublication = () => {
     setFilePreview(file ? URL.createObjectURL(file) : null);
   };
 
+  const uploadPublication = async (e) => {
+    e.preventDefault();
+    const text = e.target.text.value;
+
+    //Subir texto de publicación
+    const { status, message, publication } = await Request(
+      "publication",
+      "POST",
+      true,
+      { text },
+    );
+
+    setResult({ status, message });
+
+    if (status === "error") {
+      return;
+    }
+
+    //Subir imagen si hay
+    if (fileSelected) {
+      const formData = new FormData();
+      formData.append("file0", fileSelected);
+
+      const uploadReq = await fetch(
+        `${url}publication/${publication._id}/upload`,
+        {
+          method: "POST",
+          body: formData,
+          headers: {
+            Authorization: localStorage.getItem("token"),
+          },
+        },
+      );
+      const uploadRes = await uploadReq.json();
+
+      if (status === "error") {
+        setResult({
+          status: uploadRes.status,
+          message: uploadRes.message,
+        });
+        return;
+      }
+    }
+
+    // Actualizar contador de publicaciones si todo salió bien
+    setUser((prev) => ({
+      ...prev,
+      publicationsCount: prev.publicationsCount + 1,
+    }));
+
+    // Borrar inputs
+    e.target.text.value = "";
+    setFilePreview(null);
+    setFileSelected(null);
+  };
+
   return (
     <div className="text-text-primary bg-surface relative rounded-2xl">
       <button
         className="flex w-full cursor-pointer items-center gap-2 p-4 text-xl font-semibold"
         onClick={() => {
-          console.log(show);
           setShow((prev) => !prev);
         }}
       >
@@ -37,12 +97,16 @@ export const CreatePublication = () => {
         />
       </button>
       {show && (
-        <form className="flex flex-col gap-4 p-4 pt-0">
+        <form
+          className="flex flex-col gap-4 p-4 pt-0"
+          onSubmit={(e) => uploadPublication(e)}
+        >
           <textarea
             placeholder="¿Qué estás pensando?"
             className="border-border-input focus:border-primary field-sizing-content resize-none rounded-2xl border p-2 py-3 text-xl focus:outline-none"
             maxLength="255"
             required
+            name="text"
           />
           {filePreview && (
             <div className="relative w-full">
@@ -71,10 +135,10 @@ export const CreatePublication = () => {
               <ImagePlus />
             </label>
             <input
+              name="files"
               type="file"
               className="hidden"
               id="file0"
-              name="file0"
               onChange={handleFileChange}
             />
             <input

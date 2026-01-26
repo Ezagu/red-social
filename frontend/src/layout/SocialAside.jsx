@@ -64,7 +64,7 @@ export const SocialAside = () => {
         ) : users.length === 0 ? (
           <div>No se encontraron usuarios</div>
         ) : (
-          users.map((user) => <UserCard user={user} />)
+          users.map((user) => <UserCard user={user} key={user._id} />)
         )}
       </ul>
       {usersInfo.hasNextPage && (

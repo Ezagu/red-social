@@ -3,11 +3,13 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-api-rest/uploads/avatars/*
-api-rest/uploads/publications/*
+
+backend/uploads/avatars/*
+backend/uploads/publications/*
 
 /frontend/src/assets/*
 /frontend-deprecated
+
 
 
 # Environment variables

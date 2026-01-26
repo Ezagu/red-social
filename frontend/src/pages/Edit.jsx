@@ -58,8 +58,6 @@ export const Edit = () => {
       const formData = new FormData();
       formData.append("file0", fileSelected);
 
-      console.log(formData.file0);
-
       const uploadReq = await fetch(url + "user/upload", {
         method: "POST",
         body: formData,
