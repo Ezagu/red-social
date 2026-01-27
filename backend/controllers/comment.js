@@ -129,15 +129,26 @@ const remove = async (req, res) => {
 const replies = async (req, res) => {
   const parentComment = req.params.id;
 
+  const page = req.query.page || 1;
+  const limit = req.query.limit || 5;
+
   try {
-    const replies = await Comment.find({ parentComment }, "", {
-      sort: { createdAt: -1 },
-    }).populate("user", "-password -role -email -__v");
+    const replies = await Comment.paginate(
+      { parentComment },
+      {
+        page,
+        limit,
+        sort: { createdAt: -1 },
+        populate: { path: "user", select: "-password -role -email -__v" },
+      },
+    );
 
     return res.status(200).json({
       status: "success",
-      message: "Listado de respuestas de un comentario",
-      replies,
+      page,
+      limit,
+      hasNextPage: replies.hasNextPage,
+      items: replies.docs,
     });
   } catch (error) {
     return res.status(500).json({

@@ -4,8 +4,10 @@ import { Heart } from "lucide-react";
 import { Link } from "react-router";
 import { url } from "../../helpers/Global.jsx";
 import { useLike } from "../../hooks/useLike.jsx";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Request from "../../helpers/Request.jsx";
+import { usePaginate } from "../../hooks/usePaginate.jsx";
+import { Loading } from "../ui/Loading.jsx";
 
 export const Comment = ({ comment }) => {
   const { liked, toggleLike, likesCount } = useLike({
@@ -14,19 +16,20 @@ export const Comment = ({ comment }) => {
   });
 
   const [repliesCount, setRepliesCount] = useState(comment.repliesCount);
-  const [replies, setReplies] = useState([]);
   const [showReplies, setShowReplies] = useState(false);
 
-  useEffect(() => {
-    const loadReplies = async () => {
-      const response = await Request(`comment/${comment._id}/replies`);
-      setReplies(response.replies);
-    };
-
-    if (comment.repliesCount > 0) {
-      loadReplies();
-    }
-  }, [comment]);
+  const {
+    items: replies,
+    loading,
+    loadNextPage,
+    load,
+    paginate,
+    addItem,
+  } = usePaginate({
+    endpoint: `comment/${comment._id}/replies`,
+    limit: 3,
+    autoLoad: false,
+  });
 
   const createReplie = async (e) => {
     e.preventDefault();
@@ -44,12 +47,14 @@ export const Comment = ({ comment }) => {
     }
 
     setRepliesCount((prev) => prev + 1);
-    setReplies((prev) => [response.comment, ...prev]);
+    addItem(response.comment);
     e.target.text.value = "";
   };
 
   return (
-    <article className="border-border-input flex gap-2 border-t px-2 py-3 first:border-none">
+    <article
+      className={`border-border-input flex gap-2 border-t px-2 py-3 first:border-none ${paginate.hasNextPage && "last:border-b"}`}
+    >
       <Link to={`/profile/${comment.user._id}`} className="shrink-0">
         <Avatar src={`${url}user/avatar/${comment.user.image}`} size="lg" />
       </Link>
@@ -64,7 +69,10 @@ export const Comment = ({ comment }) => {
         <div className="text-text-secondary mt-2 flex gap-4">
           <button
             className="group flex cursor-pointer items-center gap-1.5"
-            onClick={() => setShowReplies((prev) => !prev)}
+            onClick={() => {
+              load();
+              setShowReplies((prev) => !prev);
+            }}
           >
             <div className="group-hover:text-primary transition-all group-hover:scale-125">
               <MessageCircle className="size-5.5" />
@@ -86,8 +94,12 @@ export const Comment = ({ comment }) => {
             {comment.createdAt}
           </span>
         </div>
-        {showReplies ? (
-          <>
+        {!showReplies ? (
+          ""
+        ) : loading ? (
+          <Loading />
+        ) : (
+          <div className="flex flex-col">
             <form
               className={`flex gap-2 pt-2 ${repliesCount > 0 ? "border-border-input border-b pb-3 " : ""}`}
               onSubmit={(e) => createReplie(e)}
@@ -110,9 +122,15 @@ export const Comment = ({ comment }) => {
                 <Comment comment={replie} key={replie._id} />
               ))}
             </ul>
-          </>
-        ) : (
-          ""
+            {paginate.hasNextPage && (
+              <button
+                className="bg-primary hover:bg-primary-hover text-text-primary m-auto mt-2 cursor-pointer rounded-2xl px-4 py-1 font-semibold"
+                onClick={loadNextPage}
+              >
+                Ver más
+              </button>
+            )}
+          </div>
         )}
       </div>
     </article>
