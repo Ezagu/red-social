@@ -6,6 +6,7 @@ const path = require("path");
 const Publication = require("../models/publication.js");
 const User = require("../models/user.js");
 const Comment = require("../models/comment.js");
+const Like = require("../models/like.js");
 
 // Importar servicios
 const followService = require("../services/followService.js");
@@ -52,9 +53,25 @@ const detail = async (req, res) => {
       "-password -role -email -__v",
     );
 
+    if (!publication) {
+      return res.status(500).json({
+        status: "error",
+        message: "No se pudo conseguir la publicación",
+      });
+    }
+
+    const like = await Like.find({
+      user: req.user._id,
+      targetType: "Publication",
+      targetId: publication._id,
+    });
+
     return res.status(200).json({
       status: "success",
-      publication,
+      publication: {
+        ...publication.toObject(),
+        liked: like.length === 1,
+      },
     });
   } catch (error) {
     return res.status(404).json({
@@ -243,22 +260,58 @@ const followingPublications = async (req, res) => {
 const comments = async (req, res) => {
   const id = req.params.id;
 
+  const limit = req.query.limit || 10;
+  const page = req.query.page || 1;
+
   try {
-    const comments = await Comment.find({
-      publication: id,
-      parentComment: null,
-    }).populate("user", "-password -role -email -__v");
+    const commentsPaginate = await Comment.paginate(
+      {
+        publication: id,
+        parentComment: null,
+      },
+      {
+        limit,
+        page,
+        sort: { createdAt: -1 },
+        populate: { path: "user", select: "-password -role -email -__v" },
+      },
+    );
+
+    // Saber si el comentario fue likeado por el user identity
+    const commentsIds = commentsPaginate.docs.map((comment) => comment._id);
+
+    const likesInComments = await Like.find({
+      user: req.user._id,
+      targetType: "Comment",
+      targetId: commentsIds,
+    });
+
+    const commentsLiked = likesInComments.map((like) =>
+      like.targetId.toString(),
+    );
+
+    const comments = commentsPaginate.docs.map((com) => {
+      const comment = com.toObject();
+      return {
+        ...comment,
+        liked: commentsLiked.includes(comment._id.toString()),
+      };
+    });
 
     res.status(200).json({
       status: "success",
       message: "Lista de comentarios",
+      page,
+      limit,
+      totalComments: commentsPaginate.totalDocs,
+      totalPages: commentsPaginate.totalPages,
+      hasNextPage: commentsPaginate.hasNextPage,
       comments,
     });
   } catch (error) {
     res.status(200).json({
       status: "error",
       message: "No se pudo obtener los comentarios",
-      id,
     });
   }
 };

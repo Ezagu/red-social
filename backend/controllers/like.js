@@ -64,9 +64,14 @@ const save = async (req, res) => {
 const remove = async (req, res) => {
   const user = req.user._id;
   const targetId = req.params.id;
+  const { targetType } = req.body;
 
   try {
-    const likeRemoved = await Like.findOneAndDelete({ targetId, user });
+    const likeRemoved = await Like.findOneAndDelete({
+      targetId,
+      user,
+      targetType,
+    });
 
     if (!likeRemoved) {
       return res.status(404).json({

@@ -2,12 +2,54 @@ import { Avatar } from "../ui/Avatar";
 import { MessageCircle } from "lucide-react";
 import { Heart } from "lucide-react";
 import { Link } from "react-router";
-import { Input } from "../ui/Input.jsx";
 import { url } from "../../helpers/Global.jsx";
+import { useLike } from "../../hooks/useLike.jsx";
+import { useEffect, useState } from "react";
+import Request from "../../helpers/Request.jsx";
 
 export const Comment = ({ comment }) => {
+  const { liked, toggleLike, likesCount } = useLike({
+    targetType: "Comment",
+    target: comment,
+  });
+
+  const [repliesCount, setRepliesCount] = useState(comment.repliesCount);
+  const [replies, setReplies] = useState([]);
+  const [showReplies, setShowReplies] = useState(false);
+
+  useEffect(() => {
+    const loadReplies = async () => {
+      const response = await Request(`comment/${comment._id}/replies`);
+      setReplies(response.replies);
+    };
+
+    if (comment.repliesCount > 0) {
+      loadReplies();
+    }
+  }, [comment]);
+
+  const createReplie = async (e) => {
+    e.preventDefault();
+
+    const text = e.target.text.value;
+
+    const response = await Request(`comment`, "POST", true, {
+      publicationId: comment.publication,
+      text,
+      parentComment: comment._id,
+    });
+
+    if (response.status === "error") {
+      return;
+    }
+
+    setRepliesCount((prev) => prev + 1);
+    setReplies((prev) => [response.comment, ...prev]);
+    e.target.text.value = "";
+  };
+
   return (
-    <article className="border-border-input flex gap-2 border-t px-2 py-3">
+    <article className="border-border-input flex gap-2 border-t px-2 py-3 first:border-none">
       <Link to={`/profile/${comment.user._id}`} className="shrink-0">
         <Avatar src={`${url}user/avatar/${comment.user.image}`} size="lg" />
       </Link>
@@ -20,22 +62,58 @@ export const Comment = ({ comment }) => {
         </Link>
         <p className="text-xl">{comment.text}</p>
         <div className="text-text-secondary mt-2 flex gap-4">
-          <button className="flex cursor-pointer items-center gap-1.5">
-            <div>
+          <button
+            className="group flex cursor-pointer items-center gap-1.5"
+            onClick={() => setShowReplies((prev) => !prev)}
+          >
+            <div className="group-hover:text-primary transition-all group-hover:scale-125">
               <MessageCircle className="size-5.5" />
             </div>
-            <span className="text-lg">{comment.repliesCount}</span>
+            <span className="text-lg">{repliesCount}</span>
           </button>
-          <button className="flex cursor-pointer items-center gap-1.5">
-            <div>
-              <Heart className="fill-primary text-primary size-6" />
+          <button
+            className="group flex cursor-pointer items-center gap-1.5"
+            onClick={toggleLike}
+          >
+            <div className="group">
+              <Heart
+                className={`${liked ? "fill-primary text-primary" : ""} group-hover:text-primary size-6 transition-all group-hover:scale-125`}
+              />
             </div>
-            <span className="text-lg">{comment.likesCount}</span>
+            <span className="text-lg">{likesCount}</span>
           </button>
           <span className="text-text-secondary border-border-input border-l pl-3 text-xl">
             {comment.createdAt}
           </span>
         </div>
+        {showReplies ? (
+          <>
+            <form
+              className={`flex gap-2 pt-2 ${repliesCount > 0 ? "border-border-input border-b pb-3 " : ""}`}
+              onSubmit={(e) => createReplie(e)}
+            >
+              <input
+                type="text"
+                className="border-border-input placeholder:text-placeholder focus:border-primary text-text-primary text-md w-full rounded-xl border p-2 focus:outline-none"
+                placeholder="Ingrese un comentario"
+                required
+                name="text"
+              />
+              <input
+                type="submit"
+                className="bg-primary cursor-pointer rounded-2xl px-4 text-lg font-semibold"
+                value="Comentar"
+              />
+            </form>
+            <ul>
+              {replies.map((replie) => (
+                <Comment comment={replie} key={replie._id} />
+              ))}
+            </ul>
+          </>
+        ) : (
+          ""
+        )}
       </div>
     </article>
   );

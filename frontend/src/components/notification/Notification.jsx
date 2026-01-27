@@ -13,7 +13,7 @@ export const Notification = ({ notification, read, deleteOne }) => {
       icon: (
         <MessageCircle className="bg-surface fill-text-primary absolute -right-2 -bottom-1 size-6 rounded-full p-1" />
       ),
-      message: ` ha comentado tu publicación.`,
+      message: `${notification.targetId.parentComment ? "ha respondido tu comentario" : "ha comentado tu publicación"}`,
       link: `publication/${notification.targetId.publication}`,
     },
     Like: {

@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React from "react";
 import { Avatar } from "../../components/ui/Avatar.jsx";
 import { Link } from "react-router";
 import { MessageCircle } from "lucide-react";
 import { Heart } from "lucide-react";
 import { PageHeader } from "../pages/PageHeader.jsx";
 import { url } from "../../helpers/Global.jsx";
-import { handleLike } from "../../helpers/Like.jsx";
+import { useLike } from "../../hooks/useLike.jsx";
 
 export const Publication = ({ mode = "feed", publication }) => {
   {
@@ -16,7 +16,10 @@ export const Publication = ({ mode = "feed", publication }) => {
   const Wrapper = isFeed ? Link : "div";
   const WrapperProps = isFeed ? { to: "/publication/" + publication._id } : {};
 
-  const [liked, setLiked] = useState(publication.liked);
+  const { liked, likesCount, toggleLike } = useLike({
+    target: publication,
+    targetType: "Publication",
+  });
 
   return (
     <article
@@ -63,32 +66,26 @@ export const Publication = ({ mode = "feed", publication }) => {
       <footer className="text-text-secondary mx-6 mt-4 mb-4 flex gap-4">
         <Wrapper
           {...WrapperProps}
-          className="hover:text-text-primary flex cursor-pointer items-center gap-1.5"
+          className={`flex ${isFeed ? "group cursor-pointer" : ""} items-center gap-1.5`}
         >
           <div>
-            <MessageCircle className="size-5.5" />
+            <MessageCircle
+              className={`${isFeed ? "group-hover:text-primary transition-all group-hover:scale-125" : ""} size-5.5`}
+            />
           </div>
           <span className="text-lg">{publication.commentsCount}</span>
         </Wrapper>
 
         <button
-          className="hover:text-text-primary flex cursor-pointer items-center gap-1.5"
-          onClick={() =>
-            handleLike(
-              publication._id,
-              "Publication",
-              liked,
-              setLiked,
-              publication,
-            )
-          }
+          className="group flex cursor-pointer items-center gap-1.5"
+          onClick={toggleLike}
         >
-          <div>
+          <div className="group-hover:text-primary transition-all group-hover:scale-125">
             <Heart
-              className={`${liked ? "fill-primary text-primary" : "text-text-secondary"} size-6`}
+              className={`${liked ? "fill-primary text-primary" : ""} size-6`}
             />
           </div>
-          <span className="text-lg">{publication.likesCount}</span>
+          <span className="text-lg">{likesCount}</span>
         </button>
         <span className="text-text-secondary justify-self border-border-input border-l pl-3 text-xl">
           {publication.createdAt}

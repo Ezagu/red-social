@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Publication } from "../components/publications/Publication.jsx";
-import { Input } from "../components/ui/Input.jsx";
 import { Comment } from "../components/comments/Comment.jsx";
 import { useNavigate, useParams } from "react-router";
 import Request from "../helpers/Request.jsx";
@@ -15,6 +14,28 @@ export const PublicationPage = () => {
   const [loading, setLoading] = useState(true);
   const [comments, setComments] = useState([]);
   const [loadingComments, setLoadingComments] = useState(true);
+
+  const createComment = async (e) => {
+    e.preventDefault();
+
+    const text = e.target.text.value;
+
+    const response = await Request(`comment`, "POST", true, {
+      publicationId: id,
+      text,
+    });
+
+    if (response.status === "error") {
+      return;
+    }
+
+    setPublication((prev) => ({
+      ...prev,
+      commentsCount: prev.commentsCount + 1,
+    }));
+    setComments((prev) => [response.comment, ...prev]);
+    e.target.text.value = "";
+  };
 
   useEffect(() => {
     const getPublication = async () => {
@@ -44,19 +65,34 @@ export const PublicationPage = () => {
         <>
           <Publication mode="page" publication={publication} />
           <section>
-            <header className="flex gap-2 p-4 pt-0">
-              <Input placeholder="Ingrese un comentario" />
+            <form
+              className="border-border-input m-4 mb-0 flex gap-2 border-b pt-0 pb-4"
+              onSubmit={createComment}
+            >
+              <input
+                type="text"
+                className="border-border-input placeholder:text-placeholder focus:border-primary text-text-primary w-full rounded-xl border p-3 text-lg focus:outline-none"
+                placeholder="Ingrese un comentario"
+                required
+                name="text"
+              />
               <input
                 type="submit"
-                className="bg-primary rounded-2xl px-4 text-lg font-semibold"
+                className="bg-primary cursor-pointer rounded-2xl px-4 text-lg font-semibold"
                 value="Comentar"
               />
-            </header>
+            </form>
             <ul className="px-4">
               {loadingComments ? (
                 <Loading />
+              ) : comments.length > 0 ? (
+                comments.map((comment) => (
+                  <Comment comment={comment} key={comment._id} />
+                ))
               ) : (
-                comments.map((comment) => <Comment comment={comment} />)
+                <div>
+                  <p className="my-6 text-center text-xl">No hay comentarios</p>
+                </div>
               )}
             </ul>
           </section>
