@@ -6,11 +6,10 @@ yarn-error.log*
 
 backend/uploads/avatars/*
 backend/uploads/publications/*
+backend/arrancar-proyecto.bat
 
 /frontend/src/assets/*
 /frontend-deprecated
-
-
 
 # Environment variables
 .env
@@ -18,4 +17,4 @@ backend/uploads/publications/*
 # Build
 dist/
 build/
-api-rest/arrancar-proyecto.bat
+

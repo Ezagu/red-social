@@ -26,9 +26,7 @@ export const SocialAside = () => {
       searchUsers();
     }, 400);
 
-    {
-      /*Cuando retornas, se ejecuta la proxima vez que se ejecuta el useEffect (función cleanup) */
-    }
+    //Cuando retornas, se ejecuta la proxima vez que se ejecuta el useEffect (función cleanup)
     return () => clearTimeout(timeout);
   }, [search]);
 
@@ -37,11 +35,11 @@ export const SocialAside = () => {
       `user/users?search=${search}&page=${Number(usersInfo.page) + 1}`,
     );
     setUsersInfo(response);
-    setUsers((prev) => [...prev, ...response.users]);
+    setUsers((prev) => [...prev, ...response.items]);
   };
 
   return (
-    <aside className="text-text-primary sticky top-20 flex h-fit w-full max-w-lg flex-col gap-4">
+    <aside className="text-text-primary sticky top-24 flex h-fit w-full max-w-lg flex-col gap-4">
       <header className="relative w-full">
         <Search className="absolute top-4.5 left-3" />
         <input
@@ -56,7 +54,9 @@ export const SocialAside = () => {
           }}
         />
       </header>
-      <ul className="flex flex-col items-center gap-4">
+      <ul
+        className={`scrollbar-dark flex max-h-[75vh] flex-col items-center gap-4 overscroll-contain ${!loading && "overflow-y-auto"}`}
+      >
         {search === "" ? (
           ""
         ) : loading ? (
@@ -66,15 +66,15 @@ export const SocialAside = () => {
         ) : (
           users.map((user) => <UserCard user={user} key={user._id} />)
         )}
+        {usersInfo.hasNextPage && (
+          <button
+            className="bg-primary hover:bg-primary-hover text-text-primary m-auto my-4 w-1/2 cursor-pointer rounded-2xl py-2 font-semibold"
+            onClick={() => loadNextPage()}
+          >
+            Ver más
+          </button>
+        )}
       </ul>
-      {usersInfo.hasNextPage && (
-        <button
-          className="bg-primary hover:bg-primary-hover text-text-primary m-auto my-4 w-1/2 cursor-pointer rounded-2xl py-2 font-semibold"
-          onClick={() => loadNextPage()}
-        >
-          Ver más
-        </button>
-      )}
     </aside>
   );
 };

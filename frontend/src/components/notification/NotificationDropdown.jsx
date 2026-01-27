@@ -53,7 +53,7 @@ export const NotificationDropdown = () => {
                 Borrar todo
               </button>
             </header>
-            <ul className="flex flex-col gap-2 p-4 pt-1">
+            <ul className="scrollbar flex h-full max-h-[30vh] flex-col gap-2 overflow-x-hidden overflow-y-auto overscroll-contain p-4 pt-1">
               {notifications.map((notification) => (
                 <Notification
                   notification={notification}

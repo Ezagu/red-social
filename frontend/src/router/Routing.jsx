@@ -31,7 +31,6 @@ export const Routing = () => {
             <Route path="*" element={<Error />} />
           </Route>
         </Routes>
-        <Footer />
       </AuthProvider>
     </BrowserRouter>
   );
