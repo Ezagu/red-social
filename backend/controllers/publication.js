@@ -306,7 +306,7 @@ const comments = async (req, res) => {
       totalComments: commentsPaginate.totalDocs,
       totalPages: commentsPaginate.totalPages,
       hasNextPage: commentsPaginate.hasNextPage,
-      comments,
+      items: comments,
     });
   } catch (error) {
     res.status(200).json({

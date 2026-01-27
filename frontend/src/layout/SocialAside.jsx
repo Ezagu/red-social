@@ -17,7 +17,7 @@ export const SocialAside = () => {
       const response = await Request(`user/users?search=${search}`);
 
       setUsersInfo(response);
-      setUsers(response.users);
+      setUsers(response.items);
 
       setLoading(false);
     };

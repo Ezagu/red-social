@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { UserRoundX } from "lucide-react";
 import { UserRoundPlus } from "lucide-react";
 import Request from "../../helpers/Request";
@@ -10,11 +10,14 @@ export const ButtonFollowUnfollow = ({
   className = "",
 }) => {
   const { setUser } = useAuth();
+  const [following, setFollowing] = useState(profile.isFollowed);
 
   const follow = async () => {
     const response = await Request(`follow/${profile._id}`, "POST");
 
     if (response.status === "success") {
+      setFollowing(true);
+
       // Modifica valores de seguidores en el perfil visualizado
       setProfile &&
         setProfile((prevProf) => ({
@@ -34,6 +37,7 @@ export const ButtonFollowUnfollow = ({
     const response = await Request(`follow/${profile._id}`, "DELETE");
 
     if (response.status === "success") {
+      setFollowing(false);
       setProfile &&
         setProfile((prevProf) => ({
           ...prevProf,
@@ -48,13 +52,17 @@ export const ButtonFollowUnfollow = ({
     }
   };
 
-  return profile.isFollowed ? (
+  return following ? (
     <button
       className={
         "bg-danger/80 hover:bg-danger flex cursor-pointer items-center gap-2 rounded-2xl px-3 py-1 " +
         className
       }
-      onClick={unfollow}
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        unfollow();
+      }}
     >
       Dejar de seguir
       <UserRoundX className="size-5" />
@@ -65,7 +73,11 @@ export const ButtonFollowUnfollow = ({
         "bg-primary hover:bg-primary-hover flex cursor-pointer items-center gap-2 rounded-2xl px-3 py-1 " +
         className
       }
-      onClick={follow}
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        follow();
+      }}
     >
       Seguir
       <UserRoundPlus className="size-5" />

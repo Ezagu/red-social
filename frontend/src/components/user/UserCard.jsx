@@ -25,6 +25,10 @@ export const UserCard = ({ user }) => {
         </div>
         <p className="text-text-muted -mt-1 truncate">{user.fullName}</p>
         <p className="truncate">{user.bio}</p>
+        <ButtonFollowUnfollow
+          profile={user}
+          className="absolute top-2 right-2"
+        />
       </div>
     </Link>
   );

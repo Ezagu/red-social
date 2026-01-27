@@ -46,7 +46,7 @@ const getPublications = async (
       totalPublications: publications.totalDocs,
       totalPages: publications.totalPages,
       hasNextPage: publications.hasNextPage,
-      publications: publicationsWithLikes,
+      items: publicationsWithLikes,
     };
   } catch (error) {
     return null;

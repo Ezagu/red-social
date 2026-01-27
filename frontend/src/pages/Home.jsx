@@ -1,42 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Loading } from "../components/ui/Loading";
 import Request from "../helpers/Request";
 import { ListPublications } from "../components/publications/ListPublications";
+import { usePaginate } from "../hooks/usePaginate";
 
 export const Home = () => {
   const [section, setSection] = useState("all");
-  const [loading, setLoading] = useState(true);
-  const [publications, setPublications] = useState([]);
-  const [publicationsInfo, setPublicationsInfo] = useState([]);
 
-  useEffect(() => {
-    const getPublications = async () => {
-      setLoading(true);
-      const endpoint =
-        section === "all"
-          ? "publication/publications?limit=20"
-          : "publication/publications/following?limit=20";
-
-      const response = await Request(endpoint);
-
-      setPublicationsInfo(response);
-      setPublications(response.publications);
-      setLoading(false);
-    };
-
-    getPublications();
-  }, [section]);
-
-  const loadNextPage = async () => {
-    const endpoint =
-      section === "all"
-        ? `publication/publications?limit=20&page=${Number(publicationsInfo.page) + 1}`
-        : `publication/publications/following?limit=20&page=${Number(publicationsInfo.page) + 1}`;
-
-    const response = await Request(endpoint);
-    setPublicationsInfo(response);
-    setPublications((prev) => [...prev, ...response.publications]);
-  };
+  const {
+    items: publications,
+    paginate,
+    loading,
+    loadNextPage,
+  } = usePaginate({
+    endpoint: `${section === "all" ? "publication/publications" : "publication/publications/following"}`,
+    limit: 20,
+  });
 
   return (
     <main className="bg-surface text-text-primary rounded-2xl">
@@ -69,8 +48,7 @@ export const Home = () => {
       ) : publications.length > 0 ? (
         <ListPublications
           publications={publications}
-          setPublications={setPublications}
-          publicationsInfo={publicationsInfo}
+          publicationsInfo={paginate}
           loadNextPage={loadNextPage}
         />
       ) : (

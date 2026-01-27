@@ -4,16 +4,25 @@ import { Comment } from "../components/comments/Comment.jsx";
 import { useNavigate, useParams } from "react-router";
 import Request from "../helpers/Request.jsx";
 import { Loading } from "../components/ui/Loading.jsx";
+import { usePaginate } from "../hooks/usePaginate.jsx";
 
 export const PublicationPage = () => {
   const { id } = useParams();
 
-  const navigate = useNavigate();
-
   const [publication, setPublication] = useState({});
   const [loading, setLoading] = useState(true);
-  const [comments, setComments] = useState([]);
-  const [loadingComments, setLoadingComments] = useState(true);
+
+  const navigate = useNavigate();
+
+  const {
+    items: comments,
+    paginate,
+    loading: loadingComments,
+    loadNextPage,
+  } = usePaginate({
+    endpoint: `publication/${id}/comments`,
+    limit: 10,
+  });
 
   const createComment = async (e) => {
     e.preventDefault();
@@ -33,8 +42,6 @@ export const PublicationPage = () => {
       ...prev,
       commentsCount: prev.commentsCount + 1,
     }));
-    setComments((prev) => [response.comment, ...prev]);
-    e.target.text.value = "";
   };
 
   useEffect(() => {
@@ -47,11 +54,6 @@ export const PublicationPage = () => {
 
       setPublication(response.publication);
       setLoading(false);
-
-      //Buscar comentarios
-      const responseComments = await Request(`publication/${id}/comments`);
-      setLoadingComments(false);
-      setComments(responseComments.comments);
     };
 
     getPublication();
@@ -64,7 +66,7 @@ export const PublicationPage = () => {
       ) : (
         <>
           <Publication mode="page" publication={publication} />
-          <section>
+          <section className="flex flex-col">
             <form
               className="border-border-input m-4 mb-0 flex gap-2 border-b pt-0 pb-4"
               onSubmit={createComment}
@@ -95,6 +97,14 @@ export const PublicationPage = () => {
                 </div>
               )}
             </ul>
+            {paginate.hasNextPage && (
+              <button
+                onClick={loadNextPage}
+                className="bg-primary hover:bg-primary-hover text-text-primary my-4 w-1/2 cursor-pointer self-center rounded-2xl py-2 font-semibold"
+              >
+                Ver más
+              </button>
+            )}
           </section>
         </>
       )}

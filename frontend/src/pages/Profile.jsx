@@ -9,17 +9,22 @@ import { url } from "../helpers/Global.jsx";
 import { useAuth } from "../hooks/useAuth.jsx";
 import { ButtonFollowUnfollow } from "../components/ui/ButtonFollowUnfollow.jsx";
 import { ListPublications } from "../components/publications/ListPublications.jsx";
+import { usePaginate } from "../hooks/usePaginate.jsx";
 
 export const Profile = () => {
+  const { id } = useParams();
+
+  const { user } = useAuth();
+
   const [profile, setProfile] = useState({});
   const [loadingProfile, setLoadingProfile] = useState(true);
 
-  const [publicationsInfo, setPublicationsInfo] = useState({});
-  const [publications, setPublications] = useState([]);
-  const [loadingPublications, setLoadingPublications] = useState(true);
-
-  const { user } = useAuth();
-  const { id } = useParams();
+  const {
+    items: publications,
+    paginate,
+    loadNextPage,
+    loading: loadingPublications,
+  } = usePaginate({ endpoint: `user/${id}/publications`, limit: 10 });
 
   useEffect(() => {
     const getProfile = async () => {
@@ -29,25 +34,8 @@ export const Profile = () => {
       setLoadingProfile(false);
     };
 
-    const loadPublications = async () => {
-      setLoadingPublications(true);
-      const response = await Request(`user/${id}/publications?limit=10`);
-      setPublicationsInfo(response);
-      setPublications(response.publications);
-      setLoadingPublications(false);
-    };
-
     getProfile();
-    loadPublications();
   }, [id]);
-
-  const loadNextPage = async () => {
-    const response = await Request(
-      `user/${id}/publications?page=${Number(publicationsInfo.page) + 1}&limit=10`,
-    );
-    setPublicationsInfo(response);
-    setPublications((prev) => [...prev, ...response.publications]);
-  };
 
   return (
     <main className="text-text-primary bg-surface flex flex-col items-center rounded-2xl">
@@ -130,7 +118,7 @@ export const Profile = () => {
           ) : (
             <ListPublications
               publications={publications}
-              publicationsInfo={publicationsInfo}
+              publicationsInfo={paginate}
               loadNextPage={loadNextPage}
             />
           )}

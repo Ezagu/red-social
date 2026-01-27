@@ -177,7 +177,7 @@ const list = async (req, res) => {
       totalUsers: result.totalDocs,
       totalPages: result.totalPages,
       hasNextPage: result.hasNextPage,
-      users: usersWithFollowInfo,
+      items: usersWithFollowInfo,
     });
   } catch (err) {
     return res.status(404).json({
@@ -213,7 +213,7 @@ const listFollowers = async (req, res) => {
       totalUsers: result.totalDocs,
       totalPages: result.totalPages,
       hasNextPage: result.hasNextPage,
-      users: usersWithFollowInfo,
+      items: usersWithFollowInfo,
     });
   } catch {
     return res.status(404).json({
@@ -249,7 +249,7 @@ const listFollowing = async (req, res) => {
       totalUsers: result.totalDocs,
       totalPages: result.totalPages,
       hasNextPage: result.hasNextPage,
-      users: usersWithFollowInfo,
+      items: usersWithFollowInfo,
     });
   } catch {
     return res.status(400).json({
