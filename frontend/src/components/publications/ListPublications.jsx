@@ -5,6 +5,7 @@ export const ListPublications = ({
   publicationsInfo,
   publications,
   loadNextPage,
+  removeItem,
 }) => {
   return (
     <>
@@ -15,6 +16,7 @@ export const ListPublications = ({
               mode="feed"
               publication={publication}
               key={publication._id}
+              removeItem={removeItem}
             />
           ))}
         </ul>

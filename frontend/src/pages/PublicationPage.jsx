@@ -19,6 +19,7 @@ export const PublicationPage = () => {
     paginate,
     loading: loadingComments,
     loadNextPage,
+    removeItem,
   } = usePaginate({
     endpoint: `publication/${id}/comments`,
     limit: 10,
@@ -89,7 +90,17 @@ export const PublicationPage = () => {
                 <Loading />
               ) : comments.length > 0 ? (
                 comments.map((comment) => (
-                  <Comment comment={comment} key={comment._id} />
+                  <Comment
+                    comment={comment}
+                    key={comment._id}
+                    remove={() => {
+                      removeItem(comment._id);
+                      setPublication((prev) => ({
+                        ...prev,
+                        commentsCount: prev.commentsCount - 1,
+                      }));
+                    }}
+                  />
                 ))
               ) : (
                 <div>

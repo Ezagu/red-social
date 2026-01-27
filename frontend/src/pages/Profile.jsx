@@ -24,6 +24,7 @@ export const Profile = () => {
     paginate,
     loadNextPage,
     loading: loadingPublications,
+    removeItem,
   } = usePaginate({ endpoint: `user/${id}/publications`, limit: 10 });
 
   useEffect(() => {
@@ -120,6 +121,7 @@ export const Profile = () => {
               publications={publications}
               publicationsInfo={paginate}
               loadNextPage={loadNextPage}
+              removeItem={removeItem}
             />
           )}
         </>

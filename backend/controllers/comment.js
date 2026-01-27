@@ -78,7 +78,7 @@ const create = async (req, res) => {
 
 const remove = async (req, res) => {
   const user = req.user._id;
-  const { comment } = req.params.id;
+  const comment = req.params.id;
 
   try {
     // Elimina comentario

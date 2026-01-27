@@ -1,23 +1,21 @@
-import { Avatar } from "../ui/Avatar";
-import { MessageCircle } from "lucide-react";
-import { Heart } from "lucide-react";
-import { Link } from "react-router";
-import { url } from "../../helpers/Global.jsx";
-import { useLike } from "../../hooks/useLike.jsx";
 import { useState } from "react";
-import Request from "../../helpers/Request.jsx";
+import { Link } from "react-router";
+import { useLike } from "../../hooks/useLike.jsx";
 import { usePaginate } from "../../hooks/usePaginate.jsx";
+import { useAuth } from "../../hooks/useAuth.jsx";
+import { url } from "../../helpers/Global.jsx";
+import Request from "../../helpers/Request.jsx";
+import { Avatar } from "../ui/Avatar";
 import { Loading } from "../ui/Loading.jsx";
+import { MessageCircle, Trash2, Heart } from "lucide-react";
 
-export const Comment = ({ comment }) => {
+export const Comment = ({ comment, remove }) => {
+  const { user } = useAuth();
+
   const { liked, toggleLike, likesCount } = useLike({
     targetType: "Comment",
     target: comment,
   });
-
-  const [repliesCount, setRepliesCount] = useState(comment.repliesCount);
-  const [showReplies, setShowReplies] = useState(false);
-
   const {
     items: replies,
     loading,
@@ -25,11 +23,15 @@ export const Comment = ({ comment }) => {
     load,
     paginate,
     addItem,
+    removeItem,
   } = usePaginate({
     endpoint: `comment/${comment._id}/replies`,
-    limit: 3,
+    limit: 5,
     autoLoad: false,
   });
+
+  const [repliesCount, setRepliesCount] = useState(comment.repliesCount);
+  const [showReplies, setShowReplies] = useState(false);
 
   const createReplie = async (e) => {
     e.preventDefault();
@@ -51,10 +53,28 @@ export const Comment = ({ comment }) => {
     e.target.text.value = "";
   };
 
+  const removeComment = async () => {
+    const response = await Request(`comment/${comment._id}`, "DELETE");
+    if (response.status === "error") return;
+
+    remove();
+  };
+
   return (
     <article
-      className={`border-border-input flex gap-2 border-t px-2 py-3 first:border-none ${paginate.hasNextPage && "last:border-b"}`}
+      className={`border-border-input relative flex gap-2 border-t px-2 py-3 first:border-none ${paginate.hasNextPage && "last:border-b"}`}
     >
+      {comment.user._id === user._id ? (
+        <button
+          onClick={removeComment}
+          className="hover:bg-danger text-text-secondary hover:text-text-primary absolute top-2 right-2 ml-auto shrink-0 rounded-full p-3 hover:cursor-pointer"
+        >
+          <Trash2 />
+        </button>
+      ) : (
+        ""
+      )}
+
       <Link to={`/profile/${comment.user._id}`} className="shrink-0">
         <Avatar src={`${url}user/avatar/${comment.user.image}`} size="lg" />
       </Link>
@@ -119,7 +139,14 @@ export const Comment = ({ comment }) => {
             </form>
             <ul>
               {replies.map((replie) => (
-                <Comment comment={replie} key={replie._id} />
+                <Comment
+                  comment={replie}
+                  key={replie._id}
+                  remove={() => {
+                    removeItem(replie._id);
+                    setRepliesCount((prev) => prev - 1);
+                  }}
+                />
               ))}
             </ul>
             {paginate.hasNextPage && (

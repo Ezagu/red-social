@@ -14,10 +14,7 @@ export const usePaginate = ({
   useEffect(() => {
     const loadItems = async () => {
       const response = await Request(`${endpoint}?limit=${limit}&page=${page}`);
-
-      if (response.status === "error") {
-        return;
-      }
+      if (response.status === "error") return;
 
       setItems(response.items);
 
@@ -34,10 +31,7 @@ export const usePaginate = ({
     const response = await Request(
       `${endpoint}?limit=${limit}&page=${Number(paginate.page) + 1}`,
     );
-
-    if (response.status === "error") {
-      return;
-    }
+    if (response.status === "error") return;
 
     const { items, ...pagination } = response;
 
@@ -48,10 +42,7 @@ export const usePaginate = ({
 
   const load = async () => {
     const response = await Request(`${endpoint}?limit=${limit}&page=${page}`);
-
-    if (response.status === "error") {
-      return;
-    }
+    if (response.status === "error") return;
 
     setItems(response.items);
 

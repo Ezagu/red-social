@@ -1,33 +1,47 @@
 import React from "react";
-import { Avatar } from "../../components/ui/Avatar.jsx";
 import { Link } from "react-router";
-import { MessageCircle } from "lucide-react";
-import { Heart } from "lucide-react";
-import { PageHeader } from "../pages/PageHeader.jsx";
 import { url } from "../../helpers/Global.jsx";
 import { useLike } from "../../hooks/useLike.jsx";
+import { useAuth } from "../../hooks/useAuth.jsx";
+import { PageHeader } from "../pages/PageHeader.jsx";
+import { Avatar } from "../../components/ui/Avatar.jsx";
+import { MessageCircle } from "lucide-react";
+import { Trash2 } from "lucide-react";
+import { Heart } from "lucide-react";
+import Request from "../../helpers/Request.jsx";
 
-export const Publication = ({ mode = "feed", publication }) => {
-  {
-    /*Cambiar tipo de publicacion para feed o pagina*/
-  }
+export const Publication = ({ mode = "feed", publication, removeItem }) => {
+  //Cambiar tipo de publicacion para feed o pagina
   const isFeed = mode === "feed";
 
   const Wrapper = isFeed ? Link : "div";
   const WrapperProps = isFeed ? { to: "/publication/" + publication._id } : {};
 
+  const { user, setUser } = useAuth();
   const { liked, likesCount, toggleLike } = useLike({
     target: publication,
     targetType: "Publication",
   });
 
+  const removePublication = async () => {
+    const response = await Request(`publication/${publication._id}`, "DELETE");
+    if (response.status === "error") {
+      return;
+    }
+    removeItem(publication._id);
+    setUser((prev) => ({
+      ...prev,
+      publicationsCount: prev.publicationsCount - 1,
+    }));
+  };
+
   return (
     <article
-      className={`border-border-input border-t ${isFeed ? "pt-4" : ""} first:border-t-0 last:border-b`}
+      className={`border-border-input border-t ${isFeed ? "pt-4 first:pt-2" : ""} first:border-t-0 last:border-b`}
     >
       {!isFeed && <PageHeader title="Publicación" />}
       <header className="flex items-center gap-2 px-4">
-        <Link to={"/profile/" + publication.user._id}>
+        <Link to={"/profile/" + publication.user._id} className="shrink-0">
           <Avatar
             src={url + "user/avatar/" + publication.user.image}
             size="lg"
@@ -44,6 +58,16 @@ export const Publication = ({ mode = "feed", publication }) => {
             {publication.user.fullName}
           </p>
         </div>
+        {publication.user._id === user._id ? (
+          <button
+            className="hover:bg-danger text-text-secondary hover:text-text-primary ml-auto shrink-0 rounded-full p-3 hover:cursor-pointer"
+            onClick={removePublication}
+          >
+            <Trash2 />
+          </button>
+        ) : (
+          ""
+        )}
       </header>
 
       <Wrapper {...WrapperProps}>
