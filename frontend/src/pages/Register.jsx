@@ -4,10 +4,11 @@ import { Alert } from "../components/ui/Alert";
 import { PasswordInput } from "../components/ui/PasswordInput";
 import { useForm } from "react-hook-form";
 import Request from "../helpers/Request";
+import { Input } from "../components/ui/Input";
 
 export const Register = () => {
   const { register, handleSubmit } = useForm();
-  const [alert, setAlert] = useState();
+  const [alert, setAlert] = useState(null);
 
   const signin = async (data) => {
     const response = await Request("user/register", "POST", null, data);
@@ -23,28 +24,28 @@ export const Register = () => {
         <form
           className="bg-surface flex flex-col gap-6 rounded-2xl px-10 py-10"
           onSubmit={handleSubmit(signin)}
+          onChange={() => {
+            alert && setAlert(null);
+          }}
         >
           {alert && <Alert status={alert.status} message={alert.message} />}
 
-          <input
-            type="text"
-            className="border-border-input focus:border-primary placeholder:text-placeholder w-full rounded-xl border p-3 text-lg focus:outline-none"
-            placeholder="Email"
-            {...register("email")}
-          />
+          <Input register={register} registerName="email" placeholder="Email" />
+
           <PasswordInput register={register} />
-          <input
-            type="text"
-            className="border-border-input focus:border-primary placeholder:text-placeholder w-full rounded-xl border p-3 text-lg focus:outline-none"
+
+          <Input
+            register={register}
+            registerName="fullName"
             placeholder="Nombre completo"
-            {...register("fullName")}
           />
-          <input
-            type="text"
-            className="border-border-input focus:border-primary placeholder:text-placeholder w-full rounded-xl border p-3 text-lg focus:outline-none"
+
+          <Input
+            register={register}
+            registerName="nick"
             placeholder="Nombre de usuario"
-            {...register("nick")}
           />
+
           <input
             type="submit"
             className="bg-primary hover:bg-primary-hover w-full cursor-pointer rounded-xl border border-none p-3 text-lg font-bold transition-all"

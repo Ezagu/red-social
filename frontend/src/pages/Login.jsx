@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import request from "../helpers/Request";
 import { Alert } from "../components/ui/Alert";
 import { useAuth } from "../hooks/useAuth";
+import { Input } from "../components/ui/Input";
 
 export const Login = () => {
   const { register, handleSubmit } = useForm();
@@ -46,12 +47,13 @@ export const Login = () => {
             onSubmit={handleSubmit(login)}
           >
             {alert && <Alert message={alert.message} status={alert.status} />}
-            <input
-              type="text"
-              className="border-border-input placeholder:text-placeholder focus:border-primary w-full rounded-xl border p-3 text-lg focus:outline-none"
-              placeholder="Email o nombre de usuario"
-              {...register("email")}
+
+            <Input
+              register={register}
+              registerName={"email"}
+              placeholder="Email o Nombre de Usuario"
             />
+
             <PasswordInput register={register} />
 
             <input
@@ -59,9 +61,6 @@ export const Login = () => {
               className="bg-primary hover:bg-primary-hover w-full cursor-pointer rounded-xl border border-none p-3 text-lg font-bold transition-all"
               value="Iniciar Sesión"
             />
-            <Link className="lace-self-start text-text-secondary -my-2 self-center hover:underline">
-              ¿Olvidaste tu contraseña?
-            </Link>
           </form>
           <div className="rounded-2xl bg-gray-900 px-10 py-4 text-center">
             <p>
