@@ -30,6 +30,27 @@ const register = async (req, res) => {
   }
 
   try {
+    // Validar que email y nick no estén en uso
+    const replicatedUser = await User.findOne({
+      $or: [{ email: params.email }, { nick: params.nick }],
+    });
+
+    if (replicatedUser) {
+      console.log(replicatedUser);
+      if (replicatedUser.email === params.email) {
+        return res.status(409).json({
+          status: "error",
+          message: "Email ya registrado",
+        });
+      }
+      if (replicatedUser.nick === params.nick) {
+        return res.status(409).json({
+          status: "error",
+          message: "Nombre de usuario en uso",
+        });
+      }
+    }
+
     // Guardar usuario en la base de datos
     const user = await User.create(params);
 
@@ -42,14 +63,15 @@ const register = async (req, res) => {
       status: "success",
     });
   } catch (error) {
-    let message = "Error al crear el usuario";
     if (error.code === 11000) {
-      message = "Ya existe el usuario";
+      return res.status(409).send({
+        status: "error",
+        message: "Ya existe el usuario",
+      });
     }
-    return res.status(409).send({
+    return res.status(500).send({
       status: "error",
-      message,
-      error,
+      message: "Error en el servidor",
     });
   }
 };

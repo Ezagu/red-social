@@ -38,9 +38,9 @@ export const Users = () => {
       <PageHeader
         title={`Usuarios que ${mode === "followers" ? "siguen a" : "sigue"} ${profile?.nick}`}
       />
-      <div className="my-10">
+      <div>
         {loading ? (
-          <Loading />
+          <Loading className="my-10" />
         ) : users.length === 0 ? (
           <p className="text-text-secondary font-l text-center text-xl tracking-wide">
             No hay usuarios

@@ -69,7 +69,9 @@ export const NotificationDropdown = () => {
             </ul>
           </div>
         ) : (
-          <p className="py-6 text-center text-lg">No hay notificaciones</p>
+          <p className="text-text-secondary my-10 text-center text-xl tracking-wide">
+            No hay notificaciones
+          </p>
         ))
       )}
     </div>

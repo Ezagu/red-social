@@ -46,13 +46,9 @@ export const Register = () => {
                 alert && setAlert(null);
               }}
             >
-              <div
-                className={`ease overflow-hidden transition-all duration-300 ${
-                  alert ? "max-h-24 opacity-100" : "max-h-0 opacity-0"
-                }`}
-              >
+              {alert && (
                 <Alert status={alert?.status} message={alert?.message} />
-              </div>
+              )}
 
               <Input
                 register={register}

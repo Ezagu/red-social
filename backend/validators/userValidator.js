@@ -17,7 +17,7 @@ const email = body("email")
 const nick = body("nick")
   .trim()
   .notEmpty()
-  .withMessage("Ingrese un nick")
+  .withMessage("Ingrese un nombre de usuario")
   .isLength({ min: 3 })
   .withMessage("Nombre de usuario debe contener un mínimo de 3 caracteres")
   .isLength({ max: 20 })
@@ -33,7 +33,7 @@ const bio = body("bio")
   .withMessage("La biografia no debe contener mas de 255 caracteres");
 
 exports.register = [
-  [fullName, email, nick, password, bio.optional()],
+  [email, password, fullName, nick, bio.optional()],
   validateFields,
 ];
 
