@@ -8,6 +8,7 @@ import Request from "../../helpers/Request.jsx";
 import { Avatar } from "../ui/Avatar";
 import { Loading } from "../ui/Loading.jsx";
 import { MessageCircle, Trash2, Heart } from "lucide-react";
+import ReactTimeAgo from "react-time-ago";
 
 export const Comment = ({ comment, remove }) => {
   const { user } = useAuth();
@@ -111,7 +112,7 @@ export const Comment = ({ comment, remove }) => {
             <span className="text-lg">{likesCount}</span>
           </button>
           <span className="text-text-secondary border-border-input border-l pl-3 text-xl">
-            {comment.createdAt}
+            <ReactTimeAgo date={comment.createdAt} />
           </span>
         </div>
         {!showReplies ? (

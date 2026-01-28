@@ -1,6 +1,3 @@
-const dotenv = require("dotenv");
-dotenv.config();
-
 // Importar dependencias
 const connection = require("./database/connection.js");
 const express = require("express");

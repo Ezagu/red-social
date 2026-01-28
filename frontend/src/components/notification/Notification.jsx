@@ -6,6 +6,7 @@ import { Link } from "react-router";
 import { Heart } from "lucide-react";
 import { UserPlus } from "lucide-react";
 import { url } from "../../helpers/Global";
+import ReactTimeAgo from "react-time-ago";
 
 export const Notification = ({ notification, read, deleteOne }) => {
   const data = {
@@ -51,7 +52,7 @@ export const Notification = ({ notification, read, deleteOne }) => {
           {data[notification.targetType].message}
         </div>
         <p className="text-text-secondary bg-inherit text-sm">
-          {notification.createdAt}
+          <ReactTimeAgo date={notification.createdAt} />
         </p>
       </div>
       <div

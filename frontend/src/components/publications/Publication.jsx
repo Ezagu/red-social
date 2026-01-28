@@ -9,6 +9,7 @@ import { MessageCircle } from "lucide-react";
 import { Trash2 } from "lucide-react";
 import { Heart } from "lucide-react";
 import Request from "../../helpers/Request.jsx";
+import ReactTimeAgo from "react-time-ago";
 
 export const Publication = ({ mode = "feed", publication, removeItem }) => {
   //Cambiar tipo de publicacion para feed o pagina
@@ -112,7 +113,9 @@ export const Publication = ({ mode = "feed", publication, removeItem }) => {
           <span className="text-lg">{likesCount}</span>
         </button>
         <span className="text-text-secondary justify-self border-border-input border-l pl-3 text-xl">
-          {publication.createdAt}
+          {publication.createdAt && (
+            <ReactTimeAgo date={publication.createdAt} />
+          )}
         </span>
       </footer>
     </article>
