@@ -4,11 +4,13 @@ import { useAuth } from "./useAuth";
 
 export const useNotifications = () => {
   const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
   const { setUser } = useAuth();
 
   useEffect(() => {
     const loadNotifications = async () => {
       const response = await Request("user/notifications");
+      setLoading(false);
       setNotifications(response.notifications);
     };
 
@@ -16,6 +18,9 @@ export const useNotifications = () => {
   }, []);
 
   const read = async (id) => {
+    const notification = notifications.find((noti) => noti._id === id);
+    if (notification.read) return;
+
     const response = await Request(`notification/${id}/read`, "PATCH");
     if (response.status === "success") {
       // Marcar como leída la notificacion en la lista de notificaciones
@@ -79,5 +84,6 @@ export const useNotifications = () => {
     readAll,
     deleteOne,
     deleteAll,
+    loading,
   };
 };

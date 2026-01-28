@@ -21,6 +21,7 @@ export const PublicationPage = () => {
     loading: loadingComments,
     loadNextPage,
     removeItem,
+    addItem,
   } = usePaginate({
     endpoint: `publication/${id}/comments`,
     limit: 10,
@@ -39,6 +40,8 @@ export const PublicationPage = () => {
     if (response.status === "error") {
       return;
     }
+
+    addItem(response.comment);
 
     setPublication((prev) => ({
       ...prev,

@@ -5,12 +5,13 @@ import { ChevronUp } from "lucide-react";
 import { Circle } from "lucide-react";
 import { Notification } from "./Notification.jsx";
 import { useNotifications } from "../../hooks/useNotifications.jsx";
+import { Loading } from "../ui/Loading.jsx";
 
 export const NotificationDropdown = () => {
   const { user } = useAuth();
   const [show, setShow] = useState(false);
 
-  const { notifications, read, readAll, deleteOne, deleteAll } =
+  const { notifications, read, readAll, deleteOne, deleteAll, loading } =
     useNotifications();
 
   return (
@@ -36,7 +37,10 @@ export const NotificationDropdown = () => {
           }`}
         />
       </button>
-      {show &&
+      {loading ? (
+        <Loading className="my-10" />
+      ) : (
+        show &&
         (notifications.length > 0 ? (
           <div>
             <header className="flex gap-2 px-4 py-2">
@@ -66,7 +70,8 @@ export const NotificationDropdown = () => {
           </div>
         ) : (
           <p className="py-6 text-center text-lg">No hay notificaciones</p>
-        ))}
+        ))
+      )}
     </div>
   );
 };
