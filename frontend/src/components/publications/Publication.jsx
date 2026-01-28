@@ -38,9 +38,8 @@ export const Publication = ({ mode = "feed", publication, removeItem }) => {
 
   return (
     <article
-      className={`border-border-input border-t ${isFeed ? "pt-4 first:pt-2" : ""} first:border-t-0 last:border-b`}
+      className={`${isFeed ? "border-border-input border-t first:pt-2" : ""} pt-4 first:border-t-0`}
     >
-      {!isFeed && <PageHeader title="Publicación" />}
       <header className="flex items-center gap-2 px-4">
         <Link to={"/profile/" + publication.user._id} className="shrink-0">
           <Avatar

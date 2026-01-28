@@ -44,15 +44,13 @@ export const Home = () => {
         </div>
       </header>
       {loading ? (
-        <Loading />
-      ) : publications.length > 0 ? (
+        <Loading className="my-10" />
+      ) : (
         <ListPublications
           publications={publications}
-          publicationsInfo={paginate}
+          paginate={paginate}
           loadNextPage={loadNextPage}
         />
-      ) : (
-        <p className="mt-10 text-center text-lg">No hay publicaciones</p>
       )}
     </main>
   );

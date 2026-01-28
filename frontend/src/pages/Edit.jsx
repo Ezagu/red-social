@@ -66,6 +66,13 @@ export const Edit = () => {
         },
       });
       const uploadResponse = await uploadReq.json();
+
+      if (uploadResponse.status === "error")
+        setResult({ status: "error", message: uploadResponse?.message });
+
+      setFilePreview(null);
+      setFileSelected(null);
+
       setUser(uploadResponse.user);
     } else {
       setResult({ status, message });
@@ -152,7 +159,7 @@ export const Edit = () => {
             <CircleX />
           </button>
           <button className="bg-primary hover:bg-primary-hover flex cursor-pointer items-center gap-2 rounded-2xl px-4 py-2">
-            <span className="text-xl">Guardar</span>
+            <span className="text-xl">Actualizar</span>
             <CircleCheck />
           </button>
         </div>

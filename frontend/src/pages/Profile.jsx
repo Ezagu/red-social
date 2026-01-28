@@ -40,11 +40,11 @@ export const Profile = () => {
 
   return (
     <main className="text-text-primary bg-surface flex flex-col items-center rounded-2xl">
+      <PageHeader title={"Perfil de " + profile.nick} />
       {loadingProfile ? (
-        <Loading />
+        <Loading className="my-10" />
       ) : (
         <>
-          <PageHeader title={"Perfil de " + profile.nick} />
           <header className="border-border-input w-full border-b p-4">
             <div className="ml-4 flex gap-4">
               <Avatar
@@ -115,11 +115,11 @@ export const Profile = () => {
             </div>
           </header>
           {loadingPublications ? (
-            <Loading />
+            <Loading className="my-5" />
           ) : (
             <ListPublications
               publications={publications}
-              publicationsInfo={paginate}
+              paginate={paginate}
               loadNextPage={loadNextPage}
               removeItem={removeItem}
             />
