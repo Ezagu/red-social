@@ -7,17 +7,23 @@ import { Alert } from "../components/ui/Alert";
 import { useAuth } from "../hooks/useAuth";
 import { Input } from "../components/ui/Input";
 import { Loading } from "../components/ui/Loading";
+import { LoaderCircle } from "lucide-react";
 
 export const Login = () => {
   const { register, handleSubmit } = useForm();
   const [alert, setAlert] = useState();
   const { user, loading, setUser } = useAuth();
+  const [waitingResponse, setWaitingResponse] = useState(false);
 
   const navigate = useNavigate();
 
   const login = async (data) => {
+    setWaitingResponse(true);
+    setAlert(null);
+
     const response = await request("user/login", "POST", null, data);
 
+    setWaitingResponse(false);
     setAlert(response);
 
     if (response.status === "success") {
@@ -52,6 +58,7 @@ export const Login = () => {
               <form
                 className="bg-surface flex flex-col gap-6 rounded-2xl px-10 py-10"
                 onSubmit={handleSubmit(login)}
+                onChange={() => alert && setAlert(null)}
               >
                 {alert && (
                   <Alert message={alert.message} status={alert.status} />
@@ -65,11 +72,16 @@ export const Login = () => {
 
                 <PasswordInput register={register} />
 
-                <input
+                <button
                   type="submit"
-                  className="bg-primary hover:bg-primary-hover w-full cursor-pointer rounded-xl border border-none p-3 text-lg font-bold transition-all"
-                  value="Iniciar Sesión"
-                />
+                  className={`bg-primary flex w-full items-center justify-center gap-2 rounded-xl border border-none p-3 text-lg font-bold transition-all ${waitingResponse ? "bg-primary/50" : " hover:bg-primary-hover cursor-pointer"}`}
+                  {...{ disabled: waitingResponse }}
+                >
+                  {waitingResponse && (
+                    <LoaderCircle className="size-6 animate-spin" />
+                  )}
+                  {waitingResponse ? "Iniciando Sesión" : "Inciar Sesión"}
+                </button>
               </form>
               <div className="rounded-2xl bg-gray-900 px-10 py-4 text-center">
                 <p>

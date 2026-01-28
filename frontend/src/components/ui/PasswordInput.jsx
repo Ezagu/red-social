@@ -36,6 +36,7 @@ export const PasswordInput = ({ register, placeholder = "Contraseña" }) => {
       </label>
       {showIcon && (
         <button
+          type="button"
           className="text-border-input hover:text-text-secondary absolute top-1/2 right-4 -translate-y-1/2 cursor-pointer"
           onClick={(e) => {
             e.preventDefault();

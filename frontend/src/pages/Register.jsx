@@ -7,6 +7,7 @@ import Request from "../helpers/Request";
 import { Input } from "../components/ui/Input";
 import { useAuth } from "../hooks/useAuth";
 import { Loading } from "../components/ui/Loading";
+import { LoaderCircle } from "lucide-react";
 
 export const Register = () => {
   const { user, loading } = useAuth();
@@ -14,11 +15,16 @@ export const Register = () => {
   const navigate = useNavigate();
 
   const { register, handleSubmit } = useForm();
+  const [waitingResponse, setWaitingResponse] = useState(false);
   const [alert, setAlert] = useState(null);
 
   const signin = async (data) => {
+    setWaitingResponse(true);
+    setAlert(null);
+
     const response = await Request("user/register", "POST", null, data);
     setAlert(response);
+    setWaitingResponse(false);
   };
 
   return (
@@ -40,7 +46,13 @@ export const Register = () => {
                 alert && setAlert(null);
               }}
             >
-              {alert && <Alert status={alert.status} message={alert.message} />}
+              <div
+                className={`ease overflow-hidden transition-all duration-300 ${
+                  alert ? "max-h-24 opacity-100" : "max-h-0 opacity-0"
+                }`}
+              >
+                <Alert status={alert?.status} message={alert?.message} />
+              </div>
 
               <Input
                 register={register}
@@ -62,11 +74,16 @@ export const Register = () => {
                 placeholder="Nombre de usuario"
               />
 
-              <input
+              <button
                 type="submit"
-                className="bg-primary hover:bg-primary-hover w-full cursor-pointer rounded-xl border border-none p-3 text-lg font-bold transition-all"
-                value="Registrarse"
-              />
+                className={`bg-primary flex w-full items-center justify-center gap-2 rounded-xl border border-none p-3 text-lg font-bold transition-all ${waitingResponse ? "bg-primary/50" : " hover:bg-primary-hover cursor-pointer"}`}
+                {...{ disabled: waitingResponse }}
+              >
+                {waitingResponse && (
+                  <LoaderCircle className="size-6 animate-spin" />
+                )}
+                {waitingResponse ? "Registrando" : "Registrarse"}
+              </button>
             </form>
             <div className="bg-surface rounded-2xl px-10 py-4 text-center">
               <p>
