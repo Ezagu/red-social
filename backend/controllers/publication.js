@@ -1,6 +1,7 @@
 // Importar modulos
 const fs = require("fs");
 const path = require("path");
+const mongoose = require("mongoose");
 
 // Importar modelos
 const Publication = require("../models/publication.js");
@@ -16,15 +17,31 @@ const { getPublications } = require("../services/publicationService.js");
 const save = async (req, res) => {
   // Recoger datos
   const { text } = req.body;
+  const file = req.file;
   const user = req.user.id;
 
+  const session = await mongoose.startSession();
+
   try {
+    let publication = {};
+
+    await session.withTransaction(async () => {
+      publication = new Publication({ text, user, file: file?.filename });
+      await publication.save({ session });
+
+      const userUpdated = await User.findByIdAndUpdate(
+        user,
+        {
+          $inc: { publicationsCount: 1 },
+        },
+        { session },
+      );
+
+      if (!userUpdated) throw new Error("USER_NOT_FOUND");
+    });
+
     // Crear y guardar el objeto del modelo
-    const publication = await Publication.create({ text, user });
-
     await publication.populate("user", "-email -password -role -__v");
-
-    await User.findByIdAndUpdate(user, { $inc: { publicationsCount: 1 } });
 
     // Devolver respuesta
     return res.status(201).json({
@@ -33,10 +50,12 @@ const save = async (req, res) => {
       publication,
     });
   } catch (error) {
+    let message = "Error en el servidor";
+    if (error.message === "USER_NOT_FOUND")
+      message = "Usuario identificado no encontrado";
     return res.status(500).json({
       status: "error",
-      message: "No se pudo subir la publicación",
-      error,
+      message,
     });
   }
 };
@@ -56,7 +75,7 @@ const detail = async (req, res) => {
     if (!publication) {
       return res.status(500).json({
         status: "error",
-        message: "No se pudo conseguir la publicación",
+        message: "No existe la publicación",
       });
     }
 
@@ -74,9 +93,9 @@ const detail = async (req, res) => {
       },
     });
   } catch (error) {
-    return res.status(404).json({
+    return res.status(500).json({
       status: "error",
-      message: "No existe la publicación",
+      message: "Error en el servidor",
     });
   }
 };
@@ -87,21 +106,55 @@ const remove = async (req, res) => {
   const publicationId = req.params.id;
   const user = req.user._id;
 
+  const session = await mongoose.startSession();
+
   // Find y luego remove
   try {
-    const publicationDeleted = await Publication.findOneAndDelete({
-      user,
-      _id: publicationId,
+    let publicationDeleted;
+
+    await session.withTransaction(async () => {
+      // Borrar publicación
+      publicationDeleted = await Publication.findOneAndDelete(
+        {
+          user,
+          _id: publicationId,
+        },
+        { session },
+      );
+
+      if (!publicationDeleted) throw new Error("PUBLICATION_NOT_FOUND");
+
+      // Descontar contador de publicaciones del usuario
+      const userUpdated = await User.findByIdAndUpdate(
+        user,
+        {
+          $inc: { publicationsCount: -1 },
+        },
+        { session },
+      );
+
+      if (!userUpdated) throw new Error("USER_NOT_FOUND");
+
+      // Eliminar imagen si contiene
+      if (publicationDeleted.file) {
+        fs.unlinkSync("./uploads/publications/" + publicationDeleted.file);
+      }
+
+      // Eliminar comentarios
+      await Comment.deleteMany(
+        { publication: publicationDeleted._id },
+        { session },
+      );
+
+      // Eliminar likes
+      await Like.deleteMany(
+        {
+          targetType: "Publication",
+          targetId: publicationDeleted._id,
+        },
+        { session },
+      );
     });
-
-    if (!publicationDeleted) {
-      return res.status(404).json({
-        status: "error",
-        message: "Publicación no encontrada",
-      });
-    }
-
-    await User.findByIdAndUpdate(user, { $inc: { publicationsCount: -1 } });
 
     // DEvolver respuesta
     return res.status(200).json({
@@ -110,69 +163,14 @@ const remove = async (req, res) => {
       publicationDeleted,
     });
   } catch (error) {
+    let message = "Error en el servidor";
+    if (error.message === "PUBLICATION_NOT_FOUND")
+      message = "No existe la publicación";
+    if (error.message === "USER_NOT_FOUND")
+      message = "No se encontró el usuario identificado";
     return res.status(500).json({
       status: "error",
-      message: "No se eliminó la publicación",
-    });
-  }
-};
-
-// Subir ficheros
-const upload = async (req, res) => {
-  // Sacar el id de la publicacion
-  const publicationId = req.params.id;
-
-  // Recoger el fichero de imagen y comprobar que existe
-  if (!req.file) {
-    return res.status(404).send({
-      status: "error",
-      message: "Peticion no incluye la imagen",
-    });
-  }
-
-  // Conseguir nombre del archivo
-  const image = req.file.originalname;
-
-  // Sacar la extensión del archivo
-  const imagesSplit = image.split(".");
-  const extension = imagesSplit[1];
-
-  // Comprobar extensión
-  if (
-    extension != "png" &&
-    extension != "jpg" &&
-    extension != "jpeg" &&
-    extension != "gif"
-  ) {
-    // Borrar archivo subido
-    const filePath = req.file.path;
-    const fileDeleted = fs.unlinkSync(filePath);
-
-    return res.status(400).json({
-      status: "error",
-      message: "Extensión del fichero invalida",
-    });
-  }
-
-  // Si lo es, guardar imagen en base de datos
-  try {
-    const publicationUpdated = await Publication.findOneAndUpdate(
-      { user: req.user.id, _id: publicationId },
-      { file: req.file.filename },
-      { new: true },
-    );
-
-    if (!publicationUpdated) throw new Error();
-
-    return res.status(200).json({
-      status: "success",
-      publication: publicationUpdated,
-      file: req.file,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      status: "error",
-      message: "Error en la subida del archivo",
+      message,
     });
   }
 };
@@ -219,14 +217,11 @@ const publications = async (req, res) => {
       limit,
     );
 
-    if (!publications) throw new Error();
-
     return res.status(200).json(publications);
   } catch (error) {
     return res.status(500).json({
       status: "error",
-      message: "No se pudo listar las publicaciones del feed",
-      error,
+      message: "Error del servidor",
     });
   }
 };
@@ -246,13 +241,11 @@ const followingPublications = async (req, res) => {
       limit,
     );
 
-    if (!publications) throw new Error();
-
     return res.status(200).json(publications);
   } catch (error) {
     return res.status(500).json({
       status: "error",
-      message: "No se pudo listar las publicaciones de tus seguidos",
+      message: "Error del servidor",
     });
   }
 };
@@ -321,7 +314,6 @@ module.exports = {
   save,
   detail,
   remove,
-  upload,
   media,
   publications,
   followingPublications,

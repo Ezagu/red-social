@@ -26,46 +26,28 @@ export const CreatePublication = () => {
 
   const uploadPublication = async (e) => {
     e.preventDefault();
-    const text = e.target.text.value;
+
+    const formData = new FormData();
+    formData.append("text", e.target.text.value);
+    if (fileSelected) {
+      formData.append("file0", fileSelected);
+    }
 
     //Subir texto de publicación
-    const { status, message, publication } = await Request(
-      "publication",
-      "POST",
-      true,
-      { text },
-    );
+    const req = await fetch(url + "publication", {
+      method: "POST",
+      body: formData,
+      headers: {
+        Authorization: localStorage.getItem("token"),
+      },
+    });
+
+    const { status, message } = await req.json();
 
     setResult({ status, message });
 
     if (status === "error") {
       return;
-    }
-
-    //Subir imagen si hay
-    if (fileSelected) {
-      const formData = new FormData();
-      formData.append("file0", fileSelected);
-
-      const uploadReq = await fetch(
-        `${url}publication/${publication._id}/upload`,
-        {
-          method: "POST",
-          body: formData,
-          headers: {
-            Authorization: localStorage.getItem("token"),
-          },
-        },
-      );
-      const uploadRes = await uploadReq.json();
-
-      if (status === "error") {
-        setResult({
-          status: uploadRes.status,
-          message: uploadRes.message,
-        });
-        return;
-      }
     }
 
     // Actualizar contador de publicaciones si todo salió bien

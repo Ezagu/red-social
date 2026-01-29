@@ -4,6 +4,7 @@ const multer = require("multer");
 const publicationController = require("../controllers/publication");
 const auth = require("../middlewares/auth.js");
 const publicationValidator = require("../validators/publicationValidator.js");
+const validateFile = require("../middlewares/validateFile.js");
 
 // Configuracion de subida
 const storage = multer.diskStorage({
@@ -25,15 +26,17 @@ router.get(
   publicationController.followingPublications,
 );
 router.get("/:id/comments", auth, publicationController.comments);
-router.post(
-  "/:id/upload",
-  [auth, uploads.single("file0")],
-  publicationController.upload,
-);
 router.get("/media/:file", publicationController.media);
-router.post("/", auth, publicationValidator.save, publicationController.save);
 router.get("/:id", auth, publicationController.detail);
 router.delete("/:id", auth, publicationController.remove);
+router.post(
+  "/",
+  auth,
+  uploads.single("file0"),
+  validateFile,
+  publicationValidator.save,
+  publicationController.save,
+);
 
 // Exportar router
 module.exports = router;
