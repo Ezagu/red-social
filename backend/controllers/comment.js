@@ -4,41 +4,29 @@ const Comment = require("../models/comment.js");
 const Publication = require("../models/publication.js");
 const Notification = require("../models/notification.js");
 const User = require("../models/user.js");
+const Like = require("../models/like.js");
 
 const create = async (req, res) => {
   const user = req.user._id;
   const { publicationId, text } = req.body;
   const parentComment = req.body.parentComment || null;
 
-  const session = await mongoose.startSession();
-
   try {
-    // Validar que la publicación exista
-    const publication = await Publication.findById(publicationId);
-
-    if (!publication) {
-      return res.status(404).json({
-        status: "error",
-        message: "La publicacion no existe",
-      });
-    }
-
-    let newComment;
-
+    const session = await mongoose.startSession();
     await session.withTransaction(async () => {
       // Crear comentario
-      newComment = new Comment({
+      const comment = new Comment({
         user,
         publication: publicationId,
         text,
         parentComment,
       });
-      await newComment.save({ session });
+      await comment.save({ session });
 
-      await newComment.populate("user", "-email -password -role -__v");
+      await comment.populate("user", "-email -password -role -__v");
 
       // Determinar a quien notificar
-      let userToNotificate = publication.user._id;
+      let userToNotificate;
 
       // MODIFICAR CONTADORES
       if (parentComment) {
@@ -53,13 +41,14 @@ const create = async (req, res) => {
         userToNotificate = parentComent.user._id;
       } else {
         // Sino aumentar contador de comentarios de publicacion
-        await Publication.findByIdAndUpdate(
+        const publication = await Publication.findByIdAndUpdate(
           publicationId,
           {
             $inc: { commentsCount: 1 },
           },
           { session },
         );
+        userToNotificate = publication.user;
       }
 
       //NOTIFICACIÓN
@@ -69,7 +58,7 @@ const create = async (req, res) => {
           user: userToNotificate,
           fromUser: user,
           targetType: "Comment",
-          targetId: newComment._id,
+          targetId: comment._id,
         });
         notification.save({ session });
 
@@ -85,7 +74,7 @@ const create = async (req, res) => {
       return res.status(201).json({
         status: "success",
         message: "Comentario publicado",
-        comment: newComment,
+        comment: comment,
       });
     });
   } catch (error) {
@@ -100,11 +89,8 @@ const create = async (req, res) => {
 const remove = async (req, res) => {
   const comment = req.params.id;
 
-  const session = await mongoose.startSession();
-
   try {
-    let commentRemoved;
-
+    const session = await mongoose.startSession();
     await session.withTransaction(async () => {
       // Elimina comentario
       commentRemoved = await Comment.findByIdAndDelete(comment, { session });
@@ -133,6 +119,12 @@ const remove = async (req, res) => {
       // Eliminar respuestas
       await Comment.deleteMany(
         { parentComment: commentRemoved._id },
+        { session },
+      );
+
+      // Eliminar likes
+      await Like.deleteMany(
+        { targetType: "Comment", targetId: comment },
         { session },
       );
 

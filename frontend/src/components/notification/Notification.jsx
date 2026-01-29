@@ -14,15 +14,15 @@ export const Notification = ({ notification, read, deleteOne }) => {
       icon: (
         <MessageCircle className="bg-surface fill-text-primary absolute -right-2 -bottom-1 size-6 rounded-full p-1" />
       ),
-      message: `${notification.targetId.parentComment ? "ha respondido tu comentario" : "ha comentado tu publicación"}`,
-      link: `publication/${notification.targetId.publication}`,
+      message: `${notification.targetId?.parentComment ? "ha respondido tu comentario" : "ha comentado tu publicación"}`,
+      link: `publication/${notification.targetId?.publication}`,
     },
     Like: {
       icon: (
         <Heart className="bg-surface absolute -right-2 -bottom-1 size-6 rounded-full fill-red-800 p-1 text-red-800" />
       ),
-      message: ` le ha dado like a tu ${notification.targetId.targetType === "Comment" ? "comentario" : "publicación"}`,
-      link: `publication/${notification.targetId.targetType === "Publication" ? notification.targetId.targetId?._id : notification.targetId.targetId?.publication}`,
+      message: ` le ha dado like a tu ${notification.targetId?.targetType === "Comment" ? "comentario" : "publicación"}`,
+      link: `publication/${notification.targetId?.targetType === "Publication" ? notification.targetId?.targetId?._id : notification.targetId?.targetId?.publication}`,
     },
     Follow: {
       icon: (

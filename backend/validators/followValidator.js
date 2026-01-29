@@ -1,21 +1,8 @@
 const { param } = require("express-validator");
 const validateFields = require("./validateFields");
 const mongoose = require("mongoose");
-const User = require("../models/user");
 const Follow = require("../models/follow");
-
-const isObjectId = (value) => {
-  if (!mongoose.Types.ObjectId.isValid(value)) {
-    throw new Error("Se debe pasar un ObjectId válido");
-  }
-  return true;
-};
-
-const mustExistUser = async (value) => {
-  const user = await User.findById(value);
-  if (!user) throw new Error("No existe el usuario");
-  return true;
-};
+const { mustExistUser, isObjectId } = require("./customs");
 
 const mustNotExistFollow = async (value, { req }) => {
   const follow = await Follow.findOne({ user: req.user._id, followed: value });
