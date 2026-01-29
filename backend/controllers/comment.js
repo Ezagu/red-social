@@ -33,7 +33,7 @@ const create = async (req, res) => {
         text,
         parentComment,
       });
-      newComment.save({ session });
+      await newComment.save({ session });
 
       await newComment.populate("user", "-email -password -role -__v");
 

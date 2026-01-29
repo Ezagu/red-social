@@ -39,7 +39,7 @@ exports.register = [
 
 exports.update = [
   [
-    body().notEmpty().withMessage("No se evió ningún dato para actualizar"),
+    body().notEmpty().withMessage("No se envió ningún dato para actualizar"),
     email.optional(),
     password.optional(),
     fullName.optional(),
