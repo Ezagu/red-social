@@ -36,8 +36,6 @@ const save = async (req, res) => {
         },
         { session },
       );
-
-      if (!userUpdated) throw new Error("USER_NOT_FOUND");
     });
 
     // Crear y guardar el objeto del modelo
@@ -50,12 +48,9 @@ const save = async (req, res) => {
       publication,
     });
   } catch (error) {
-    let message = "Error en el servidor";
-    if (error.message === "USER_NOT_FOUND")
-      message = "Usuario identificado no encontrado";
     return res.status(500).json({
       status: "error",
-      message,
+      message: "Error en el servidor",
     });
   }
 };
@@ -106,15 +101,12 @@ const remove = async (req, res) => {
   const publicationId = req.params.id;
   const user = req.user._id;
 
-  const session = await mongoose.startSession();
-
   // Find y luego remove
   try {
-    let publicationDeleted;
-
+    const session = await mongoose.startSession();
     await session.withTransaction(async () => {
       // Borrar publicación
-      publicationDeleted = await Publication.findOneAndDelete(
+      const publicationDeleted = await Publication.findOneAndDelete(
         {
           user,
           _id: publicationId,
@@ -133,11 +125,11 @@ const remove = async (req, res) => {
         { session },
       );
 
-      if (!userUpdated) throw new Error("USER_NOT_FOUND");
-
       // Eliminar imagen si contiene
       if (publicationDeleted.file) {
-        fs.unlinkSync("./uploads/publications/" + publicationDeleted.file);
+        fs.unlinkSync(
+          path.join("uploads", "publications", publicationDeleted.file),
+        );
       }
 
       // Eliminar comentarios
@@ -154,20 +146,18 @@ const remove = async (req, res) => {
         },
         { session },
       );
-    });
 
-    // DEvolver respuesta
-    return res.status(200).json({
-      status: "success",
-      message: "Publicación eliminada",
-      publicationDeleted,
+      // DEvolver respuesta
+      return res.status(200).json({
+        status: "success",
+        message: "Publicación eliminada",
+        publicationDeleted,
+      });
     });
   } catch (error) {
     let message = "Error en el servidor";
     if (error.message === "PUBLICATION_NOT_FOUND")
       message = "No existe la publicación";
-    if (error.message === "USER_NOT_FOUND")
-      message = "No se encontró el usuario identificado";
     return res.status(500).json({
       status: "error",
       message,

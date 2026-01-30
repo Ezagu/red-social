@@ -1,77 +1,38 @@
 // Importar dependencias y modulos
-const bcrypt = require("bcrypt");
 const fs = require("fs");
 const path = require("path");
 
 // Importar modelos
 const User = require("../models/user.js");
-const Publication = require("../models/publication.js");
 const Notification = require("../models/notification.js");
-const Like = require("../models/like.js");
 
 // Importar servicios
 const jwt = require("../services/jwt.js");
 const followService = require("../services/followService.js");
+const passwordService = require("../services/passwordService.js");
 const { getPublications } = require("../services/publicationService.js");
 
 // Registro de usuario
 const register = async (req, res) => {
+  console.log(req.body);
   //Recoger datos de la peticion
   const params = req.body;
 
-  // Cifrar contraseña
   try {
-    params.password = await bcrypt.hash(params.password, 10);
-  } catch (error) {
-    return res.status(500).json({
-      status: "error",
-      message: "No se pudo encriptar la contraseña",
-    });
-  }
-
-  try {
-    // Validar que email y nick no estén en uso
-    const replicatedUser = await User.findOne({
-      $or: [{ email: params.email }, { nick: params.nick }],
-    });
-
-    if (replicatedUser) {
-      console.log(replicatedUser);
-      if (replicatedUser.email === params.email) {
-        return res.status(409).json({
-          status: "error",
-          message: "Email ya registrado",
-        });
-      }
-      if (replicatedUser.nick === params.nick) {
-        return res.status(409).json({
-          status: "error",
-          message: "Nombre de usuario en uso",
-        });
-      }
-    }
+    params.password = passwordService.encrypt(params.password);
 
     // Guardar usuario en la base de datos
-    const user = await User.create(params);
-
-    if (!user) {
-      throw new Error();
-    }
+    await User.create(params);
 
     return res.status(201).json({
       message: "Usuario registrado correctamente",
       status: "success",
     });
   } catch (error) {
-    if (error.code === 11000) {
-      return res.status(409).send({
-        status: "error",
-        message: "Ya existe el usuario",
-      });
-    }
     return res.status(500).send({
       status: "error",
       message: "Error en el servidor",
+      error,
     });
   }
 };
@@ -80,67 +41,55 @@ const login = async (req, res) => {
   // Recoger parametros body
   const params = req.body;
 
-  // Buscar en la base de datos si existe
-  const user = await User.findOne({
-    $or: [{ email: params.email }, { nick: params.email }],
-  });
+  try {
+    const user = await User.findOne({
+      $or: [{ email: params.email }, { nick: params.email }],
+    });
+    if (!user) throw new Error("USER_NOT_FOUND");
 
-  if (!user) {
-    return res.status(400).json({
+    const pwd = passwordService.decrypt(params.password, user.password);
+    if (!pwd) throw new Error("USER_NOT_FOUND");
+
+    // Conseguir token
+    const token = jwt.createToken(user);
+
+    const userClean = user.toObject();
+
+    delete userClean.password;
+    delete userClean.email;
+    delete userClean.role;
+    delete userClean.__v;
+
+    // Devolver datos del usuario
+    return res.status(200).json({
+      status: "success",
+      message: "Login correcto",
+      user: userClean,
+      token,
+    });
+  } catch (error) {
+    let message = "Error en el servidor";
+    if (error.message === "USER_NOT_FOUND")
+      message = "Usuario o contraseña incorrecta";
+    return res.status(500).json({
       status: "error",
-      message: "Usuario incorrecto",
+      message,
     });
   }
-
-  // Comprobar su contraseña
-  const pwd = bcrypt.compareSync(params.password, user.password);
-
-  if (!pwd) {
-    return res.status(400).json({
-      status: "error",
-      message: "Contraseña incorrecta",
-    });
-  }
-
-  // Conseguir token
-  const token = jwt.createToken(user);
-
-  const userClean = user.toObject();
-
-  delete userClean.password;
-  delete userClean.email;
-  delete userClean.role;
-  delete userClean.__v;
-
-  // Devolver datos del usuario
-  return res.status(200).json({
-    status: "success",
-    message: "Login correcto",
-    user: userClean,
-    token,
-  });
 };
 
 const profile = async (req, res) => {
   // Recibir el parámetro del id de usuario por la url
-  const id = req.params.id || req.user._id;
+  const id = req.params.id;
 
   // Consulta para sacar los datos del usuario
   try {
     const userProfile = await User.findById(id, "-password -role -email -__v");
 
-    if (!userProfile) {
-      return res.status(404).send({
-        status: "error",
-        message: "Usuario no encontrado",
-      });
-    }
-
     // Info de seguimiento
     const followInfo = await followService.followThisUser(req.user.id, id);
 
     // Devolver el resultado
-    // TODO: Devolver informacion de follows
     return res.status(200).json({
       status: "success",
       user: {
@@ -150,9 +99,9 @@ const profile = async (req, res) => {
       },
     });
   } catch (err) {
-    return res.status(404).send({
+    return res.status(500).send({
       status: "error",
-      message: "Error al buscar el usuario",
+      message: "Error en el servidor",
     });
   }
 };
@@ -195,16 +144,13 @@ const list = async (req, res) => {
     return res.status(200).json({
       status: "success",
       page,
-      limit,
-      totalUsers: result.totalDocs,
-      totalPages: result.totalPages,
       hasNextPage: result.hasNextPage,
       items: usersWithFollowInfo,
     });
   } catch (err) {
     return res.status(404).json({
       status: "error",
-      message: "Usuarios no encontrados",
+      message: "Error en el servidor",
     });
   }
 };
@@ -231,16 +177,13 @@ const listFollowers = async (req, res) => {
     return res.status(200).json({
       status: "success",
       page,
-      limit,
-      totalUsers: result.totalDocs,
-      totalPages: result.totalPages,
       hasNextPage: result.hasNextPage,
       items: usersWithFollowInfo,
     });
   } catch {
-    return res.status(404).json({
+    return res.status(500).json({
       status: "error",
-      message: "Usuarios no encontrados",
+      message: "Error en el servidor",
     });
   }
 };
@@ -267,9 +210,6 @@ const listFollowing = async (req, res) => {
     return res.status(200).json({
       status: "success",
       page,
-      limit,
-      totalUsers: result.totalDocs,
-      totalPages: result.totalPages,
       hasNextPage: result.hasNextPage,
       items: usersWithFollowInfo,
     });
@@ -283,126 +223,50 @@ const listFollowing = async (req, res) => {
 
 const update = async (req, res) => {
   // Recoger info del usuario a actualizar
-  let userIdentity = req.user;
+  let userIdentityId = req.user._id;
   const userToUpdate = req.body;
 
-  // Comprobar si se quiere actualizar a un email o nick que ya existe
-  let conditions = [];
-  if (userToUpdate.email) {
-    conditions.push({ email: userToUpdate.email });
-  }
-  if (userToUpdate.nick) {
-    conditions.push({ nick: userToUpdate.nick });
-  }
+  console.log(req.file);
 
-  if (conditions.length > 0) {
-    const duplicatedUsers = await User.find({ $or: conditions });
-
-    let userIsset = false;
-    duplicatedUsers.forEach((user) => {
-      if (user && user._id != userIdentity.id) {
-        userIsset = true;
-      }
-    });
-
-    if (userIsset) {
-      return res.status(409).json({
-        status: "error",
-        message: "Nombre de usuario en uso",
-      });
-    }
-  }
-
-  // Si me llega la password cifrarla
-  if (userToUpdate.password) {
-    try {
-      userToUpdate.password = await bcrypt.hash(userToUpdate.password, 10);
-    } catch (err) {
-      return res.status(500).json({
-        status: "error",
-        message: "No se pudo encriptar la contraseña",
-      });
-    }
-  } else {
-    delete userToUpdate.password;
-  }
-
-  // Buscar y actualizar
   try {
+    // Si me llega la password cifrarla
+    if (userToUpdate.password) {
+      userToUpdate.password = passwordService.encrypt(userToUpdate.password);
+    }
+
+    if (req.file) {
+      userToUpdate.image = req.file.filename;
+    }
+
+    // Buscar y actualizar
     const userUpdated = await User.findByIdAndUpdate(
-      { _id: userIdentity.id },
+      { _id: userIdentityId },
       userToUpdate,
-      { new: true, select: "-password -role -__v -email" },
+      { select: "-password -role -__v -email" },
     );
 
-    if (userUpdated) {
-      return res.status(200).json({
-        status: "success",
-        message: "Usuario actualizado",
-        userUpdated,
-      });
+    // Si se actualizo el avatar y habia un avatar anterior, borrarlo
+    if (req.file && userUpdated.image !== "default.jpg") {
+      const prevAvatarPath = path.join("uploads", "avatars", userUpdated.image);
+      if (fs.existsSync(prevAvatarPath)) {
+        fs.unlinkSync(prevAvatarPath);
+      }
     }
-  } catch (error) {
-    return res.status(404).json({
-      status: "error",
-      message: "Error al actualizar usuario",
-    });
-  }
-};
 
-const upload = async (req, res) => {
-  // Recoger el fichero de imagen y comprobar que existe
-  if (!req.file) {
-    return res.status(400).send({
-      status: "error",
-      message: "Falta enviar imagen",
-    });
-  }
-
-  // Conseguir nombre del archivo
-  const image = req.file.originalname;
-
-  // Sacar la extensión del archivo
-  const extension = image.split(".").pop().toLowerCase();
-
-  // Comprobar extensión
-  if (!["png", "jpg", "jpeg", "gif"].includes(extension)) {
-    // Borrar archivo subido
-    fs.unlinkSync(req.file.path);
-    return res.status(400).json({
-      status: "error",
-      message: "Extensión del fichero inválida",
-    });
-  }
-
-  // Si lo es, guardar imagen en base de datos
-  try {
-    const user = await User.findById(req.user.id, "image");
-
-    const userUpdated = await User.findOneAndUpdate(
-      { _id: req.user.id },
-      { image: req.file.filename },
-      { new: true, select: "-password -role -__v -email" },
+    const user = await User.findById(
+      userIdentityId,
+      "-password -role -__v -email",
     );
-
-    // Eliminar fichero de avatar anterior si es que tiene
-    const prevAvatarPath =
-      user.image !== "default.png" &&
-      path.join("uploads", "avatars", user.image);
-
-    if (prevAvatarPath && fs.existsSync(prevAvatarPath)) {
-      fs.unlinkSync(prevAvatarPath);
-    }
 
     return res.status(200).json({
       status: "success",
-      user: userUpdated,
-      file: req.file,
+      message: "Usuario actualizado",
+      user,
     });
-  } catch (error) {
+  } catch (err) {
     return res.status(500).json({
       status: "error",
-      message: "Error subiendo avatar",
+      message: "Error en el servidor",
     });
   }
 };
@@ -436,13 +300,11 @@ const publications = async (req, res) => {
       limit,
     );
 
-    if (!publications) throw new Error();
-
     return res.status(200).json(publications);
   } catch (error) {
     return res.status(500).json({
       status: "error",
-      message: "No se pudo listar las publicaciones del usuario",
+      message: "Error en el servidor",
     });
   }
 };
@@ -481,7 +343,7 @@ const notifications = async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       status: "error",
-      message: "No se pudo listar las notificaciones",
+      message: "Error en el servidor",
     });
   }
 };
@@ -495,7 +357,6 @@ module.exports = {
   listFollowers,
   listFollowing,
   update,
-  upload,
   avatar,
   publications,
   notifications,
