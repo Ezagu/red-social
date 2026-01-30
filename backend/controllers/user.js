@@ -80,7 +80,7 @@ const login = async (req, res) => {
 
 const profile = async (req, res) => {
   // Recibir el parámetro del id de usuario por la url
-  const id = req.params.id;
+  const id = req.params.id || req.user._id;
 
   // Consulta para sacar los datos del usuario
   try {
@@ -225,8 +225,6 @@ const update = async (req, res) => {
   // Recoger info del usuario a actualizar
   let userIdentityId = req.user._id;
   const userToUpdate = req.body;
-
-  console.log(req.file);
 
   try {
     // Si me llega la password cifrarla

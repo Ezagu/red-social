@@ -17,7 +17,12 @@ export const Edit = () => {
   const [result, setResult] = useState(null);
 
   const { user, setUser } = useAuth();
-  const { register, handleSubmit, reset } = useForm();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { isDirty },
+  } = useForm();
 
   const navigate = useNavigate();
 
@@ -42,42 +47,37 @@ export const Edit = () => {
   };
 
   const editUser = async (data) => {
-    const { status, message, userUpdated } = await Request(
-      "user",
-      "PUT",
-      true,
-      data,
-    );
-
-    if (status === "error") {
-      setResult({ status, message });
+    console.log(isDirty, fileSelected);
+    if (!isDirty && !fileSelected) {
+      setResult({
+        status: "error",
+        message: "No realizaste ningún cambio",
+      });
       return;
     }
 
-    if (fileSelected) {
-      const formData = new FormData();
-      formData.append("file0", fileSelected);
-
-      const uploadReq = await fetch(url + "user/upload", {
-        method: "POST",
-        body: formData,
-        headers: {
-          Authorization: localStorage.getItem("token"),
-        },
-      });
-      const uploadResponse = await uploadReq.json();
-
-      if (uploadResponse.status === "error")
-        setResult({ status: "error", message: uploadResponse?.message });
-
-      setFilePreview(null);
-      setFileSelected(null);
-
-      setUser(uploadResponse.user);
-    } else {
-      setResult({ status, message });
-      setUser(userUpdated);
+    const formData = new FormData();
+    for (const key in data) {
+      formData.append(key, data[key]);
     }
+    if (fileSelected) {
+      formData.append("file0", fileSelected);
+    }
+
+    const request = await fetch(url + "user", {
+      method: "PUT",
+      body: formData,
+      headers: {
+        Authorization: localStorage.getItem("token"),
+      },
+    });
+    const { status, message, user: userUpdated } = await request.json();
+    setResult({ status, message });
+    if (status === "error") return;
+
+    setUser(userUpdated);
+    setFilePreview(null);
+    setFileSelected(null);
   };
 
   return (

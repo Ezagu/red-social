@@ -4,7 +4,20 @@ const User = require("../models/user");
 const { isObjectId, mustExistUser } = require("./customs");
 const { search, page, limit } = require("./fields");
 
-const notDuplicatedMail = async (email) => {
+const notDuplicatedEmailWithoutMe = async (email) => {
+  if (email === req.user.email) return true;
+  const user = await User.findOne({ email, _id: { $ne: req.user._id } });
+  if (user) throw new Error("Email ya registrado");
+  return true;
+};
+
+const notDuplicatedNickWithoutMe = async (nick, { req }) => {
+  const user = await User.findOne({ nick, _id: { $ne: req.user._id } });
+  if (user) throw new Error("Nombre de usuario en uso");
+  return true;
+};
+
+const notDuplicatedEmail = async (email) => {
   const user = await User.findOne({ email });
   if (user) throw new Error("Email ya registrado");
   return true;
@@ -58,7 +71,7 @@ const bio = body("bio")
 exports.register = [
   [
     body().notEmpty().withMessage("Campos requeridos"),
-    email.custom(notDuplicatedMail),
+    email.custom(notDuplicatedEmail),
     password,
     fullName,
     nick.custom(notDuplicatedNick),
@@ -68,10 +81,10 @@ exports.register = [
 
 exports.update = [
   [
-    email.custom(notDuplicatedMail).optional(),
+    email.custom(notDuplicatedEmailWithoutMe).optional(),
     password.optional(),
     fullName.optional(),
-    nick.custom(notDuplicatedNick).optional(),
+    nick.custom(notDuplicatedNickWithoutMe).optional(),
     bio.optional(),
   ],
   validateFields,
@@ -90,4 +103,4 @@ exports.login = [
 
 exports.list = [[limit, page, search], validateFields];
 
-exports.userId = [[userId], validateFields];
+exports.userId = [[userId.optional()], validateFields];

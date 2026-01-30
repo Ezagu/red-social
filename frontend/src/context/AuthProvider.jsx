@@ -16,7 +16,7 @@ export const AuthProvider = ({ children }) => {
         return false;
       }
 
-      const profile = await request("user", "GET", token);
+      const profile = await request("user");
 
       setUser(profile.user);
       setLoading(false);

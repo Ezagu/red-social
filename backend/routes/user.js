@@ -42,13 +42,13 @@ router.get(
   userValidator.list,
   userController.publications,
 );
-router.get("/:id", auth, userValidator.userId, userController.profile);
+router.get("/{:id}", auth, userValidator.userId, userController.profile);
 router.put(
   "/",
   auth,
+  userValidator.update,
   uploads.single("file0"),
   validateFile,
-  userValidator.update,
   userController.update,
 );
 

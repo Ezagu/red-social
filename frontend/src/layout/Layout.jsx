@@ -18,7 +18,7 @@ export const Layout = () => {
       <main className="m-4 grid flex-1 grid-cols-3 items-start gap-4">
         {loading ? (
           <Loading className="col-span-3 self-center" />
-        ) : user._id ? (
+        ) : user?._id ? (
           <>
             <ProfileAside />
             <Outlet />
