@@ -1,3 +1,5 @@
+const mongoose = require("mongoose");
+
 const Notification = require("../models/notification.js");
 const User = require("../models/user.js");
 
@@ -6,26 +8,33 @@ const read = async (req, res) => {
   const notificationId = req.params.id;
 
   try {
-    const notification = await Notification.findOneAndUpdate(
-      { user: req.user._id, _id: notificationId },
-      { read: true },
-    );
+    const session = await mongoose.startSession();
+    await session.withTransaction(async () => {
+      const notification = await Notification.findByIdAndUpdate(
+        notificationId,
+        { read: true },
+        { session },
+      );
 
-    if (!notification.read) {
-      await User.findByIdAndUpdate(user, {
-        $inc: { unreadNotificationsCount: -1 },
+      if (!notification.read) {
+        await User.findByIdAndUpdate(
+          user,
+          {
+            $inc: { unreadNotificationsCount: -1 },
+          },
+          { session },
+        );
+      }
+
+      res.status(200).json({
+        status: "success",
+        message: "Notificación leída",
       });
-    }
-
-    res.status(200).json({
-      status: "success",
-      message: "Notificación leída",
-      notification,
     });
   } catch (error) {
     res.status(500).json({
       status: "error",
-      message: "No se pudo leer la notificación",
+      message: "Error en el servidor",
     });
   }
 };
@@ -34,32 +43,33 @@ const remove = async (req, res) => {
   const notificationId = req.params.id;
 
   try {
-    const notificationRemoved = await Notification.findOneAndDelete({
-      user: req.user._id,
-      _id: notificationId,
-    });
+    const session = await mongoose.startSession();
+    await session.withTransaction(async () => {
+      const notificationRemoved = await Notification.findByIdAndDelete(
+        notificationId,
+        { session },
+      );
 
-    if (!notificationRemoved) {
-      return res.status(404).json({
-        status: "error",
-        message: "Notificación inexistente",
-      });
-    }
-    if (!notificationRemoved.read) {
-      await User.findByIdAndUpdate(req.user._id, {
-        $inc: { unreadNotificationsCount: -1 },
-      });
-    }
+      if (!notificationRemoved.read) {
+        await User.findByIdAndUpdate(
+          req.user._id,
+          {
+            $inc: { unreadNotificationsCount: -1 },
+          },
+          { session },
+        );
+      }
 
-    res.status(200).json({
-      status: "success",
-      message: "Notificación eliminada",
-      notification: notificationRemoved,
+      res.status(200).json({
+        status: "success",
+        message: "Notificación eliminada",
+        notification: notificationRemoved,
+      });
     });
   } catch (error) {
     res.status(500).json({
       status: "error",
-      message: "No se pudo eliminar la notificación",
+      message: "Error en el servidor",
     });
   }
 };
@@ -68,18 +78,27 @@ const readAll = async (req, res) => {
   const user = req.user._id;
 
   try {
-    await Notification.updateMany({ user, read: false }, { read: true });
-
-    await User.findByIdAndUpdate(user, { unreadNotificationsCount: 0 });
-
-    return res.status(200).send({
-      status: "success",
-      message: "Se leyeron todas las notificaciones",
+    const session = await mongoose.startSession();
+    await session.withTransaction(async () => {
+      await Notification.updateMany(
+        { user, read: false },
+        { read: true },
+        { session },
+      );
+      await User.findByIdAndUpdate(
+        user,
+        { unreadNotificationsCount: 0 },
+        { session },
+      );
+      return res.status(200).send({
+        status: "success",
+        message: "Notificaciones leídas",
+      });
     });
   } catch (error) {
     return res.status(500).json({
       status: "error",
-      message: "No se pudieron leer las notificaciones",
+      message: "Error en el servidor",
     });
   }
 };
@@ -88,20 +107,27 @@ const removeAll = async (req, res) => {
   const user = req.user._id;
 
   try {
-    await Notification.deleteMany({ user });
+    const session = await mongoose.startSession();
+    await session.withTransaction(async () => {
+      await Notification.deleteMany({ user }, { session });
 
-    await User.findByIdAndUpdate(req.user._id, {
-      unreadNotificationsCount: 0,
-    });
+      await User.findByIdAndUpdate(
+        req.user._id,
+        {
+          unreadNotificationsCount: 0,
+        },
+        { session },
+      );
 
-    return res.status(200).json({
-      status: "success",
-      message: "Todas las notificaciones fueron removidas",
+      return res.status(200).json({
+        status: "success",
+        message: "Notificaciones removidas",
+      });
     });
   } catch (error) {
     return res.status(500).json({
       status: "error",
-      message: "No se pudieron eliminar las notificaciones",
+      message: "Error en el servidor",
     });
   }
 };

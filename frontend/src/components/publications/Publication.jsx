@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { url } from "../../helpers/Global.jsx";
 import { useLike } from "../../hooks/useLike.jsx";
 import { useAuth } from "../../hooks/useAuth.jsx";
@@ -23,17 +23,19 @@ export const Publication = ({ mode = "feed", publication, removeItem }) => {
     target: publication,
     targetType: "Publication",
   });
+  const navigate = useNavigate();
 
   const removePublication = async () => {
     const response = await Request(`publication/${publication._id}`, "DELETE");
     if (response.status === "error") {
       return;
     }
-    removeItem(publication._id);
+    removeItem && removeItem(publication._id);
     setUser((prev) => ({
       ...prev,
       publicationsCount: prev.publicationsCount - 1,
     }));
+    navigate(-1);
   };
 
   return (

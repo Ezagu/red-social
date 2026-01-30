@@ -91,7 +91,7 @@ export const Comment = ({ comment, remove }) => {
           <button
             className="group flex cursor-pointer items-center gap-1.5"
             onClick={() => {
-              load();
+              if (!showReplies) load();
               setShowReplies((prev) => !prev);
             }}
           >
@@ -131,6 +131,7 @@ export const Comment = ({ comment, remove }) => {
                 placeholder="Ingrese un comentario"
                 required
                 name="text"
+                autoFocus
               />
               <input
                 type="submit"

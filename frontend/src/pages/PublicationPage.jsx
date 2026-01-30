@@ -47,6 +47,8 @@ export const PublicationPage = () => {
       ...prev,
       commentsCount: prev.commentsCount + 1,
     }));
+
+    e.target.text.value = "";
   };
 
   useEffect(() => {

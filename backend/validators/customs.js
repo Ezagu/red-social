@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 
 exports.isObjectId = (value) => {
   if (!mongoose.Types.ObjectId.isValid(value)) {
-    throw new Error("Se debe pasar un ObjectId válido");
+    throw new Error("Se debe enviar un ObjectId válido");
   }
   return true;
 };
