@@ -1,12 +1,7 @@
-import React from "react";
-import { MessageCircle } from "lucide-react";
-import { X } from "lucide-react";
-import { Avatar } from "../ui/Avatar";
 import { Link } from "react-router";
-import { Heart } from "lucide-react";
-import { UserPlus } from "lucide-react";
-import { url } from "../../helpers/Global";
 import ReactTimeAgo from "react-time-ago";
+import { MessageCircle, X, Heart, UserPlus } from "lucide-react";
+import { Avatar } from "../ui/Avatar";
 
 export const Notification = ({ notification, read, deleteOne }) => {
   const data = {
@@ -40,10 +35,7 @@ export const Notification = ({ notification, read, deleteOne }) => {
       onClick={() => read(notification._id)}
     >
       <div className="relative shrink-0">
-        <Avatar
-          src={url + "user/avatar/" + notification.fromUser.image}
-          size="md"
-        />
+        <Avatar src={notification.fromUser.image} size="md" />
         {data[notification.targetType].icon}
       </div>
       <div className="flex min-w-0 flex-col">

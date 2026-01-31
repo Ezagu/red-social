@@ -93,12 +93,7 @@ export const Edit = () => {
         >
           <ImagePlus className="absolute top-17 left-16 z-10 m-auto hidden size-15 group-hover:block" />
           <div className="group-hover:blur-[1px]">
-            <Avatar
-              src={
-                filePreview ? filePreview : `${url}user/avatar/${user.image}`
-              }
-              size="4xl"
-            />
+            <Avatar src={filePreview ? filePreview : user.image} size="4xl" />
           </div>
         </label>
 
