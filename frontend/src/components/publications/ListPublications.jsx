@@ -6,6 +6,17 @@ export const ListPublications = ({
   loadNextPage,
   removeItem,
 }) => {
+  console.log(publications);
+  if (publications.length === 0) {
+    return (
+      <section className="bg-surface text-text-primary w-full rounded-2xl pt-2 text-center">
+        <p className="text-text-secondary my-10 text-xl tracking-wide">
+          No hay publicaciones
+        </p>
+      </section>
+    );
+  }
+
   return (
     <>
       <section className="bg-surface text-text-primary w-full rounded-2xl pt-2">
@@ -22,19 +33,13 @@ export const ListPublications = ({
         <footer
           className={`text-center ${paginate.hasNextPage && "border-border-input border-t"}`}
         >
-          {publications.length === 0 ? (
-            <p className="text-text-secondary my-10 text-xl tracking-wide">
-              No hay publicaciones
-            </p>
-          ) : (
-            paginate.hasNextPage && (
-              <button
-                className="bg-primary hover:bg-primary-hover text-text-primary m-auto my-4 w-1/2 cursor-pointer rounded-2xl py-2 font-semibold"
-                onClick={loadNextPage}
-              >
-                Ver más
-              </button>
-            )
+          {paginate.hasNextPage && (
+            <button
+              className="bg-primary hover:bg-primary-hover text-text-primary m-auto my-4 w-1/2 cursor-pointer rounded-2xl py-2 font-semibold"
+              onClick={loadNextPage}
+            >
+              Ver más
+            </button>
           )}
         </footer>
       </section>

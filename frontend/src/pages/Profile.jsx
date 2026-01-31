@@ -139,9 +139,9 @@ export const Profile = () => {
           ) : (
             <ListPublications
               publications={
-                id.toString() !== user._id.toString()
-                  ? publications
-                  : myPublications
+                id.toString() === user._id.toString()
+                  ? myPublications
+                  : publications
               }
               paginate={paginate}
               loadNextPage={loadNextPage}

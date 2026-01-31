@@ -17,7 +17,7 @@ export const ProfileCard = () => {
     localStorage.clear();
     navigate("/login");
     setUser({});
-    setMyPublications({});
+    setMyPublications([]);
     setProfile({});
   };
 
