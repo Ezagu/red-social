@@ -138,7 +138,11 @@ export const Profile = () => {
             <Loading className="my-5" />
           ) : (
             <ListPublications
-              publications={id === user._id ? myPublications : publications}
+              publications={
+                id.toString() !== user._id.toString()
+                  ? publications
+                  : myPublications
+              }
               paginate={paginate}
               loadNextPage={loadNextPage}
               removeItem={removeItem}
