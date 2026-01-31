@@ -1,13 +1,14 @@
 const express = require("express");
-const router = express.Router();
-const multer = require("multer");
+const uploads = require("../middlewares/multer.js");
 const publicationController = require("../controllers/publication");
 const auth = require("../middlewares/auth.js");
 const publicationValidator = require("../validators/publicationValidator.js");
 const validateFile = require("../middlewares/validateFile.js");
 
+const router = express.Router();
+
 // Configuracion de subida
-const storage = multer.diskStorage({
+/*const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "./uploads/publications");
   },
@@ -17,6 +18,7 @@ const storage = multer.diskStorage({
 });
 
 const uploads = multer({ storage });
+*/
 
 // Rutas
 router.get("/publications", auth, publicationController.publications);
@@ -26,7 +28,7 @@ router.get(
   publicationController.followingPublications,
 );
 router.get("/:id/comments", auth, publicationController.comments);
-router.get("/media/:file", publicationController.media);
+//router.get("/media/:file", publicationController.media);
 router.get("/:id", auth, publicationController.detail);
 router.delete("/:id", auth, publicationController.remove);
 router.post(

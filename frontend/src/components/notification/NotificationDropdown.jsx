@@ -17,13 +17,11 @@ export const NotificationDropdown = () => {
       icon={<Bell />}
       headerExtra={
         user.unreadNotificationsCount > 0 && (
-          <div className="absolute -top-1 left-8 z-10 text-xs">
+          <div className="absolute -top-1 left-5 z-10 text-xs">
             <div className="relative">
-              <Circle className="text-primary fill-primary absolute top-0 right-0 size-5" />
-              <Circle className="text-primary absolute top-0 right-0 size-5 animate-ping" />
-              <p className="left- absolute top-0.5 right-2 z-10">
-                {user.unreadNotificationsCount}
-              </p>
+              <Circle className="text-primary fill-primary absolute top-0 -right-1.5 -z-10 size-5" />
+              <Circle className="text-primary absolute top-0 -right-1.5 -z-10 size-5 animate-ping" />
+              <p className="z-10">{user.unreadNotificationsCount}</p>
             </div>
           </div>
         )

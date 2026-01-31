@@ -12,6 +12,7 @@ const Like = require("../models/like.js");
 // Importar servicios
 const followService = require("../services/followService.js");
 const { getPublications } = require("../services/publicationService.js");
+const uploadCloudinary = require("../services/cloudinary.js");
 
 // Guardar publicacion
 const save = async (req, res) => {
@@ -24,12 +25,18 @@ const save = async (req, res) => {
 
   try {
     let publication = {};
+    let imageUrl = null;
+
+    if (file) {
+      const result = await uploadCloudinary(file.buffer);
+      imageUrl = result.secure_url;
+    }
 
     await session.withTransaction(async () => {
-      publication = new Publication({ text, user, file: file?.filename });
+      publication = new Publication({ text, user, file: imageUrl });
       await publication.save({ session });
 
-      const userUpdated = await User.findByIdAndUpdate(
+      await User.findByIdAndUpdate(
         user,
         {
           $inc: { publicationsCount: 1 },
@@ -45,7 +52,8 @@ const save = async (req, res) => {
     return res.status(201).json({
       status: "success",
       message: "Publicación subida",
-      publication,
+      //publication,
+      imageUrl,
     });
   } catch (error) {
     return res.status(500).json({
