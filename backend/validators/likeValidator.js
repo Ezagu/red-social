@@ -32,7 +32,6 @@ const mustExistLike = async (targetId, { req }) => {
 const mustNotExistLike = async (targetId, { req }) => {
   const targetType = req.body.targetType;
   const like = await Like.findOne({ targetId, targetType, user: req.user._id });
-  console.log(like);
   if (like)
     throw new Error(
       `Ya le has dado like a ${targetType === "Comment" ? "este comentario" : "esta publicación"}`,

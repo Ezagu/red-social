@@ -14,7 +14,6 @@ const { getPublications } = require("../services/publicationService.js");
 
 // Registro de usuario
 const register = async (req, res) => {
-  console.log(req.body);
   //Recoger datos de la peticion
   const params = req.body;
 

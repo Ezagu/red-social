@@ -1,8 +1,10 @@
 const mongoose = require("mongoose");
+const dotenv = require("dotenv");
 
 const connection = async () => {
+  dotenv.config();
   try {
-    await mongoose.connect("mongodb://localhost:27017/mi_redsocial");
+    await mongoose.connect(process.env.MONGO_URI);
     console.log("Conectado correctamente a la base de datos: mi_redsocial");
   } catch (error) {
     console.log(error);
