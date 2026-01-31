@@ -13,7 +13,6 @@ export const PasswordInput = ({ register, placeholder = "Contraseña" }) => {
       <input
         {...register("password", {
           onChange: (e) => {
-            console.log(e.target.value);
             e.target.value !== "" ? setShowIcon(true) : setShowIcon(false);
           },
           onBlur: (e) => {

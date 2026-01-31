@@ -4,7 +4,7 @@ const User = require("../models/user");
 const { isObjectId, mustExistUser } = require("./customs");
 const { search, page, limit } = require("./fields");
 
-const notDuplicatedEmailWithoutMe = async (email) => {
+const notDuplicatedEmailWithoutMe = async (email, { req }) => {
   if (email === req.user.email) return true;
   const user = await User.findOne({ email, _id: { $ne: req.user._id } });
   if (user) throw new Error("Email ya registrado");
@@ -43,21 +43,23 @@ const fullName = body("fullName")
   .isLength({ min: 3 })
   .withMessage("El nombre debe contener mínimo 3 caracteres");
 
-const email = body("email")
-  .trim()
-  .notEmpty()
-  .withMessage("Ingrese su mail")
-  .isEmail()
-  .withMessage("Ingrese un mail válido");
+const emailBase = () =>
+  body("email")
+    .trim()
+    .notEmpty()
+    .withMessage("Ingrese su mail")
+    .isEmail()
+    .withMessage("Ingrese un mail válido");
 
-const nick = body("nick")
-  .trim()
-  .notEmpty()
-  .withMessage("Ingrese un nombre de usuario")
-  .isLength({ min: 3 })
-  .withMessage("Nombre de usuario demasiado corto")
-  .isLength({ max: 20 })
-  .withMessage("Nombre de usuario demasiado largo");
+const nickBase = () =>
+  body("nick")
+    .trim()
+    .notEmpty()
+    .withMessage("Ingrese un nombre de usuario")
+    .isLength({ min: 3 })
+    .withMessage("Nombre de usuario demasiado corto")
+    .isLength({ max: 20 })
+    .withMessage("Nombre de usuario demasiado largo");
 
 const password = body("password")
   .trim()
@@ -71,20 +73,20 @@ const bio = body("bio")
 exports.register = [
   [
     body().notEmpty().withMessage("Campos requeridos"),
-    email.custom(notDuplicatedEmail),
+    emailBase().custom(notDuplicatedEmail),
     password,
     fullName,
-    nick.custom(notDuplicatedNick),
+    nickBase().custom(notDuplicatedNick),
   ],
   validateFields,
 ];
 
 exports.update = [
   [
-    email.custom(notDuplicatedEmailWithoutMe).optional(),
+    emailBase().custom(notDuplicatedEmailWithoutMe).optional(),
     password.optional(),
     fullName.optional(),
-    nick.custom(notDuplicatedNickWithoutMe).optional(),
+    nickBase().custom(notDuplicatedNickWithoutMe).optional(),
     bio.optional(),
   ],
   validateFields,

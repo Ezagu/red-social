@@ -1,4 +1,3 @@
-import React from "react";
 import { Publication } from "./Publication.jsx";
 
 export const ListPublications = ({
@@ -10,7 +9,6 @@ export const ListPublications = ({
   return (
     <>
       <section className="bg-surface text-text-primary w-full rounded-2xl pt-2">
-        {console.log(publications)}
         <ul className="">
           {publications.map((publication) => (
             <Publication
