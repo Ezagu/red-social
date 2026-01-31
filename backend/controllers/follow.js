@@ -98,7 +98,7 @@ const unfollow = async (req, res) => {
         { session },
       );
 
-      if (!notification.read) {
+      if (notification && !notification.read) {
         await User.findByIdAndUpdate(
           followed,
           {

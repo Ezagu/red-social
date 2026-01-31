@@ -5,6 +5,7 @@ import { useSearchParams } from "react-router";
 import Request from "../helpers/Request.jsx";
 import { usePaginate } from "../hooks/usePaginate.jsx";
 import { Loading } from "../components/ui/Loading.jsx";
+import { PageWithHeader } from "../components/pages/PageWithHeader.jsx";
 
 export const Users = () => {
   const [params] = useSearchParams();
@@ -34,35 +35,32 @@ export const Users = () => {
   }, [mode, id]);
 
   return (
-    <main className="text-text-primary bg-surface rounded-2xl">
-      <PageHeader
-        title={`Usuarios que ${mode === "followers" ? "siguen a" : "sigue"} ${profile?.nick}`}
-      />
-      <div>
-        {loading ? (
-          <Loading className="my-10" />
-        ) : users.length === 0 ? (
-          <p className="text-text-secondary font-l text-center text-xl tracking-wide">
-            No hay usuarios
-          </p>
-        ) : (
-          <>
-            <ul className="flex flex-col gap-2 px-2 pb-4">
-              {users.map((user) => (
-                <UserCard user={user} key={user._id} />
-              ))}
-            </ul>
-            {paginate.hasNextPage && (
-              <button
-                className="bg-primary hover:bg-primary-hover text-text-primary m-auto my-4 block w-1/2 cursor-pointer rounded-2xl py-2 font-semibold"
-                onClick={loadNextPage}
-              >
-                Ver más
-              </button>
-            )}
-          </>
-        )}
-      </div>
-    </main>
+    <PageWithHeader
+      title={`Usuarios que ${mode === "followers" ? "siguen a" : "sigue"} ${profile?.nick}`}
+    >
+      {loading ? (
+        <Loading className="my-10" />
+      ) : users.length === 0 ? (
+        <p className="text-text-secondary font-l text-center text-xl tracking-wide">
+          No hay usuarios
+        </p>
+      ) : (
+        <>
+          <ul className="flex flex-col gap-2 px-2 pb-4">
+            {users.map((user) => (
+              <UserCard user={user} key={user._id} />
+            ))}
+          </ul>
+          {paginate.hasNextPage && (
+            <button
+              className="bg-primary hover:bg-primary-hover text-text-primary m-auto my-4 block w-1/2 cursor-pointer rounded-2xl py-2 font-semibold"
+              onClick={loadNextPage}
+            >
+              Ver más
+            </button>
+          )}
+        </>
+      )}
+    </PageWithHeader>
   );
 };

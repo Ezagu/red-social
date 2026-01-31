@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Link, useParams } from "react-router";
 import { Avatar } from "../components/ui/Avatar";
 import { SquarePen } from "lucide-react";
-import { PageHeader } from "../components/pages/PageHeader.jsx";
+import { PageWithHeader } from "../components/pages/PageWithHeader.jsx";
 import Request from "../helpers/Request.jsx";
 import { Loading } from "../components/ui/Loading.jsx";
 import { url } from "../helpers/Global.jsx";
@@ -10,14 +10,18 @@ import { useAuth } from "../hooks/useAuth.jsx";
 import { ButtonFollowUnfollow } from "../components/ui/ButtonFollowUnfollow.jsx";
 import { ListPublications } from "../components/publications/ListPublications.jsx";
 import { usePaginate } from "../hooks/usePaginate.jsx";
+import ProfileContext from "../context/ProfileProvider.jsx";
+import { ButtonUnfollow } from "../components/ui/ButtonUnfollow.jsx";
+import { ButtonFollow } from "../components/ui/ButtonFollow.jsx";
 
 export const Profile = () => {
   const { id } = useParams();
 
   const { user } = useAuth();
 
-  const [profile, setProfile] = useState({});
   const [loadingProfile, setLoadingProfile] = useState(true);
+
+  const { profile, setProfile } = useContext(ProfileContext);
 
   const {
     items: publications,
@@ -29,7 +33,13 @@ export const Profile = () => {
 
   useEffect(() => {
     const getProfile = async () => {
+      if (profile?._id === id) {
+        setLoadingProfile(false);
+        return;
+      }
       const response = await Request("user/" + id, "GET");
+
+      console.log(response.user);
 
       setProfile(response.user);
       setLoadingProfile(false);
@@ -39,8 +49,7 @@ export const Profile = () => {
   }, [id]);
 
   return (
-    <main className="text-text-primary bg-surface flex flex-col items-center rounded-2xl">
-      <PageHeader title={"Perfil de " + profile.nick} />
+    <PageWithHeader title={"Perfil de " + profile.nick}>
       {loadingProfile ? (
         <Loading className="my-10" />
       ) : (
@@ -62,11 +71,16 @@ export const Profile = () => {
                     <SquarePen className="size-5" />
                   </Link>
                 ) : (
-                  <ButtonFollowUnfollow
-                    profile={profile}
-                    setProfile={setProfile}
-                    className="grow-0 self-end"
-                  />
+                  <div className="self-end">
+                    {profile.isFollowed ? (
+                      <ButtonUnfollow
+                        profile={profile}
+                        setProfile={setProfile}
+                      />
+                    ) : (
+                      <ButtonFollow profile={profile} setProfile={setProfile} />
+                    )}
+                  </div>
                 )}
                 <div className="mt-2 flex items-center gap-2">
                   <h1 className="truncate text-5xl font-semibold">
@@ -126,6 +140,6 @@ export const Profile = () => {
           )}
         </>
       )}
-    </main>
+    </PageWithHeader>
   );
 };

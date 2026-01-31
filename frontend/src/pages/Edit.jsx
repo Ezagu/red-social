@@ -1,15 +1,14 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Avatar } from "../components/ui/Avatar";
 import { CircleX } from "lucide-react";
 import { CircleCheck } from "lucide-react";
 import { ImagePlus } from "lucide-react";
-import { PageHeader } from "../components/pages/PageHeader";
 import { useAuth } from "../hooks/useAuth";
 import { useForm } from "react-hook-form";
 import { Alert } from "../components/ui/Alert";
-import Request from "../helpers/Request";
 import { useNavigate } from "react-router";
 import { url } from "../helpers/Global";
+import { PageWithHeader } from "../components/pages/PageWithHeader";
 
 export const Edit = () => {
   const [filePreview, setFilePreview] = useState(null);
@@ -81,8 +80,7 @@ export const Edit = () => {
   };
 
   return (
-    <main className="bg-surface text-text-primary w-full rounded-2xl">
-      <PageHeader title="Modificar perfil" />
+    <PageWithHeader title={"Modificar perfil"}>
       <form
         className="m-auto my-10 flex w-3/4 flex-col gap-4"
         onSubmit={handleSubmit(editUser)}
@@ -164,6 +162,6 @@ export const Edit = () => {
           </button>
         </div>
       </form>
-    </main>
+    </PageWithHeader>
   );
 };

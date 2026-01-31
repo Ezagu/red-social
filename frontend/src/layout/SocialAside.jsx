@@ -69,7 +69,7 @@ export const SocialAside = () => {
         {usersInfo.hasNextPage && (
           <button
             className="bg-primary hover:bg-primary-hover text-text-primary m-auto my-4 w-1/2 cursor-pointer rounded-2xl py-2 font-semibold"
-            onClick={() => loadNextPage()}
+            onClick={loadNextPage}
           >
             Ver más
           </button>

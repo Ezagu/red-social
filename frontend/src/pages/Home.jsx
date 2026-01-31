@@ -3,6 +3,7 @@ import { Loading } from "../components/ui/Loading";
 import Request from "../helpers/Request";
 import { ListPublications } from "../components/publications/ListPublications";
 import { usePaginate } from "../hooks/usePaginate";
+import { Page } from "../components/pages/Page";
 
 export const Home = () => {
   const [section, setSection] = useState("all");
@@ -18,7 +19,7 @@ export const Home = () => {
   });
 
   return (
-    <main className="bg-surface text-text-primary rounded-2xl">
+    <Page>
       <header className="border-border-input border-b text-center">
         <div className="flex">
           <button
@@ -52,6 +53,6 @@ export const Home = () => {
           loadNextPage={loadNextPage}
         />
       )}
-    </main>
+    </Page>
   );
 };

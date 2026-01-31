@@ -1,12 +1,12 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useAuth } from "../../hooks/useAuth.jsx";
-import Request from "../../helpers/Request.jsx";
 import { ChevronUp } from "lucide-react";
 import { Pen } from "lucide-react";
 import { Alert } from "../ui/Alert.jsx";
 import { ImagePlus } from "lucide-react";
 import { X } from "lucide-react";
 import { url } from "../../helpers/Global.jsx";
+import { Button } from "../ui/Button.jsx";
 
 export const CreatePublication = () => {
   const [show, setShow] = useState(true);
@@ -123,11 +123,7 @@ export const CreatePublication = () => {
               id="file0"
               onChange={handleFileChange}
             />
-            <input
-              type="submit"
-              value="Publicar"
-              className="bg-primary hover:bg-primary-hover cursor-pointer rounded-2xl p-2 px-4 font-semibold"
-            />
+            <Button type="submit">Publicar</Button>
           </div>
         </form>
       )}

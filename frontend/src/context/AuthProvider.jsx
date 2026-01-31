@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import request from "../helpers/Request";
 
 const AuthContext = createContext();

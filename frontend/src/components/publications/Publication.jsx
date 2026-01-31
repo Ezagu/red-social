@@ -10,6 +10,7 @@ import { Trash2 } from "lucide-react";
 import { Heart } from "lucide-react";
 import Request from "../../helpers/Request.jsx";
 import ReactTimeAgo from "react-time-ago";
+import { useProfile } from "../../hooks/useProfile.jsx";
 
 export const Publication = ({ mode = "feed", publication, removeItem }) => {
   //Cambiar tipo de publicacion para feed o pagina
@@ -17,6 +18,8 @@ export const Publication = ({ mode = "feed", publication, removeItem }) => {
 
   const Wrapper = isFeed ? Link : "div";
   const WrapperProps = isFeed ? { to: "/publication/" + publication._id } : {};
+
+  const { setProfile } = useProfile();
 
   const { user, setUser } = useAuth();
   const { liked, likesCount, toggleLike } = useLike({
@@ -35,7 +38,11 @@ export const Publication = ({ mode = "feed", publication, removeItem }) => {
       ...prev,
       publicationsCount: prev.publicationsCount - 1,
     }));
-    navigate(-1);
+    !isFeed && navigate(-1);
+    setProfile((prev) => ({
+      ...prev,
+      publicationsCount: prev.publicationsCount - 1,
+    }));
   };
 
   return (
