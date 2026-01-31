@@ -52,7 +52,7 @@ const save = async (req, res) => {
     return res.status(201).json({
       status: "success",
       message: "Publicación subida",
-      //publication,
+      publication,
       imageUrl,
     });
   } catch (error) {
