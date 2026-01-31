@@ -3,9 +3,13 @@ import { LogOut } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth.jsx";
 import { Avatar } from "../../components/ui/Avatar.jsx";
 import { Loading } from "../../components/ui/Loading.jsx";
+import { useMyPublications } from "../../hooks/useMyPublications.jsx";
+import { useProfile } from "../../hooks/useProfile.jsx";
 
 export const ProfileCard = () => {
   const { user, setUser, loading } = useAuth();
+  const { setMyPublications } = useMyPublications();
+  const { setProfile } = useProfile();
 
   const navigate = useNavigate();
 
@@ -13,6 +17,8 @@ export const ProfileCard = () => {
     localStorage.clear();
     navigate("/login");
     setUser({});
+    setMyPublications({});
+    setProfile({});
   };
 
   return loading ? (
