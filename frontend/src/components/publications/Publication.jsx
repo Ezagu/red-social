@@ -80,7 +80,11 @@ export const Publication = ({ mode = "feed", publication, removeItem }) => {
       </header>
 
       <Wrapper {...WrapperProps}>
-        <p className="mt-4 px-6 text-2xl wrap-break-word">{publication.text}</p>
+        <p
+          className={`mt-4 px-6 text-2xl wrap-break-word whitespace-pre-wrap ${isFeed ? "line-clamp-5 truncate text-ellipsis" : ""}`}
+        >
+          {publication.text}
+        </p>
 
         {publication.file && (
           <div className="flex w-full justify-center px-6 py-2 pt-4">

@@ -8,6 +8,7 @@ import { X } from "lucide-react";
 import { url } from "../../helpers/Global.jsx";
 import { Button } from "../ui/Button.jsx";
 import { useMyPublications } from "../../hooks/useMyPublications.jsx";
+import { useProfile } from "../../hooks/useProfile.jsx";
 
 export const CreatePublication = () => {
   const [show, setShow] = useState(true);
@@ -17,8 +18,9 @@ export const CreatePublication = () => {
   const [fileSelected, setFileSelected] = useState(null);
 
   const { setMyPublications } = useMyPublications();
+  const { profile: profileCache, setProfile: setProfileCache } = useProfile();
 
-  const { setUser } = useAuth();
+  const { user, setUser } = useAuth();
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -59,6 +61,11 @@ export const CreatePublication = () => {
       publicationsCount: prev.publicationsCount + 1,
     }));
     setMyPublications((prev) => [publication, ...prev]);
+    if (profileCache._id === user._id)
+      setProfileCache((prev) => ({
+        ...prev,
+        publicationsCount: prev.publicationsCount + 1,
+      }));
 
     // Borrar inputs
     e.target.text.value = "";
