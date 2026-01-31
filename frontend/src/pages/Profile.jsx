@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router";
 import { Avatar } from "../components/ui/Avatar";
 import { SquarePen } from "lucide-react";
@@ -7,12 +7,12 @@ import Request from "../helpers/Request.jsx";
 import { Loading } from "../components/ui/Loading.jsx";
 import { url } from "../helpers/Global.jsx";
 import { useAuth } from "../hooks/useAuth.jsx";
-import { ButtonFollowUnfollow } from "../components/ui/ButtonFollowUnfollow.jsx";
 import { ListPublications } from "../components/publications/ListPublications.jsx";
 import { usePaginate } from "../hooks/usePaginate.jsx";
-import ProfileContext from "../context/ProfileProvider.jsx";
 import { ButtonUnfollow } from "../components/ui/ButtonUnfollow.jsx";
 import { ButtonFollow } from "../components/ui/ButtonFollow.jsx";
+import { useProfile } from "../hooks/useProfile.jsx";
+import { useMyPublications } from "../hooks/useMyPublications.jsx";
 
 export const Profile = () => {
   const { id } = useParams();
@@ -21,7 +21,8 @@ export const Profile = () => {
 
   const [loadingProfile, setLoadingProfile] = useState(true);
 
-  const { profile, setProfile } = useContext(ProfileContext);
+  const { profile, setProfile } = useProfile();
+  const { setMyPublications, myPublications } = useMyPublications();
 
   const {
     items: publications,
@@ -39,14 +40,20 @@ export const Profile = () => {
       }
       const response = await Request("user/" + id, "GET");
 
-      console.log(response.user);
-
       setProfile(response.user);
       setLoadingProfile(false);
     };
 
     getProfile();
   }, [id]);
+
+  useEffect(() => {
+    if (publications.length === 0) return;
+
+    if (id === user._id) {
+      setMyPublications(publications);
+    }
+  }, [publications]);
 
   return (
     <PageWithHeader title={"Perfil de " + profile.nick}>
@@ -132,7 +139,7 @@ export const Profile = () => {
             <Loading className="my-5" />
           ) : (
             <ListPublications
-              publications={publications}
+              publications={id === user._id ? myPublications : publications}
               paginate={paginate}
               loadNextPage={loadNextPage}
               removeItem={removeItem}

@@ -7,6 +7,7 @@ import { ImagePlus } from "lucide-react";
 import { X } from "lucide-react";
 import { url } from "../../helpers/Global.jsx";
 import { Button } from "../ui/Button.jsx";
+import { useMyPublications } from "../../hooks/useMyPublications.jsx";
 
 export const CreatePublication = () => {
   const [show, setShow] = useState(true);
@@ -14,6 +15,8 @@ export const CreatePublication = () => {
 
   const [filePreview, setFilePreview] = useState(null);
   const [fileSelected, setFileSelected] = useState(null);
+
+  const { setMyPublications } = useMyPublications();
 
   const { setUser } = useAuth();
 
@@ -42,7 +45,7 @@ export const CreatePublication = () => {
       },
     });
 
-    const { status, message } = await req.json();
+    const { status, message, publication } = await req.json();
 
     setResult({ status, message });
 
@@ -55,6 +58,7 @@ export const CreatePublication = () => {
       ...prev,
       publicationsCount: prev.publicationsCount + 1,
     }));
+    setMyPublications((prev) => [publication, ...prev]);
 
     // Borrar inputs
     e.target.text.value = "";

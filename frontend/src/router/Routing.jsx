@@ -12,28 +12,31 @@ import { Users } from "../pages/Users.jsx";
 import { Error } from "../pages/Error.jsx";
 import { AuthProvider } from "../context/AuthProvider.jsx";
 import { ProfileProvider } from "../context/ProfileProvider.jsx";
+import { MyPublicationsProvider } from "../context/MyPublicationsProvider.jsx";
 
 export const Routing = () => {
   return (
     <BrowserRouter>
       <AuthProvider>
         <ProfileProvider>
-          <Routes>
-            {/*Public Routes*/}
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
+          <MyPublicationsProvider>
+            <Routes>
+              {/*Public Routes*/}
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
 
-            {/*Private Routes*/}
+              {/*Private Routes*/}
 
-            <Route path="/" element={<Layout />}>
-              <Route index element={<Home />} />
-              <Route path="/profile/:id" element={<Profile />} />
-              <Route path="/edit" element={<Edit />} />
-              <Route path="/publication/:id" element={<PublicationPage />} />
-              <Route path="/users" element={<Users />} />
-              <Route path="*" element={<Error />} />
-            </Route>
-          </Routes>
+              <Route path="/" element={<Layout />}>
+                <Route index element={<Home />} />
+                <Route path="/profile/:id" element={<Profile />} />
+                <Route path="/edit" element={<Edit />} />
+                <Route path="/publication/:id" element={<PublicationPage />} />
+                <Route path="/users" element={<Users />} />
+                <Route path="*" element={<Error />} />
+              </Route>
+            </Routes>
+          </MyPublicationsProvider>
         </ProfileProvider>
       </AuthProvider>
     </BrowserRouter>

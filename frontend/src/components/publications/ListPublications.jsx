@@ -10,6 +10,7 @@ export const ListPublications = ({
   return (
     <>
       <section className="bg-surface text-text-primary w-full rounded-2xl pt-2">
+        {console.log(publications)}
         <ul className="">
           {publications.map((publication) => (
             <Publication
