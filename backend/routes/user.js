@@ -1,13 +1,12 @@
 const express = require("express");
-const router = express.Router();
-const multer = require("multer");
+const uploads = require("../middlewares/multer.js");
 const userController = require("../controllers/user");
 const auth = require("../middlewares/auth.js");
 const userValidator = require("../validators/userValidator.js");
 const validateFile = require("../middlewares/validateFile.js");
 
 // Configuracion de subida
-const storage = multer.diskStorage({
+/*const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "./uploads/avatars");
   },
@@ -16,7 +15,9 @@ const storage = multer.diskStorage({
   },
 });
 
-const uploads = multer({ storage });
+const uploads = multer({ storage });*/
+
+const router = express.Router();
 
 // Rutas
 router.post("/register", userValidator.register, userController.register);

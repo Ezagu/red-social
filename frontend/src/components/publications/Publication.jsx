@@ -1,9 +1,6 @@
-import React from "react";
 import { Link, useNavigate } from "react-router";
-import { url } from "../../helpers/Global.jsx";
 import { useLike } from "../../hooks/useLike.jsx";
 import { useAuth } from "../../hooks/useAuth.jsx";
-import { PageHeader } from "../pages/PageHeader.jsx";
 import { Avatar } from "../../components/ui/Avatar.jsx";
 import { MessageCircle } from "lucide-react";
 import { Trash2 } from "lucide-react";
@@ -51,10 +48,7 @@ export const Publication = ({ mode = "feed", publication, removeItem }) => {
     >
       <header className="flex items-center gap-2 px-4">
         <Link to={"/profile/" + publication.user._id} className="shrink-0">
-          <Avatar
-            src={url + "user/avatar/" + publication.user.image}
-            size="lg"
-          />
+          <Avatar src={publication.user.image} size="lg" />
         </Link>
         <div>
           <Link

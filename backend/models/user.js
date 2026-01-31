@@ -26,7 +26,8 @@ const UserSchema = Schema(
     },
     image: {
       type: String,
-      default: "default.jpg",
+      default:
+        "https://res.cloudinary.com/dpgojcijl/image/upload/v1769886434/default_aygmct.jpg",
     },
     followingCount: {
       type: Number,

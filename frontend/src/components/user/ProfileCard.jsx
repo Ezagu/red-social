@@ -1,9 +1,7 @@
-import React from "react";
-import { Avatar } from "../../components/ui/Avatar.jsx";
 import { Link, useNavigate } from "react-router";
 import { LogOut } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth.jsx";
-import { url } from "../../helpers/Global.jsx";
+import { Avatar } from "../../components/ui/Avatar.jsx";
 import { Loading } from "../../components/ui/Loading.jsx";
 
 export const ProfileCard = () => {
@@ -23,7 +21,7 @@ export const ProfileCard = () => {
     <div className="text-text-primary bg-surface rounded-2xl p-4">
       <div className="ml-4 flex min-w-0 items-center gap-4 overflow-hidden">
         <Link to={"/profile/" + user._id} className="shrink-0">
-          <Avatar src={url + "user/avatar/" + user.image} size="2xl" />
+          <Avatar src={user.image} size="2xl" />
         </Link>
         <div className="min-w-0 grow">
           <div className="flex justify-between">

@@ -41,7 +41,7 @@ export const Users = () => {
       {loading ? (
         <Loading className="my-10" />
       ) : users.length === 0 ? (
-        <p className="text-text-secondary font-l text-center text-xl tracking-wide">
+        <p className="text-text-secondary my-10 text-center text-xl tracking-wide">
           No hay usuarios
         </p>
       ) : (

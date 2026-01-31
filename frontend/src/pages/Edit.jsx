@@ -9,6 +9,7 @@ import { Alert } from "../components/ui/Alert";
 import { useNavigate } from "react-router";
 import { url } from "../helpers/Global";
 import { PageWithHeader } from "../components/pages/PageWithHeader";
+import { useProfile } from "../hooks/useProfile";
 
 export const Edit = () => {
   const [filePreview, setFilePreview] = useState(null);
@@ -16,6 +17,7 @@ export const Edit = () => {
   const [result, setResult] = useState(null);
 
   const { user, setUser } = useAuth();
+  const { setProfile: setProfileCache } = useProfile();
   const {
     register,
     handleSubmit,
@@ -46,7 +48,6 @@ export const Edit = () => {
   };
 
   const editUser = async (data) => {
-    console.log(isDirty, fileSelected);
     if (!isDirty && !fileSelected) {
       setResult({
         status: "error",
@@ -74,6 +75,7 @@ export const Edit = () => {
     setResult({ status, message });
     if (status === "error") return;
 
+    setProfileCache(userUpdated);
     setUser(userUpdated);
     setFilePreview(null);
     setFileSelected(null);

@@ -11,6 +11,7 @@ const jwt = require("../services/jwt.js");
 const followService = require("../services/followService.js");
 const passwordService = require("../services/passwordService.js");
 const { getPublications } = require("../services/publicationService.js");
+const uploadCloudinary = require("../services/cloudinary.js");
 
 // Registro de usuario
 const register = async (req, res) => {
@@ -224,6 +225,7 @@ const update = async (req, res) => {
   // Recoger info del usuario a actualizar
   let userIdentityId = req.user._id;
   const userToUpdate = req.body;
+  const file = req.file;
 
   try {
     // Si me llega la password cifrarla
@@ -231,8 +233,9 @@ const update = async (req, res) => {
       userToUpdate.password = passwordService.encrypt(userToUpdate.password);
     }
 
-    if (req.file) {
-      userToUpdate.image = req.file.filename;
+    if (file) {
+      const result = await uploadCloudinary(file.buffer, "avatars");
+      userToUpdate.image = result.secure_url;
     }
 
     // Buscar y actualizar

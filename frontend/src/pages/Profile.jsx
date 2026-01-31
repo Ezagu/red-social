@@ -5,7 +5,6 @@ import { SquarePen } from "lucide-react";
 import { PageWithHeader } from "../components/pages/PageWithHeader.jsx";
 import Request from "../helpers/Request.jsx";
 import { Loading } from "../components/ui/Loading.jsx";
-import { url } from "../helpers/Global.jsx";
 import { useAuth } from "../hooks/useAuth.jsx";
 import { ListPublications } from "../components/publications/ListPublications.jsx";
 import { usePaginate } from "../hooks/usePaginate.jsx";
@@ -64,7 +63,7 @@ export const Profile = () => {
           <header className="border-border-input w-full border-b p-4">
             <div className="ml-4 flex gap-4">
               <Avatar
-                src={url + "user/avatar/" + profile.image}
+                src={profile.image}
                 size="4xl"
                 className="border-primary border"
               />
