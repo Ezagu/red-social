@@ -12,9 +12,10 @@ backend/arrancar-proyecto.bat
 /frontend-deprecated
 
 # Environment variables
-.env
+.env*
 
 # Build
 dist/
 build/
+
 

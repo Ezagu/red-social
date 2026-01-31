@@ -33,6 +33,8 @@ export const Login = () => {
       setUser(response.user);
 
       navigate("/");
+    } else {
+      setWaitingResponse(false);
     }
   };
 
