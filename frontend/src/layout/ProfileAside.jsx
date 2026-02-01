@@ -5,7 +5,7 @@ import { NotificationDropdown } from "../components/notification/NotificationDro
 
 export const ProfileAside = () => {
   return (
-    <aside className="sticky top-24 flex h-fit w-full max-w-lg flex-col gap-4 justify-self-end">
+    <aside className="sticky top-24 hidden h-fit w-full flex-col gap-4 justify-self-end xl:flex">
       <ProfileCard />
       <CreatePublication />
       <NotificationDropdown />

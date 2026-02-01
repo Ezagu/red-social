@@ -6,7 +6,6 @@ export const ListPublications = ({
   loadNextPage,
   removeItem,
 }) => {
-  console.log(publications);
   if (publications.length === 0) {
     return (
       <section className="bg-surface text-text-primary w-full rounded-2xl pt-2 text-center">
