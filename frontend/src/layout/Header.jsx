@@ -24,7 +24,7 @@ export const Header = () => {
           <Link to="/notifications" className="text-text-secondary p-2">
             <Bell size={20} />
           </Link>
-          <Link className="text-text-secondary p-2">
+          <Link to="/search" className="text-text-secondary p-2">
             <Search size={20} />
           </Link>
         </div>

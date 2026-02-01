@@ -13,6 +13,7 @@ import { AuthProvider } from "../context/AuthProvider.jsx";
 import { ProfileProvider } from "../context/ProfileProvider.jsx";
 import { MyPublicationsProvider } from "../context/MyPublicationsProvider.jsx";
 import { Notification } from "../pages/Notification.jsx";
+import { Search } from "../pages/Search.jsx";
 
 export const Routing = () => {
   return (
@@ -34,7 +35,7 @@ export const Routing = () => {
                 <Route path="/publication/:id" element={<PublicationPage />} />
                 <Route path="/users" element={<Users />} />
                 <Route path="/notifications" element={<Notification />} />
-                {/*<Route path="/search" element={}/>*/}
+                <Route path="/search" element={<Search />} />
                 <Route path="*" element={<Error />} />
               </Route>
             </Routes>

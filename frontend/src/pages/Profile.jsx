@@ -61,7 +61,7 @@ export const Profile = () => {
         <Loading className="my-10" />
       ) : (
         <>
-          <header className="border-border-input w-full border-b p-4">
+          <header className="border-border-input text-text-secondary w-full border-b p-4">
             <div className="ml-4 flex gap-4">
               <Avatar
                 src={profile.image}
@@ -72,7 +72,7 @@ export const Profile = () => {
                 {user._id === profile._id ? (
                   <Link
                     to="/edit"
-                    className="bg-primary hover:bg-primary-hover flex grow-0 cursor-pointer items-center gap-2 self-end rounded-2xl px-3 py-1"
+                    className="bg-primary text-text-primary hover:bg-primary-hover flex grow-0 cursor-pointer items-center gap-2 self-end rounded-2xl px-3 py-1"
                   >
                     Edit Profile
                     <SquarePen className="size-5" />
@@ -90,7 +90,7 @@ export const Profile = () => {
                   </div>
                 )}
                 <div className="mt-2 flex items-center gap-2">
-                  <h1 className="truncate text-5xl font-semibold">
+                  <h1 className="text-text-primary truncate text-5xl font-semibold">
                     {profile.nick}
                   </h1>
                   {profile.isFollower && user._id !== profile._id && (
@@ -99,26 +99,24 @@ export const Profile = () => {
                     </span>
                   )}
                 </div>
-                <h2 className="text-text-secondary mt-1 truncate text-xl">
-                  {profile.fullName}
-                </h2>
+                <h2 className="mt-1 truncate text-xl">{profile.fullName}</h2>
                 <p className="mt-2 line-clamp-3 grow text-xl">{profile.bio}</p>
               </div>
             </div>
             <div className="mt-6 grid grid-cols-3">
-              <Link className="border-border-input border-r">
-                <h3 className="text-text-secondary text-center text-xl">
+              <div className="border-border-input border-r">
+                <h3 className="text-text-muted text-center text-xl">
                   Publicaciones
                 </h3>
                 <p className="text-center text-3xl font-bold">
                   {profile.publicationsCount}
                 </p>
-              </Link>
+              </div>
               <Link
                 to={"/users?mode=followers&id=" + profile._id}
                 className="border-border-input border-r"
               >
-                <h3 className="text-text-secondary text-center text-xl">
+                <h3 className="text-text-muted text-center text-xl">
                   Seguidores
                 </h3>
                 <p className="text-center text-3xl font-bold">
@@ -126,7 +124,7 @@ export const Profile = () => {
                 </p>
               </Link>
               <Link to={"/users?mode=following&id=" + profile._id}>
-                <h3 className="text-text-secondary text-center text-xl">
+                <h3 className="text-text-muted text-center text-xl">
                   Seguidos
                 </h3>
                 <p className="text-center text-3xl font-bold">

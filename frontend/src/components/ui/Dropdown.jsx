@@ -18,7 +18,7 @@ export const Dropdown = ({
           setShow((prev) => !prev);
         }}
       >
-        <div className="relative">{icon}</div>
+        <div className="text-text-secondary">{icon}</div>
 
         <h1>{title}</h1>
 

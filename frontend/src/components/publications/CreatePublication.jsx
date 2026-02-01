@@ -111,7 +111,7 @@ export const CreatePublication = () => {
       {result && <Alert status={result.status} message={result.message} />}
       <div className="flex w-full items-center justify-between">
         <label
-          className="hover:bg-primary cursor-pointer rounded-full p-2"
+          className="hover:bg-primary text-text-secondary cursor-pointer rounded-full p-2"
           htmlFor={fileInput}
         >
           <ImagePlus />

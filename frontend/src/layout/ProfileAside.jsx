@@ -12,14 +12,14 @@ export const ProfileAside = () => {
   return (
     <aside className="sticky top-24 hidden h-fit w-full flex-col gap-4 justify-self-end xl:flex">
       <ProfileCard />
-      <Dropdown title="Publicar" icon={<Pen />} initialState={true}>
+      <Dropdown title="Publicar" icon={<Pen size={20} />} initialState={true}>
         <CreatePublication />
       </Dropdown>
       <Dropdown
         title="Notificaciones"
-        icon={<Bell />}
+        icon={<Bell size={20} />}
         badge={
-          user.unreadNotificationsCount && (
+          user.unreadNotificationsCount > 0 && (
             <Badge>{user.unreadNotificationsCount}</Badge>
           )
         }

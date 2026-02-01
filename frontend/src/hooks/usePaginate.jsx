@@ -6,6 +6,7 @@ export const usePaginate = ({
   limit = 5,
   page = 1,
   autoLoad = true,
+  search = null,
 }) => {
   const [items, setItems] = useState([]);
   const [paginate, setPaginate] = useState({});
@@ -13,7 +14,9 @@ export const usePaginate = ({
 
   useEffect(() => {
     const loadItems = async () => {
-      const response = await Request(`${endpoint}?limit=${limit}&page=${page}`);
+      const response = await Request(
+        `${endpoint}?limit=${limit}&page=${page}${search ? "&search=" + search : ""}`,
+      );
       if (response.status === "error") return;
 
       setItems(response.items);
@@ -25,7 +28,7 @@ export const usePaginate = ({
     };
 
     autoLoad && loadItems();
-  }, [endpoint, limit, page, autoLoad]);
+  }, [endpoint, limit, page, search, autoLoad]);
 
   const loadNextPage = async () => {
     const response = await Request(
@@ -41,7 +44,9 @@ export const usePaginate = ({
   };
 
   const load = async () => {
-    const response = await Request(`${endpoint}?limit=${limit}&page=${page}`);
+    const response = await Request(
+      `${endpoint}?limit=${limit}&page=${page}${search ? "&search=" + search : ""}`,
+    );
     if (response.status === "error") return;
 
     setItems(response.items);
@@ -62,6 +67,10 @@ export const usePaginate = ({
     );
   };
 
+  const clear = () => {
+    setItems([]);
+  };
+
   return {
     items,
     paginate,
@@ -70,5 +79,6 @@ export const usePaginate = ({
     load,
     addItem,
     removeItem,
+    clear,
   };
 };
