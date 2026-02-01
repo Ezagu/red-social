@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useId, useState } from "react";
 import { X, ImagePlus } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth.jsx";
 import { useMyPublications } from "../../hooks/useMyPublications.jsx";
@@ -15,6 +15,8 @@ export const CreatePublication = () => {
 
   const { setMyPublications } = useMyPublications();
   const { profile: profileCache, setProfile: setProfileCache } = useProfile();
+
+  const fileInput = useId();
 
   const { user, setUser } = useAuth();
 
@@ -67,12 +69,19 @@ export const CreatePublication = () => {
     e.target.text.value = "";
     setFilePreview(null);
     setFileSelected(null);
+
+    setTimeout(() => {
+      setResult(null);
+    }, 3000);
   };
 
   return (
     <form
       className="flex flex-col gap-4 p-4"
       onSubmit={(e) => uploadPublication(e)}
+      onChange={() => {
+        if (result) setResult(null);
+      }}
     >
       <textarea
         placeholder="¿Qué estás pensando?"
@@ -103,7 +112,7 @@ export const CreatePublication = () => {
       <div className="flex w-full items-center justify-between">
         <label
           className="hover:bg-primary cursor-pointer rounded-full p-2"
-          htmlFor="file0"
+          htmlFor={fileInput}
         >
           <ImagePlus />
         </label>
@@ -111,7 +120,7 @@ export const CreatePublication = () => {
           name="files"
           type="file"
           className="hidden"
-          id="file0"
+          id={fileInput}
           onChange={handleFileChange}
         />
         <Button type="submit">Publicar</Button>

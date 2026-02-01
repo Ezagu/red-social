@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router";
 import { Avatar } from "../components/ui/Avatar";
-import { SquarePen } from "lucide-react";
+import { Pen, SquarePen } from "lucide-react";
 import { PageWithHeader } from "../components/pages/PageWithHeader.jsx";
 import Request from "../helpers/Request.jsx";
 import { Loading } from "../components/ui/Loading.jsx";
@@ -12,6 +12,7 @@ import { ButtonUnfollow } from "../components/ui/ButtonUnfollow.jsx";
 import { ButtonFollow } from "../components/ui/ButtonFollow.jsx";
 import { useProfile } from "../hooks/useProfile.jsx";
 import { useMyPublications } from "../hooks/useMyPublications.jsx";
+import { CreatePublication } from "../components/publications/CreatePublication.jsx";
 
 export const Profile = () => {
   const { id } = useParams();
@@ -134,6 +135,15 @@ export const Profile = () => {
               </Link>
             </div>
           </header>
+          {profile._id.toString() === user._id.toString() && (
+            <div className="border-border-input border-b xl:hidden">
+              <div className="flex items-center gap-4 p-4 pb-0">
+                <Pen size={22} />
+                <h2 className="text-2xl font-semibold">Crea una publicación</h2>
+              </div>
+              <CreatePublication />
+            </div>
+          )}
           {loadingPublications ? (
             <Loading className="my-5" />
           ) : (
