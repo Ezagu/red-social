@@ -12,6 +12,7 @@ import { Error } from "../pages/Error.jsx";
 import { AuthProvider } from "../context/AuthProvider.jsx";
 import { ProfileProvider } from "../context/ProfileProvider.jsx";
 import { MyPublicationsProvider } from "../context/MyPublicationsProvider.jsx";
+import { Notification } from "../pages/Notification.jsx";
 
 export const Routing = () => {
   return (
@@ -32,6 +33,8 @@ export const Routing = () => {
                 <Route path="/edit" element={<Edit />} />
                 <Route path="/publication/:id" element={<PublicationPage />} />
                 <Route path="/users" element={<Users />} />
+                <Route path="/notifications" element={<Notification />} />
+                {/*<Route path="/search" element={}/>*/}
                 <Route path="*" element={<Error />} />
               </Route>
             </Routes>

@@ -1,8 +1,7 @@
-import React from "react";
 import { Link } from "react-router";
 import { Avatar } from "../components/ui/Avatar";
 import { useAuth } from "../hooks/useAuth";
-import { Menu } from "lucide-react";
+import { Bell, Menu, Search } from "lucide-react";
 
 export const Header = () => {
   const { user } = useAuth();
@@ -12,6 +11,7 @@ export const Header = () => {
         <Link to={`/profile/${user._id}`} className="xl:hidden">
           <Avatar size="md" src={user.image} />
         </Link>
+
         <h1 className="group text-4xl font-light">
           <Link to="/">
             <span className="group-hover:text-primary font-bold transition-all">
@@ -20,8 +20,13 @@ export const Header = () => {
             social
           </Link>
         </h1>
-        <div className="xl:hidden">
-          <Menu />
+        <div className="flex xl:hidden">
+          <Link to="/notifications" className="text-text-secondary p-2">
+            <Bell size={20} />
+          </Link>
+          <Link className="text-text-secondary p-2">
+            <Search size={20} />
+          </Link>
         </div>
       </div>
     </header>
