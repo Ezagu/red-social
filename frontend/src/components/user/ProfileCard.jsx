@@ -4,12 +4,12 @@ import { useAuth } from "../../hooks/useAuth.jsx";
 import { Avatar } from "../../components/ui/Avatar.jsx";
 import { Loading } from "../../components/ui/Loading.jsx";
 import { useMyPublications } from "../../hooks/useMyPublications.jsx";
-import { useProfile } from "../../hooks/useProfile.jsx";
+import { useProfileCache } from "../../hooks/useProfileCache.jsx";
 
 export const ProfileCard = () => {
   const { user, setUser, loading } = useAuth();
   const { setMyPublications } = useMyPublications();
-  const { setProfile } = useProfile();
+  const { setProfileCache } = useProfileCache();
 
   const navigate = useNavigate();
 
@@ -18,7 +18,7 @@ export const ProfileCard = () => {
     navigate("/login");
     setUser({});
     setMyPublications([]);
-    setProfile({});
+    setProfileCache({});
   };
 
   return loading ? (

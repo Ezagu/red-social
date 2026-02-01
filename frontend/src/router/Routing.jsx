@@ -10,7 +10,7 @@ import { PublicationPage } from "../pages/PublicationPage.jsx";
 import { Users } from "../pages/Users.jsx";
 import { Error } from "../pages/Error.jsx";
 import { AuthProvider } from "../context/AuthProvider.jsx";
-import { ProfileProvider } from "../context/ProfileProvider.jsx";
+import { ProfileCacheProvider } from "../context/ProfileCacheProvider.jsx";
 import { MyPublicationsProvider } from "../context/MyPublicationsProvider.jsx";
 import { Notification } from "../pages/Notification.jsx";
 import { Search } from "../pages/Search.jsx";
@@ -19,7 +19,7 @@ export const Routing = () => {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <ProfileProvider>
+        <ProfileCacheProvider>
           <MyPublicationsProvider>
             <Routes>
               {/*Public Routes*/}
@@ -40,7 +40,7 @@ export const Routing = () => {
               </Route>
             </Routes>
           </MyPublicationsProvider>
-        </ProfileProvider>
+        </ProfileCacheProvider>
       </AuthProvider>
     </BrowserRouter>
   );

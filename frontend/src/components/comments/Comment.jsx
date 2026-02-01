@@ -77,7 +77,7 @@ export const Comment = ({ comment, remove }) => {
       )}
 
       <Link to={`/profile/${comment.user._id}`} className="shrink-0">
-        <Avatar src={`${url}user/avatar/${comment.user.image}`} size="lg" />
+        <Avatar src={comment.user.image} size="lg" />
       </Link>
       <div className="w-full">
         <Link

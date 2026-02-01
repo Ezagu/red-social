@@ -9,7 +9,7 @@ import { Alert } from "../components/ui/Alert";
 import { useNavigate } from "react-router";
 import { url } from "../helpers/Global";
 import { PageWithHeader } from "../components/pages/PageWithHeader";
-import { useProfile } from "../hooks/useProfile";
+import { useProfileCache } from "../hooks/useProfileCache";
 
 export const Edit = () => {
   const [filePreview, setFilePreview] = useState(null);
@@ -17,7 +17,7 @@ export const Edit = () => {
   const [result, setResult] = useState(null);
 
   const { user, setUser } = useAuth();
-  const { setProfile: setProfileCache } = useProfile();
+  const { setProfileCache } = useProfileCache();
   const {
     register,
     handleSubmit,

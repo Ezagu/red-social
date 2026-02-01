@@ -1,10 +1,10 @@
-import { useProfile } from "./useProfile";
+import { useProfileCache } from "./useProfileCache";
 import { followUser, unfollowUser } from "../services/follow.services";
 import { useAuth } from "./useAuth";
 
 export const useFollow = ({ profile, setProfile }) => {
   const { user, setUser } = useAuth();
-  const { profile: profileCache, setProfile: setProfileCache } = useProfile();
+  const { profileCache, setProfileCache } = useProfileCache();
 
   const follow = async () => {
     await followUser(profile._id);

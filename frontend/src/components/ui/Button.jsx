@@ -8,7 +8,7 @@ export const Button = ({
   return (
     <button
       onClick={onClick}
-      className={`bg-primary hover:bg-primary-hover cursor-pointer rounded-2xl font-semibold ${size === "md" ? "text-md px-4 py-2" : "px-2 py-1 text-sm"} ${className}`}
+      className={`bg-primary hover:bg-primary-hover text-text-primary cursor-pointer rounded-2xl font-semibold ${size === "md" ? "text-md px-4 py-2" : "px-2 py-1 text-sm"} ${className}`}
       type={type}
     >
       {children}
