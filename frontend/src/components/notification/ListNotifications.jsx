@@ -1,37 +1,20 @@
-import { Bell } from "lucide-react";
-import { Circle } from "lucide-react";
-import { useAuth } from "../../hooks/useAuth.jsx";
-import { useNotifications } from "../../hooks/useNotifications.jsx";
-import { Notification } from "./Notification.jsx";
-import { Loading } from "../ui/Loading.jsx";
-import { Dropdown } from "../ui/Dropdown.jsx";
+import { useNotifications } from "../../hooks/useNotifications";
+import { Notification } from "./Notification";
+import { Loading } from "../ui/Loading";
 
-export const NotificationDropdown = () => {
+export const ListNotifications = () => {
   const { notifications, read, readAll, deleteOne, deleteAll, loading } =
     useNotifications();
-  const { user } = useAuth();
+
+  if (loading) {
+    return <Loading className="my-10" />;
+  }
 
   return (
-    <Dropdown
-      title="Notificaciones"
-      icon={<Bell />}
-      headerExtra={
-        user.unreadNotificationsCount > 0 && (
-          <div className="absolute -top-1 left-5 z-10 text-xs">
-            <div className="relative">
-              <Circle className="text-primary fill-primary absolute top-0 -right-1.5 -z-10 size-5" />
-              <Circle className="text-primary absolute top-0 -right-1.5 -z-10 size-5 animate-ping" />
-              <p className="z-10">{user.unreadNotificationsCount}</p>
-            </div>
-          </div>
-        )
-      }
-    >
-      {loading ? (
-        <Loading className="my-10" />
-      ) : notifications.length > 0 ? (
+    <>
+      {notifications.length > 0 ? (
         <div>
-          <header className="flex gap-2 px-4 py-2">
+          <header className="flex gap-2 p-4">
             <button
               className="bg-primary hover:bg-primary-hover cursor-pointer rounded-2xl px-4 py-2 font-semibold"
               onClick={readAll}
@@ -61,6 +44,6 @@ export const NotificationDropdown = () => {
           No hay notificaciones
         </p>
       )}
-    </Dropdown>
+    </>
   );
 };
