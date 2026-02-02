@@ -2,7 +2,7 @@ import { useNotifications } from "../../hooks/useNotifications";
 import { Notification } from "./Notification";
 import { Loading } from "../ui/Loading";
 
-export const ListNotifications = () => {
+export const ListNotifications = ({ fullHeight = true }) => {
   const { notifications, read, readAll, deleteOne, deleteAll, loading } =
     useNotifications();
 
@@ -28,7 +28,9 @@ export const ListNotifications = () => {
               Borrar todo
             </button>
           </header>
-          <ul className="scrollbar flex h-full max-h-[30vh] flex-col gap-2 overflow-x-hidden overflow-y-auto overscroll-contain p-4 pt-1">
+          <ul
+            className={`scrollbar flex h-full max-h-[30vh] flex-col gap-2 overflow-x-hidden overflow-y-auto p-4 pt-1 ${fullHeight ? "max-h-full" : "max-h-[30vh] overscroll-contain"}`}
+          >
             {notifications.map((notification) => (
               <Notification
                 notification={notification}

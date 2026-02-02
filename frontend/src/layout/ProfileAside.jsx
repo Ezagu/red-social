@@ -24,7 +24,7 @@ export const ProfileAside = () => {
           )
         }
       >
-        <ListNotifications />
+        <ListNotifications fullHeight={false} />
       </Dropdown>
     </aside>
   );
