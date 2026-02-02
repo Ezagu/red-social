@@ -5,11 +5,11 @@ export const Search = ({ setSearch, border = false }) => {
     <div
       className={`${border ? "border-border-input focus-within:border-primary" : "focus-within:border-primary border-transparent"} relative w-full rounded-2xl border`}
     >
-      <SearchIcon className="absolute top-4.5 left-3" />
+      <SearchIcon className="absolute top-1/2 left-3 -translate-y-1/2" />
       <input
         type="text"
         placeholder="Buscar usuarios..."
-        className="bg-surface w-full rounded-2xl border border-transparent p-4 pl-12 text-lg focus:outline-none"
+        className="bg-surface w-full rounded-2xl border border-transparent p-4 pl-14 text-lg focus:outline-none"
         onChange={(e) => {
           setSearch(e.target.value);
         }}
