@@ -15,7 +15,7 @@ export const Header = () => {
           <Avatar size="md" src={user.image} />
         </Link>
 
-        <h1 className="group justify-self-center text-4xl font-light">
+        <h1 className="group justify-self-center text-4xl font-light xl:col-span-3">
           <Link to="/">
             <span className="group-hover:text-primary font-bold transition-all">
               REACT
