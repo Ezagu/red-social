@@ -78,19 +78,21 @@ export const Publication = ({ mode = "feed", publication, removeItem }) => {
           {publication.text}
         </p>
 
-        <div className="flex w-full justify-center px-6 py-2 pt-4">
-          <img
-            src={publication.file}
-            className={
-              mode === "page"
-                ? "h-full w-full"
-                : "max-h-76 w-full max-w-120 object-contain"
-            }
-          />
-        </div>
+        {publication.file && (
+          <div className="flex w-full justify-center px-6 py-2 pt-4">
+            <img
+              src={publication.file}
+              className={
+                mode === "page"
+                  ? "h-full w-full"
+                  : "max-h-76 w-full max-w-120 object-contain"
+              }
+            />
+          </div>
+        )}
       </Wrapper>
 
-      <footer className="text-text-secondary mx-6 mt-4 mb-4 flex gap-4">
+      <footer className="text-text-secondary mx-6 mt-2 mb-4 flex gap-4">
         <Wrapper
           {...WrapperProps}
           className={`flex ${isFeed ? "group cursor-pointer" : ""} items-center gap-1.5`}

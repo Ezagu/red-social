@@ -1,25 +1,14 @@
-import { Link, useNavigate } from "react-router";
+import { Link } from "react-router";
 import { LogOut } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth.jsx";
+import { useLogout } from "../../hooks/useLogout.jsx";
 import { Avatar } from "../../components/ui/Avatar.jsx";
 import { Loading } from "../../components/ui/Loading.jsx";
-import { useMyPublications } from "../../hooks/useMyPublications.jsx";
-import { useProfileCache } from "../../hooks/useProfileCache.jsx";
 
 export const ProfileCard = () => {
-  const { user, setUser, loading } = useAuth();
-  const { setMyPublications } = useMyPublications();
-  const { setProfileCache } = useProfileCache();
+  const { user, loading } = useAuth();
 
-  const navigate = useNavigate();
-
-  const logout = () => {
-    localStorage.clear();
-    navigate("/login");
-    setUser({});
-    setMyPublications([]);
-    setProfileCache({});
-  };
+  const logout = useLogout();
 
   return loading ? (
     <Loading />

@@ -39,7 +39,7 @@ export const Header = () => {
           </Link>
           <button
             to="/search"
-            className="text-text-secondary hover:text-primary cursor-pointer p-2"
+            className="text-text-secondary hover:text-danger cursor-pointer p-2"
             onClick={logout}
           >
             <LogoutIcon className="size-7 sm:size-8" />
