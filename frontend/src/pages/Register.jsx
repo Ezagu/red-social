@@ -8,6 +8,7 @@ import { Input } from "../components/ui/Input";
 import { useAuth } from "../hooks/useAuth";
 import { Loading } from "../components/ui/Loading";
 import { LoaderCircle } from "lucide-react";
+import { ButtonLoading } from "../components/ui/ButtonLoading";
 
 export const Register = () => {
   const { user, loading } = useAuth();
@@ -21,7 +22,6 @@ export const Register = () => {
   const signin = async (data) => {
     setWaitingResponse(true);
     setAlert(null);
-
     const response = await Request("user/register", "POST", null, data);
     setAlert(response);
     setWaitingResponse(false);
@@ -70,16 +70,13 @@ export const Register = () => {
                 placeholder="Nombre de usuario"
               />
 
-              <button
+              <ButtonLoading
                 type="submit"
-                className={`bg-primary flex w-full items-center justify-center gap-2 rounded-xl border border-none p-3 text-lg font-bold transition-all ${waitingResponse ? "bg-primary/50" : " hover:bg-primary-hover cursor-pointer"}`}
-                {...{ disabled: waitingResponse }}
+                loading={waitingResponse}
+                className="text-2xl"
               >
-                {waitingResponse && (
-                  <LoaderCircle className="size-6 animate-spin" />
-                )}
                 {waitingResponse ? "Registrando" : "Registrarse"}
-              </button>
+              </ButtonLoading>
             </form>
             <div className="bg-surface rounded-2xl px-10 py-4 text-center">
               <p>

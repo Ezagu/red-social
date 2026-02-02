@@ -1,23 +1,24 @@
-import { useEffect, useState } from "react";
-import { Avatar } from "../components/ui/Avatar";
-import { CircleX } from "lucide-react";
-import { CircleCheck } from "lucide-react";
-import { ImagePlus } from "lucide-react";
-import { useAuth } from "../hooks/useAuth";
-import { useForm } from "react-hook-form";
-import { Alert } from "../components/ui/Alert";
+import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router";
-import { url } from "../helpers/Global";
+import { useForm } from "react-hook-form";
+import { ImagePlus } from "lucide-react";
+import { useEdit } from "../hooks/useEdit";
+import { useAuth } from "../hooks/useAuth";
+import { useFilePreview } from "../hooks/useFilePreview";
+import { Avatar } from "../components/ui/Avatar";
+import { Alert } from "../components/ui/Alert";
 import { PageWithHeader } from "../components/pages/PageWithHeader";
-import { useProfileCache } from "../hooks/useProfileCache";
+import { ButtonLoading } from "../components/ui/ButtonLoading";
+import { RedButton } from "../components/ui/RedButton";
 
 export const Edit = () => {
-  const [filePreview, setFilePreview] = useState(null);
-  const [fileSelected, setFileSelected] = useState(null);
-  const [result, setResult] = useState(null);
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
-  const { user, setUser } = useAuth();
-  const { setProfileCache } = useProfileCache();
+  const inputRef = useRef();
+  const { preview, handlePreview } = useFilePreview(inputRef);
+  const { editProfile, loading, result, clearResult } = useEdit(inputRef);
+
   const {
     register,
     handleSubmit,
@@ -25,67 +26,22 @@ export const Edit = () => {
     formState: { isDirty },
   } = useForm();
 
-  const navigate = useNavigate();
-
   useEffect(() => {
-    {
-      /*Pasarle los default values una vez que cargue el user */
-    }
-    if (user) {
+    user &&
       reset({
         nick: user.nick,
         fullName: user.fullName,
         bio: user.bio,
+        file: null,
       });
-    }
   }, [user, reset]);
-
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-
-    setFileSelected(file ? file : null);
-    setFilePreview(file ? URL.createObjectURL(file) : null);
-  };
-
-  const editUser = async (data) => {
-    if (!isDirty && !fileSelected) {
-      setResult({
-        status: "error",
-        message: "No realizaste ningún cambio",
-      });
-      return;
-    }
-
-    const formData = new FormData();
-    for (const key in data) {
-      formData.append(key, data[key]);
-    }
-    if (fileSelected) {
-      formData.append("file0", fileSelected);
-    }
-
-    const request = await fetch(url + "user", {
-      method: "PUT",
-      body: formData,
-      headers: {
-        Authorization: localStorage.getItem("token"),
-      },
-    });
-    const { status, message, user: userUpdated } = await request.json();
-    setResult({ status, message });
-    if (status === "error") return;
-
-    setProfileCache(userUpdated);
-    setUser(userUpdated);
-    setFilePreview(null);
-    setFileSelected(null);
-  };
 
   return (
     <PageWithHeader title={"Modificar perfil"}>
       <form
         className="m-auto my-10 flex w-3/4 flex-col gap-4"
-        onSubmit={handleSubmit(editUser)}
+        onSubmit={handleSubmit(editProfile)}
+        onChange={() => result && clearResult()}
       >
         <label
           className="group relative cursor-pointer self-center overflow-hidden"
@@ -93,16 +49,19 @@ export const Edit = () => {
         >
           <ImagePlus className="absolute top-17 left-16 z-10 m-auto hidden size-15 group-hover:block" />
           <div className="group-hover:blur-[1px]">
-            <Avatar src={filePreview ? filePreview : user.image} size="4xl" />
+            <Avatar src={preview ? preview : user.image} size="4xl" />
           </div>
         </label>
 
         <input
           type="file"
-          className="hidden"
           id="avatar"
-          name="file0"
-          onChange={handleFileChange}
+          className="hidden"
+          {...register("file", {
+            onChange: (e) => {
+              handlePreview(e);
+            },
+          })}
         />
 
         <div className="flex w-full flex-col gap-2">
@@ -145,18 +104,21 @@ export const Edit = () => {
         {result && <Alert status={result.status} message={result.message} />}
 
         <div className="mt-2 flex gap-2 self-end">
-          <button
-            className="bg-danger/80 hover:bg-danger flex cursor-pointer items-center gap-2 rounded-2xl px-4 py-2"
-            onClick={() => navigate(-1)}
-            type="button"
+          <RedButton onClick={() => navigate(-1)} className="text-xl">
+            Cancelar
+          </RedButton>
+          <ButtonLoading
+            loading={loading}
+            type="submit"
+            className={
+              (!isDirty
+                ? "bg-primary/50 hover:bg-primary/50 hover:cursor-default "
+                : "") + "text-xl"
+            }
+            {...(!isDirty && { disabled: true })}
           >
-            <span className="text-xl">Cancelar</span>
-            <CircleX />
-          </button>
-          <button className="bg-primary hover:bg-primary-hover flex cursor-pointer items-center gap-2 rounded-2xl px-4 py-2">
-            <span className="text-xl">Actualizar</span>
-            <CircleCheck />
-          </button>
+            {loading ? "Actualizando" : "Actualizar"}
+          </ButtonLoading>
         </div>
       </form>
     </PageWithHeader>

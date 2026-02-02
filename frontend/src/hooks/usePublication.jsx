@@ -9,9 +9,11 @@ export const usePublication = () => {
   const { user, setUser } = useAuth();
   const { setMyPublications } = useMyPublications();
   const { profileCache, setProfileCache } = useProfileCache();
+  const [loading, setLoading] = useState(false);
 
   const uploadPublication = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     const text = e.target.text.value;
     const file = e.target.files.files[0];
@@ -25,6 +27,7 @@ export const usePublication = () => {
     const response = await savePublication(formData);
 
     setResult({ status: response.status, message: response.message });
+    setLoading(false);
 
     if (response.status === "error") return;
 
@@ -59,5 +62,6 @@ export const usePublication = () => {
     uploadPublication,
     result,
     clearResult,
+    loading,
   };
 };

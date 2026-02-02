@@ -2,13 +2,13 @@ import { useId, useRef } from "react";
 import { X, ImagePlus } from "lucide-react";
 import { usePublication } from "../../hooks/usePublication.jsx";
 import { Alert } from "../ui/Alert.jsx";
-import { Button } from "../ui/Button.jsx";
+import { ButtonLoading } from "../ui/ButtonLoading.jsx";
 import { useFilePreview } from "../../hooks/useFilePreview.jsx";
 
 export const CreatePublication = () => {
   const fileInput = useId();
   const inputRef = useRef(null);
-  const { uploadPublication, result, clearResult } = usePublication();
+  const { uploadPublication, result, clearResult, loading } = usePublication();
   const { handlePreview, removePreview, preview } = useFilePreview(inputRef);
 
   return (
@@ -55,7 +55,9 @@ export const CreatePublication = () => {
           id={fileInput}
           onChange={handlePreview}
         />
-        <Button type="submit">Publicar</Button>
+        <ButtonLoading type="submit" loading={loading}>
+          {loading ? "Publicando" : "Publicar"}
+        </ButtonLoading>
       </div>
     </form>
   );

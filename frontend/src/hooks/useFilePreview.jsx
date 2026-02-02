@@ -5,7 +5,9 @@ export const useFilePreview = (inputRef) => {
 
   const handlePreview = (e) => {
     const inputFile = e.target.files[0];
-    setPreview(inputFile ? URL.createObjectURL(inputFile) : null);
+    if (!inputFile) return;
+
+    setPreview(URL.createObjectURL(inputFile));
   };
 
   const removePreview = () => {
