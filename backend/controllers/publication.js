@@ -133,13 +133,6 @@ const remove = async (req, res) => {
         { session },
       );
 
-      // Eliminar imagen si contiene
-      if (publicationDeleted.file) {
-        fs.unlinkSync(
-          path.join("uploads", "publications", publicationDeleted.file),
-        );
-      }
-
       // Eliminar comentarios
       await Comment.deleteMany(
         { publication: publicationDeleted._id },
