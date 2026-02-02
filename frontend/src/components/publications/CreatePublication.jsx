@@ -8,8 +8,9 @@ import { useFilePreview } from "../../hooks/useFilePreview.jsx";
 export const CreatePublication = () => {
   const fileInput = useId();
   const inputRef = useRef(null);
-  const { uploadPublication, result, clearResult, loading } = usePublication();
   const { handlePreview, removePreview, preview } = useFilePreview(inputRef);
+  const { uploadPublication, result, clearResult, loading } =
+    usePublication(removePreview);
 
   return (
     <form

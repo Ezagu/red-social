@@ -4,7 +4,7 @@ import { savePublication } from "../services/publication.services";
 import { useMyPublications } from "./useMyPublications";
 import { useProfileCache } from "./useProfileCache";
 
-export const usePublication = () => {
+export const usePublication = (removePreview) => {
   const [result, setResult] = useState(null);
   const { user, setUser } = useAuth();
   const { setMyPublications } = useMyPublications();
@@ -48,6 +48,7 @@ export const usePublication = () => {
 
     e.target.text.value = "";
     e.target.files.value = "";
+    removePreview();
 
     setTimeout(() => {
       setResult(null);
