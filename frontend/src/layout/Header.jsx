@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 import { Avatar } from "../components/ui/Avatar";
 import { useAuth } from "../hooks/useAuth";
-import { Bell, LogOut as LogoutIcon, Search } from "lucide-react";
+import { Bell, Circle, LogOut as LogoutIcon, Search } from "lucide-react";
 import { useLogout } from "../hooks/useLogout";
 
 export const Header = () => {
@@ -27,9 +27,15 @@ export const Header = () => {
         <div className="flex gap-1 justify-self-end-safe sm:gap-2 xl:hidden">
           <Link
             to="/notifications"
-            className="text-text-secondary hover:text-primary p-2"
+            className="text-text-secondary hover:text-primary relative p-2"
           >
             <Bell className="size-7 sm:size-8" />
+            {user.unreadNotificationsCount > 0 && (
+              <>
+                <Circle className="fill-primary text-primary absolute top-1.5 right-2.5 size-4 animate-ping" />
+                <Circle className="fill-primary absolute top-1.5 right-2.5 size-4" />
+              </>
+            )}
           </Link>
           <Link
             to="/search"
