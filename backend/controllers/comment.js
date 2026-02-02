@@ -5,6 +5,7 @@ const Publication = require("../models/publication.js");
 const Notification = require("../models/notification.js");
 const User = require("../models/user.js");
 const Like = require("../models/like.js");
+const user = require("../models/user.js");
 
 const create = async (req, res) => {
   const user = req.user._id;
@@ -61,6 +62,8 @@ const create = async (req, res) => {
           targetId: comment._id,
         });
         notification.save({ session });
+
+        console.log(notification);
 
         await User.findByIdAndUpdate(
           userToNotificate,
@@ -127,6 +130,20 @@ const remove = async (req, res) => {
         { targetType: "Comment", targetId: comment },
         { session },
       );
+
+      const notificationDelete = await Notification.findOneAndDelete(
+        {
+          targetType: "Comment",
+          targetId: commentRemoved._id,
+        },
+        { session },
+      );
+
+      if (notificationDelete && !notificationDelete.read) {
+        await User.findByIdAndUpdate(notificationDelete.user, {
+          $inc: { unreadNotificationsCount: -1 },
+        });
+      }
 
       return res.status(200).json({
         status: "success",

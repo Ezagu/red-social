@@ -24,7 +24,7 @@ export const Notification = ({ notification, read, deleteOne }) => {
         <UserPlus className="bg-surface text-primary fill-primary absolute -right-2 -bottom-1 size-6 rounded-full p-1" />
       ),
       message: ` comenzó a seguirte.`,
-      link: `/profile/${notification.targetId.user}`,
+      link: `/profile/${notification.targetId?.user}`,
     },
   };
 

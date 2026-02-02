@@ -1,14 +1,13 @@
 import { useState } from "react";
 import { Link } from "react-router";
+import ReactTimeAgo from "react-time-ago";
+import { MessageCircle, Trash2, Heart } from "lucide-react";
 import { useLike } from "../../hooks/useLike.jsx";
 import { usePaginate } from "../../hooks/usePaginate.jsx";
 import { useAuth } from "../../hooks/useAuth.jsx";
-import { url } from "../../helpers/Global.jsx";
-import Request from "../../helpers/Request.jsx";
 import { Avatar } from "../ui/Avatar";
 import { Loading } from "../ui/Loading.jsx";
-import { MessageCircle, Trash2, Heart } from "lucide-react";
-import ReactTimeAgo from "react-time-ago";
+import Request from "../../helpers/Request.jsx";
 
 export const Comment = ({ comment, remove }) => {
   const { user } = useAuth();
