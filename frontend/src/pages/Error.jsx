@@ -12,11 +12,11 @@ export const Error = () => {
           Página no encontrada
         </h2>
         <Link
-          to="/"
+          to={".."}
           className="text-text-secondary hover:text-primary mt-10 flex gap-2 text-xl font-bold transition-all hover:underline"
         >
           <ArrowLeft />
-          Volver al inicio
+          Volver
         </Link>
       </div>
     </Page>
