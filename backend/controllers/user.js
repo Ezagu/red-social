@@ -161,17 +161,17 @@ const listFollowers = async (req, res) => {
   const limit = req.query.limit || 5;
 
   try {
-    const followsIds = await followService.followsIds(userId);
+    const followersIds = await followService.followersIds(userId);
 
     const result = await User.paginate(
-      { _id: followsIds.followers },
+      { _id: followersIds },
       { page, limit, select: "-password -role -email -__v" },
     );
 
     // Indica si el usuario te sigue y si lo sigues
-    const usersWithFollowInfo = followService.addFollowInfo(
+    const usersWithFollowInfo = await followService.addMyFollowInfo(
       result.docs,
-      followsIds,
+      req.user._id,
     );
 
     return res.status(200).json({
@@ -194,17 +194,17 @@ const listFollowing = async (req, res) => {
   const limit = req.query.limit || 5;
 
   try {
-    const followsIds = await followService.followsIds(userId);
+    const followingIds = await followService.followingIds(userId);
 
     const result = await User.paginate(
-      { _id: followsIds.following },
+      { _id: followingIds },
       { page, limit, select: "-password -role -email -__v" },
     );
 
     // Indica si el usuario te sigue y si lo sigues
-    const usersWithFollowInfo = followService.addFollowInfo(
+    const usersWithFollowInfo = await followService.addMyFollowInfo(
       result.docs,
-      followsIds,
+      req.user._id,
     );
 
     return res.status(200).json({

@@ -18,20 +18,22 @@ export const UserCard = ({ user }) => {
       <div className="w-full min-w-0">
         <div className="flex items-center gap-2">
           <span className="truncate text-xl font-semibold">{user.nick}</span>
-          {profile.isFollower && profile._id !== identity._id && (
-            <span className="bg-elevated shrink-0 rounded-2xl px-1.5 py-0.5 text-sm">
-              Te sigue
-            </span>
-          )}
+          {profile._id.toString() !== identity._id.toString() &&
+            profile.isFollower && (
+              <span className="bg-elevated shrink-0 rounded-2xl px-1.5 py-0.5 text-sm">
+                Te sigue
+              </span>
+            )}
         </div>
         <p className="text-text-muted -mt-1 truncate">{user.fullName}</p>
         <p className="truncate">{user.bio}</p>
         <div className="absolute top-2 right-2">
-          {profile.isFollowed ? (
-            <ButtonUnfollow profile={profile} setProfile={setProfile} />
-          ) : (
-            <ButtonFollow profile={profile} setProfile={setProfile} />
-          )}
+          {profile._id.toString() !== identity._id.toString() &&
+            (profile.isFollowed ? (
+              <ButtonUnfollow profile={profile} setProfile={setProfile} />
+            ) : (
+              <ButtonFollow profile={profile} setProfile={setProfile} />
+            ))}
         </div>
       </div>
     </Link>
