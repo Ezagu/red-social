@@ -135,9 +135,9 @@ const list = async (req, res) => {
     });
 
     // Agrega informacion de follows
-    const usersWithFollowInfo = followService.addFollowInfo(
+    const usersWithFollowInfo = await followService.addMyFollowInfo(
       result.docs,
-      followsIds,
+      req.user._id,
     );
 
     // Devolver resultado

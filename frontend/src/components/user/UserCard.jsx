@@ -30,9 +30,17 @@ export const UserCard = ({ user }) => {
         <div className="absolute top-2 right-2">
           {profile._id.toString() !== identity._id.toString() &&
             (profile.isFollowed ? (
-              <ButtonUnfollow profile={profile} setProfile={setProfile} />
+              <ButtonUnfollow
+                profile={profile}
+                setProfile={setProfile}
+                size="sm"
+              />
             ) : (
-              <ButtonFollow profile={profile} setProfile={setProfile} />
+              <ButtonFollow
+                profile={profile}
+                setProfile={setProfile}
+                size="sm"
+              />
             ))}
         </div>
       </div>

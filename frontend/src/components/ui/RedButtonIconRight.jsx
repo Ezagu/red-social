@@ -1,18 +1,11 @@
 import { RedButton } from "./RedButton";
 
-export const RedButtonIconRight = ({
-  icon,
-  children,
-  onClick,
-  size = "sm",
-  type = "button",
-}) => {
+export const RedButtonIconRight = ({ icon, children, ...props }) => {
+  const { classname, ...remainingProps } = props;
   return (
     <RedButton
-      onClick={onClick}
-      size={size}
-      type={type}
-      className="flex cursor-pointer items-center gap-2"
+      className={`flex cursor-pointer items-center gap-2 ${classname}`}
+      {...remainingProps}
     >
       {children}
       <div className="size-5">{icon}</div>
